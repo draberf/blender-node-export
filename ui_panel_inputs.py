@@ -15,16 +15,6 @@ class UIInspectOperator(bpy.types.Operator):
         print("bl_idname", node.bl_idname)
         print("label", node.label)
         return {'FINISHED'}
-    
-class UISaveNodeOperator(bpy.types.Operator):
-    bl_idname = "ui.dumper"
-    bl_label = "Dumper"
-
-    def execute(self, context):
-        node = bpy.context.active_node
-        with open("node_export.json", 'wb') as f:
-            json.dump(node, f)
-        return {'FINISHED'}
 
 class UIInspectPanel(bpy.types.Panel):
     bl_space_type = 'NODE_EDITOR'
@@ -47,14 +37,6 @@ class UIInspectPanel(bpy.types.Panel):
             icon='NODETREE',
             text='Inspect'
         )
-        row = box.row()
-        row.label(text="Dump")
-        row.operator(
-            operator='ui.dumper',
-            icon='NODETREE',
-            text='Dump'
-        )
 
 bpy.utils.register_class(UIInspectOperator)
-bpy.utils.register_class(UISaveNodeOperator)
 bpy.utils.register_class(UIInspectPanel)
