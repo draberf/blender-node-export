@@ -5,6 +5,8 @@ class UIInspectOperator(bpy.types.Operator):
     bl_label = "Inspector"
 
     def execute(self, context):
+        # current material is accessed through bpy.context.material
+        # presumably this always matches to Nodes on screen
         nodes = bpy.context.material.node_tree.nodes
         node = nodes[2]
         print("name", node.name)
