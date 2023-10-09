@@ -21,7 +21,7 @@ class UIPickleNodeOperator(bpy.types.Operator):
     bl_label = "Pickler"
 
     def execute(self, context):
-        node = bpy.context.material.node_tree.nodes[-1]
+        node = bpy.context.active_node
         with open("node_export.pkl", 'wb') as f:
             pickle.dump(node, f)
         return {'FINISHED'}
