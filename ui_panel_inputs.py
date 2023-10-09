@@ -38,17 +38,23 @@ class UIInspectPanel(bpy.types.Panel):
         return (context.object is not None)
 
     def draw(self, context):
-        self.layout.label(text="Inspect")
-        self.layout.operator(
+        layout = self.layout
+
+        box = layout.box()
+        box.label(text="Inspect")
+        box.operator(
             operator='ui.inspector',
             icon='NODETREE',
             text='Inspect'
         )
-        self.layout.operator(
-            operator='ui.pickler',
+        row = box.row()
+        row.label(text="Dump")
+        row.operator(
+            operator='ui.dumper',
             icon='NODETREE',
-            text='Pickle'
+            text='Dump'
         )
 
 bpy.utils.register_class(UIInspectOperator)
+bpy.utils.register_class(UISaveNodeOperator)
 bpy.utils.register_class(UIInspectPanel)
