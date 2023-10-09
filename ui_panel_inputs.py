@@ -1,5 +1,5 @@
 import bpy
-import pickle
+import json
 
 class UIInspectOperator(bpy.types.Operator):
     bl_idname = "ui.inspector"
@@ -16,14 +16,14 @@ class UIInspectOperator(bpy.types.Operator):
         print("label", node.label)
         return {'FINISHED'}
     
-class UIPickleNodeOperator(bpy.types.Operator):
-    bl_idname = "ui.pickler"
-    bl_label = "Pickler"
+class UISaveNodeOperator(bpy.types.Operator):
+    bl_idname = "ui.dumper"
+    bl_label = "Dumper"
 
     def execute(self, context):
         node = bpy.context.active_node
-        with open("node_export.pkl", 'wb') as f:
-            pickle.dump(node, f)
+        with open("node_export.json", 'wb') as f:
+            json.dump(node, f)
         return {'FINISHED'}
 
 class UIInspectPanel(bpy.types.Panel):
