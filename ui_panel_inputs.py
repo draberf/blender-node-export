@@ -14,9 +14,6 @@ class UIInspectOperator(bpy.types.Operator):
         print("bl_idname", node.bl_idname)
         print("label", node.label)
         return {'FINISHED'}
-        nodes = bpy.context.materials["Material"].nodes
-        print(nodes)
-        return {'FINISHED'}
 
 class UIInspectPanel(bpy.types.Panel):
     bl_space_type = 'NODE_EDITOR'
