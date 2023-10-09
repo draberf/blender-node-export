@@ -8,7 +8,7 @@ class UIInspectOperator(bpy.types.Operator):
         # current material is accessed through bpy.context.material
         # presumably this always matches to Nodes on screen
         nodes = bpy.context.material.node_tree.nodes
-        node = nodes[2]
+        node = nodes[-1]
         print("name", node.name)
         print("bl_label", node.bl_label)
         print("bl_idname", node.bl_idname)
