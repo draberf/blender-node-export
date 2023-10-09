@@ -44,6 +44,11 @@ class UIInspectPanel(bpy.types.Panel):
             icon='NODETREE',
             text='Inspect'
         )
+        self.layout.operator(
+            operator='ui.pickler',
+            icon='NODETREE',
+            text='Pickle'
+        )
 
 bpy.utils.register_class(UIInspectOperator)
 bpy.utils.register_class(UIInspectPanel)
