@@ -8,12 +8,14 @@ class UIInspectOperator(bpy.types.Operator):
     def execute(self, context):
         # current material is accessed through bpy.context.material
         # presumably this always matches to Nodes on screen
-        nodes = bpy.context.material.node_tree.nodes
-        node = nodes[-1]
-        print("name", node.name)
-        print("bl_label", node.bl_label)
-        print("bl_idname", node.bl_idname)
-        print("label", node.label)
+        print(" === ")
+        bpy.ops.node.select_all(action='SELECT')
+        nodes = bpy.context.selected_nodes
+        for node in nodes:
+            if (label := node.label) != "":
+                print(label)
+            else:
+                print(node.name)
         return {'FINISHED'}
 
 class UIInspectPanel(bpy.types.Panel):
