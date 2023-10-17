@@ -9,10 +9,16 @@ class UIInspectOperator(bpy.types.Operator):
         # current material is accessed through bpy.context.material
         # presumably this always matches to Nodes on screen
         print(" === ")
-        preselected = bpy.context.selected_nodes
-        bpy.ops.node.select_all(action='INVERT')
-        nodes = preselected + bpy.context.selected_nodes
-        bpy.ops.node.select_all(action='INVERT')
+
+        SELECT_ALL = True
+
+        nodes = bpy.context.selected_nodes
+
+        if SELECT_ALL:
+            bpy.ops.node.select_all(action='INVERT')
+            nodes += bpy.context.selected_nodes
+            bpy.ops.node.select_all(action='INVERT')
+        
         for node in nodes:
             if (label := node.label) != "":
                 print(label)
