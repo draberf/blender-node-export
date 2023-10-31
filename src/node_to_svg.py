@@ -32,7 +32,6 @@ def nodesToSvg(nodes: types.Node):
         y -= min_y
 
         # create frame
-        print("HELLO WORLD!")
         frame = ET.Element('rect', x=f"{x}px", y=f"{y}px", width=f"{w}px", height=f"{h}px")
         g.append(frame)
 
