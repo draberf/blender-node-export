@@ -1,7 +1,7 @@
 import bpy
 import json
 
-# from node_to_svg import nodesToSvg
+from src.node_to_svg import nodesToSvg
 
 import xml.etree.ElementTree as ET
 
@@ -21,10 +21,6 @@ def nodesToSvg(nodes: bpy.types.Node):
     svg_string = ET.tostring(svg, encoding='unicode')
 
     print('\n'.join([header, doctype, svg_string]))
-
-if __name__=="__main__":
-
-    nodesToSvg([])
 
 class UIInspectOperator(bpy.types.Operator):
     bl_idname = "ui.inspector"
@@ -72,3 +68,7 @@ class UIInspectPanel(bpy.types.Panel):
 
 bpy.utils.register_class(UIInspectOperator)
 bpy.utils.register_class(UIInspectPanel)
+
+
+if __name__=="__main__":
+    pass
