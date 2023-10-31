@@ -22,11 +22,28 @@ def nodesToSvg(nodes: types.Node):
     # generation pass
 
     for i, node in enumerate(nodes):
-        g = ET.Element('g', id=f"{node.bl_name}_{i}")
-        text = ET.Element('text')
-        text.text = node.bl_name
+        
+        # create group
+        g = ET.Element('g', id=f"{node.name}_{i}")
+        w, h = node.dimensions
+        x, y = node.location
+
+        x -= min_x
+        y -= min_y
+
+        # create frame
+        print("HELLO WORLD!")
+        frame = ET.Element('rect', x=f"{x}px", y=f"{y}px", width=f"{w}px", height=f"{h}px")
+        g.append(frame)
+
+        # create text
+        text = ET.Element('text', x="1cm", y=f"{1+2*i}cm")
+        text.text = node.name
         g.append(text)
+
+        # add group to svg
         svg.append(g)
+
     svg_string = ET.tostring(svg, encoding='unicode')
 
     print('\n'.join([header, doctype, svg_string]))
