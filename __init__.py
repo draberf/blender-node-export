@@ -15,6 +15,13 @@ bl_info = {
     "category": "Import-Export"
 }
 
+# this helps with reloads
+# https://blender.stackexchange.com/questions/28504/blender-ignores-changes-to-python-scripts/28505#28505
+if "bpy" in locals():
+    import importlib
+    if "ui_panel_inputs" in locals():
+        importlib.reload(ui_panel_inputs)
+
 import bpy
 from .src import ui_panel_inputs
 
