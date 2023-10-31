@@ -16,12 +16,12 @@ bl_info = {
 }
 
 import bpy
-from .src.ui_panel_inputs import *
+from .src import ui_panel_inputs
 
 def register():
-    bpy.utils.register_class(UIInspectOperator)
-    bpy.utils.register_class(UIInspectPanel)
+    bpy.utils.register_class(ui_panel_inputs.UIInspectOperator)
+    bpy.utils.register_class(ui_panel_inputs.UIInspectPanel)
 
 def unregister():
-    bpy.utils.unregister_class(UIInspectOperator)
-    bpy.utils.unregister_class(UIInspectPanel)
+    bpy.utils.unregister_class(ui_panel_inputs.UIInspectOperator)
+    bpy.utils.unregister_class(ui_panel_inputs.UIInspectPanel)
