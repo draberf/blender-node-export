@@ -66,8 +66,8 @@ class UIInspectPanel(bpy.types.Panel):
             text='Inspect'
         )
 
-bpy.utils.register_class(UIInspectOperator)
-bpy.utils.register_class(UIInspectPanel)
+# bpy.utils.register_class(UIInspectOperator)
+# bpy.utils.register_class(UIInspectPanel)
 
 
 if __name__=="__main__":
