@@ -1,7 +1,6 @@
 import bpy
-import json
 
-from src.node_to_svg import nodesToSvg
+from .node_to_svg import nodesToSvg
 
 import xml.etree.ElementTree as ET
 
