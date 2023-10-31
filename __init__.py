@@ -16,11 +16,11 @@ bl_info = {
 }
 
 import bpy
-import src.ui_panel_inputs
+from .src.ui_panel_inputs import *
 
 def register():
-    bpy.utils.register_class(src.ui_panel_inputs.UIInspectOperator)
-    bpy.utils.register_class(src.ui_panel_inputs.UIInspectPanel)
+    bpy.utils.register_class(UIInspectOperator)
+    bpy.utils.register_class(UIInspectPanel)
 
 def unregister():
     pass
