@@ -23,5 +23,5 @@ def register():
     bpy.utils.register_class(UIInspectPanel)
 
 def unregister():
-    pass
-
+    bpy.utils.unregister_class(UIInspectOperator)
+    bpy.utils.unregister_class(UIInspectPanel)
