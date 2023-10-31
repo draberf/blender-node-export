@@ -1,25 +1,8 @@
 import bpy
+import importlib
 
-from .node_to_svg import nodesToSvg
-
-import xml.etree.ElementTree as ET
-
-def nodesToSvg(nodes: bpy.types.Node):
-
-    header = "<?xml version='1.0' encoding='utf-8'?>"
-
-    doctype = "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">"
-
-    svg = ET.Element('svg', width="20cm", height="8cm", version="1.1", xmlns="http://www.w3.org/2000/svg")
-    for i, node in enumerate(nodes):
-        g = ET.Element('g', id=f"{node.name}_{i}")
-        text = ET.Element('text', x="1cm", y=f"{1+2*i}cm")
-        text.text = node.name
-        g.append(text)
-        svg.append(g)
-    svg_string = ET.tostring(svg, encoding='unicode')
-
-    print('\n'.join([header, doctype, svg_string]))
+from . import node_to_svg
+importlib.reload(node_to_svg)
 
 class UIInspectOperator(bpy.types.Operator):
     bl_idname = "ui.inspector"
@@ -39,7 +22,7 @@ class UIInspectOperator(bpy.types.Operator):
             nodes += bpy.context.selected_nodes
             bpy.ops.node.select_all(action='INVERT')
         
-        nodesToSvg(nodes)
+        node_to_svg.nodesToSvg(nodes)
         
         return {'FINISHED'}
 
