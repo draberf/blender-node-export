@@ -40,8 +40,12 @@ def nodesToSvg(nodes: types.Node):
         svg.append(g)
 
     svg_string = ET.tostring(svg, encoding='unicode')
+    msg = '\n'.join([header, doctype, svg_string])
 
-    print('\n'.join([header, doctype, svg_string]))
+    print(msg)
+
+    with open(TARGET, "w") as f:
+        f.write(msg)
 
 if __name__=="__main__":
 
