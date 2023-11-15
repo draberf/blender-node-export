@@ -1,6 +1,9 @@
 import bpy
 import importlib
 
+# unncessary later
+import inspect
+
 from . import node_to_svg
 importlib.reload(node_to_svg)
 
