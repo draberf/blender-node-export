@@ -162,3 +162,5 @@ cython_debug/
 # custom ignores:
 output.svg
 install.sh
+test.svg
+output_close_touch.svg
