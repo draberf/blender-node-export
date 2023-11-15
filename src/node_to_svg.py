@@ -17,27 +17,31 @@ def nodesToSvg(nodes: types.Node):
 
     # generation pass
 
+    viewBox_minX, viewBox_minY = nodes[0].location
+    viewBox_maxX, viewBox_maxY = nodes[0].location
+
     for i, node in enumerate(nodes):
         
         # create group
         g = ET.Element('g', id=f"{node.name}_{i}")
         w, h = node.dimensions
-        x, y = node.location
+        x = node.location[0]
+        y = -node.location[1]
 
-        x -= min_x
-        y -= min_y
+        viewBox_minX = min(viewBox_minX, x)
+        viewBox_minY = min(viewBox_minY, y)
+
+        viewBox_maxX = max(viewBox_maxX, x+w)
+        viewBox_maxY = max(viewBox_maxY, y+h)
 
         # create frame
-        frame = ET.Element('rect', x=f"{x}px", y=f"{y}px", width=f"{w}px", height=f"{h}px")
+        frame = ET.Element('rect', x=f"{x}", y=f"{y}", width=f"{w}", height=f"{h}")
         g.append(frame)
-
-        # create text
-        text = ET.Element('text', x="1cm", y=f"{1+2*i}cm")
-        text.text = node.name
-        g.append(text)
 
         # add group to svg
         svg.append(g)
+
+    svg.set("viewBox", f"{viewBox_minX-PADDING} {viewBox_minY-PADDING} {viewBox_maxX-viewBox_minX+PADDING} {viewBox_maxY-viewBox_minY+PADDING}")
 
     svg_string = ET.tostring(svg, encoding='unicode')
     msg = '\n'.join([header, doctype, svg_string])
