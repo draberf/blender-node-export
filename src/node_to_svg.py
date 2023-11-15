@@ -1,6 +1,12 @@
 import xml.etree.ElementTree as ET
 from bpy import types
 
+# constants: move to someplace later:
+U = "px"
+PADDING = 3
+
+TARGET = "D:\\skola_mit\\dp\\blender-node-export\\output.svg"
+
 def nodesToSvg(nodes: types.Node):
 
     header = "<?xml version='1.0' encoding='utf-8'?>"
