@@ -24,8 +24,20 @@ class UIInspectOperator(bpy.types.Operator):
             bpy.ops.node.select_all(action='INVERT')
             nodes += bpy.context.selected_nodes
             bpy.ops.node.select_all(action='INVERT')
-        
-        node_to_svg.nodesToSvg(nodes)
+
+        #nodetree = context.space_data.edit_tree
+
+        for node in nodes:
+            print(node.name)
+            for inputname, input in node.inputs.items():
+                if ('default_value' in input.__dir__()):
+                    print(inputname, input, input.default_value)
+                else:
+                    print(inputname, input)
+                    
+
+
+        # node_to_svg.nodesToSvg(nodes)
         
         return {'FINISHED'}
 
