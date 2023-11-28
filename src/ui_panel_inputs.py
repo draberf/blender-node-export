@@ -28,12 +28,11 @@ class UIInspectOperator(bpy.types.Operator):
         #nodetree = context.space_data.edit_tree
 
         for node in nodes:
-            print(node.name)
-            for inputname, input in node.inputs.items():
-                if ('default_value' in input.__dir__()):
-                    print(inputname, input, input.default_value)
-                else:
-                    print(inputname, input)
+            print(node.bl_idname)
+            for socketname, socket in node.outputs.items():
+                print("OUT:", socketname, socket, socket.type)
+            for socketname, socket in node.inputs.items():
+                print("IN:", socketname, socket, socket.type)
                     
 
 
