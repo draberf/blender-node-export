@@ -30,9 +30,19 @@ class UIInspectOperator(bpy.types.Operator):
         for node in nodetree.nodes:
             print(node.bl_idname)
             for socketname, socket in node.outputs.items():
-                print("OUT:", socketname, socket, socket.type)
+                print("OUT:", "socketname", socketname,
+                      "bl_idname", socket.bl_idname,
+                      "bl_label", socket.bl_label,
+                      "description", socket.description,
+                      "label", socket.label,
+                      "name", socket.name)
             for socketname, socket in node.inputs.items():
-                print("IN:", socketname, socket, socket.type)
+                print("IN:", "socketname", socketname,
+                      "bl_idname", socket.bl_idname,
+                      "bl_label", socket.bl_label,
+                      "description", socket.description,
+                      "label", socket.label,
+                      "name", socket.name)
                     
 
 
