@@ -18,16 +18,16 @@ class UIInspectOperator(bpy.types.Operator):
 
         SELECT_ALL = True
 
-        nodes = bpy.context.selected_nodes
+        #nodes = bpy.context.selected_nodes
 
-        if SELECT_ALL:
-            bpy.ops.node.select_all(action='INVERT')
-            nodes += bpy.context.selected_nodes
-            bpy.ops.node.select_all(action='INVERT')
+        #if SELECT_ALL:
+        #    bpy.ops.node.select_all(action='INVERT')
+        #    nodes += bpy.context.selected_nodes
+        #    bpy.ops.node.select_all(action='INVERT')
 
-        #nodetree = context.space_data.edit_tree
+        nodetree = context.space_data.edit_tree
 
-        for node in nodes:
+        for node in nodetree.nodes:
             print(node.bl_idname)
             for socketname, socket in node.outputs.items():
                 print("OUT:", socketname, socket, socket.type)
