@@ -12,9 +12,16 @@ class UINode(UI):
 
     def __init__(self, node):
         self.node = node
+
+    def sockets_like(self):
+        return self.node.outputs + self.node.inputs
+
     def svg(self):
         group = ET.Element('g')
-        ...
+        
+        group.append(
+            [socket.svg() for socket in self.sockets_like()]
+        )
 
 class UISocket(UI):
     
