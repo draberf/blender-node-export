@@ -1,5 +1,6 @@
 import xml.etree.ElementTree as ET
 from bpy import types
+from . import nodes
 
 # constants: move to someplace later:
 U = "px"
@@ -22,6 +23,8 @@ def nodesToSvg(nodes: types.Node):
 
     for i, node in enumerate(nodes):
         
+        ui_node = nodes.UINode(node)
+
         # create group
         g = ET.Element('g', id=f"{node.name}_{i}")
         w, h = node.dimensions
