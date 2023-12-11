@@ -1,6 +1,8 @@
 import xml.etree.ElementTree as ET
 from bpy import types
-from . import nodes
+import importlib
+from . import uinodes
+importlib.reload(uinodes)
 
 # constants: move to someplace later:
 U = "px"
@@ -23,7 +25,7 @@ def nodesToSvg(nodes: types.Node):
 
     for i, node in enumerate(nodes):
         
-        ui_node = nodes.UINode(node)
+        ui_node = uinodes.UINode(node)
 
         # create group
         g = ET.Element('g', id=f"{node.name}_{i}")
@@ -38,8 +40,8 @@ def nodesToSvg(nodes: types.Node):
         viewBox_maxY = max(viewBox_maxY, y+h)
 
         # create frame
-        frame = ET.Element('rect', x=f"{x}", y=f"{y}", width=f"{w}", height=f"{h}")
-        g.append(frame)
+        ui = ui_node.svg()
+        g.append(ui)
 
         # add group to svg
         svg.append(g)
