@@ -53,7 +53,7 @@ class UINode(UI):
             svg = uisocket.svg()
             svg.set("transform", f"translate(0,{uiheader.height + i*uisocket.height})")
             group.append(svg)
-        for i, socket in enumerate([output for output in self.outputs() if not output.hide]):
+        for i, socket in enumerate([input for input in self.inputs() if not input.hide]):
             uisocket = UISocket(socket, width=self.w)
             svg = uisocket.svg()
             svg.set("transform", f"translate(0,{self.h - (len(self.inputs()) + i)*uisocket.height})")
@@ -74,7 +74,7 @@ class UISocket(UI):
         self.height = height
 
     def svg(self) -> ET.Element:
-        group = ET.Element('g')
+        group = ET.Element('g', id=f"Socket {self.socket.name}")
         rect = ET.Element('rect', width=f"{self.width}", height=f"{self.height}", fill="none", stroke="black")
         rect.set("stroke-width", "5")
         group.append(rect)
@@ -95,7 +95,7 @@ class UIHeader(UI):
         self.color = color
 
     def svg(self) -> ET.Element:
-        group = ET.Element('g')
+        group = ET.Element('g', id=f"Header {self.name}")
         rect = ET.Element('rect', width=f"{self.width}", height=f"{self.height}")
         
         rect.set("fill", self.color)
