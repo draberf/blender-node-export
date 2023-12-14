@@ -48,13 +48,18 @@ def nodesToSvg(nodes: types.Node):
 
     svg.set("viewBox", f"{viewBox_minX-PADDING} {viewBox_minY-PADDING} {viewBox_maxX-viewBox_minX+PADDING} {viewBox_maxY-viewBox_minY+PADDING}")
 
-    svg_string = ET.tostring(svg, encoding='unicode')
-    msg = '\n'.join([header, doctype, svg_string])
+    tree = ET.ElementTree(svg)
+    ET.indent(tree, '  ')
+    # svg_string = ET.tostring(tree, encoding='unicode')
+    # msg = '\n'.join([header, doctype, svg_string])
 
-    print(msg)
+    #print(msg)
 
     with open(TARGET, "w") as f:
-        f.write(msg)
+        f.write(header)
+        f.write(doctype)
+        tree.write(f, encoding='unicode')
+
 
 if __name__=="__main__":
 
