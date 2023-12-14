@@ -46,7 +46,7 @@ class UINode(UI):
         group = ET.Element('g', transform=f"translate({self.x},{self.y})")
 
         # frame
-        rect = ET.Element('rect', width=f"{self.w}", height=f"{self.h}", fill="gray", stroke="black")
+        rect = ET.Element('rect', width=f"{self.w}", height=f"{self.h}", fill=blColorToSVGColor(self.node.color), stroke="black")
         rect.set("stroke-width", "5")
         group.append(rect)
 
