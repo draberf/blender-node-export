@@ -73,7 +73,6 @@ class UINode(UI):
 class UISocket(UI):
     
     PADDING = 6
-    TEXT_Y = 16
 
     socket : bpy.types.NodeSocket
     width : float
@@ -90,8 +89,14 @@ class UISocket(UI):
         rect.set("stroke-width", "5")
         group.append(rect)
         # p272
-        label = ET.Element('text', x=f"{self.PADDING}", y=f"{self.height/2}")
+        label = ET.Element('text')
         label.text = self.socket.name
+        label.set("y", f"{self.TEXT_Y}")
+        if self.socket.is_output:
+            label.set("text-anchor", "end")
+            label.set("x", f"{self.width - self.PADDING}")
+        else:
+            label.set("x", f"{self.PADDING}")
         group.append(label)
         return group
     
