@@ -1,4 +1,5 @@
 import bpy
+import mathutils
 import xml.etree.ElementTree as ET
 
 class UI:
