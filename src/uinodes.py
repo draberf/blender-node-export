@@ -37,7 +37,7 @@ class UINode(UI):
         return self.node.outputs.values() + self.node.inputs.values()
 
     def outputs(self) -> [bpy.types.NodeSocket]:
-        return self.node.outputs.values()
+        return [output for output in self.node.outputs.values() if not output.hide]
     
     def inputs(self) -> [bpy.types.NodeSocket]:
         return self.node.inputs.values()
