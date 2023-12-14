@@ -40,7 +40,7 @@ class UINode(UI):
         return [output for output in self.node.outputs.values() if not output.hide]
     
     def inputs(self) -> [bpy.types.NodeSocket]:
-        return self.node.inputs.values()
+        return [input for input in self.node.inputs.values() if not input.hide]
 
     def svg(self) -> ET.Element:
         group = ET.Element('g', transform=f"translate({self.x},{self.y})")
