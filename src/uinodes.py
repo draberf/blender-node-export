@@ -48,6 +48,7 @@ class UINode(UI):
         # frame
         rect = ET.Element('rect', width=f"{self.w}", height=f"{self.h}", fill=blColorToSVGColor(self.node.color), stroke="black")
         rect.set("stroke-width", "5")
+        rect.set("id", "nodeframe")
         group.append(rect)
 
         # header
