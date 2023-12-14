@@ -66,7 +66,7 @@ class UINode(UI):
         for i, socket in enumerate([input for input in self.inputs() if not input.hide]):
             uisocket = UISocket(socket, width=self.w)
             svg = uisocket.svg()
-            svg.set("transform", f"translate(0,{self.h - (len(self.inputs()) + i)*uisocket.height})")
+            svg.set("transform", f"translate(0,{self.h - (len(self.inputs()) - i)*uisocket.height})")
             group.append(svg)
         return group
 
