@@ -73,6 +73,7 @@ class UINode(UI):
 class UISocket(UI):
     
     PADDING = 6
+    TEXT_Y = 16
 
     socket : bpy.types.NodeSocket
     width : float
