@@ -2,6 +2,14 @@ import bpy
 import mathutils
 import xml.etree.ElementTree as ET
 
+# in: mathutils.Color with r, g, b, methods
+# out: color representation in SVG-compliant format
+def blColorToSVGColor(color: mathutils.Color) -> str:
+    r, g, b = color.r, color.g, color.b
+    # compliant with specification at p85
+    return "rgb("+",".join([str(round(x*255)) for x in [r,g,b]])+")"
+    
+
 class UI:
 
     def svg(self):
