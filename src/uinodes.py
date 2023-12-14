@@ -34,7 +34,7 @@ class UINode(UI):
         self.socket_count = len(self.sockets)
 
     def sockets_like(self) -> [bpy.types.NodeSocket]:
-        return self.node.outputs.values() + self.node.inputs.values()
+        return self.outputs() + self.inputs()
 
     def outputs(self) -> [bpy.types.NodeSocket]:
         return [output for output in self.node.outputs.values() if not output.hide]
