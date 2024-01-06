@@ -10,7 +10,7 @@ PADDING = 3
 
 TARGET = "D:\\skola_mit\\dp\\blender-node-export\\output.svg"
 
-def nodesToSvg(nodes: types.Node):
+def nodesToSvg(nodes: [types.Node], links: [types.NodeLink] = []):
 
     header = "<?xml version='1.0' encoding='utf-8'?>"
 
@@ -22,6 +22,8 @@ def nodesToSvg(nodes: types.Node):
 
     viewBox_minX, viewBox_minY = nodes[0].location
     viewBox_maxX, viewBox_maxY = nodes[0].location
+
+    link_mapping = {}
 
     for i, node in enumerate(nodes):
         
