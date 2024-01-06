@@ -56,7 +56,7 @@ class UIInspectOperator(bpy.types.Operator):
                       "id", socket.id_data)
                     
 
-        node_to_svg.nodesToSvg(nodetree.nodes)
+        node_to_svg.nodesToSvg(nodetree.nodes, nodetree.links)
         
         return {'FINISHED'}
 
