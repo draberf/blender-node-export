@@ -34,7 +34,7 @@ class UIInspectOperator(bpy.types.Operator):
 
         for node in nodetree.nodes:
             print(node)
-            return
+            break
             for socketname, socket in node.outputs.items():
                 print("OUT:", "socketname", socketname,
                       "bl_idname", socket.bl_idname,
@@ -56,7 +56,6 @@ class UIInspectOperator(bpy.types.Operator):
                       "id", socket.id_data)
                     
 
-        print("debug")
         node_to_svg.nodesToSvg(nodetree.nodes)
         
         return {'FINISHED'}
