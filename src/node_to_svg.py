@@ -10,7 +10,7 @@ PADDING = 3
 
 TARGET = "D:\\skola_mit\\dp\\blender-node-export\\output.svg"
 
-def nodesToSvg(nodes: [types.Node], links: [types.NodeLink] = []):
+def nodesToSvg(nodes: types.Node):
 
     header = "<?xml version='1.0' encoding='utf-8'?>"
 
@@ -26,6 +26,7 @@ def nodesToSvg(nodes: [types.Node], links: [types.NodeLink] = []):
     for i, node in enumerate(nodes):
         
         ui_node = uinodes.UINode(node)
+        link_mapping.update(ui_node.get_socket_coords())
 
         # create group
         g = ET.Element('g', id=f"{node.name}_{i}")
@@ -44,8 +45,21 @@ def nodesToSvg(nodes: [types.Node], links: [types.NodeLink] = []):
         g.append(ui)
 
         # add group to svg
-        print(svg.get_socket_coords())
         svg.append(g)
+
+    # add links
+    print(link_mapping)
+    for link in links:
+        from_x, from_y = link_mapping[str(link.from_socket.as_pointer())]
+        to_x, to_y = link_mapping[str(link.to_socket.as_pointer())]
+        line = ET.Element('line',
+                          x1=str(from_x),
+                          y1=str(from_y),
+                          x2=str(to_x),
+                          y2=str(to_y),
+                          style="stroke:rgb(0,0,0);stroke-width:5")
+        svg.append(line)
+        
 
     svg.set("viewBox", f"{viewBox_minX-PADDING} {viewBox_minY-PADDING} {viewBox_maxX-viewBox_minX+PADDING} {viewBox_maxY-viewBox_minY+PADDING}")
 
