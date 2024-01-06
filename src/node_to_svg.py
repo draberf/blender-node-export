@@ -39,6 +39,7 @@ def nodesToSvg(nodes: types.Node):
         g.append(frame)
 
         # add group to svg
+        print(svg.get_socket_coords())
         svg.append(g)
 
     svg.set("viewBox", f"{viewBox_minX-PADDING} {viewBox_minY-PADDING} {viewBox_maxX-viewBox_minX+PADDING} {viewBox_maxY-viewBox_minY+PADDING}")
