@@ -38,6 +38,7 @@ class UINode(UI):
         self.socket_coords = {}
 
     def get_socket_coords(self):
+        print("Hey")
         self.socket_coords = {}
         for i, socket in enumerate(self.outputs()):
             self.socket_coords[str(socket.as_pointer())] = (self.x+self.w,self.y+(i+0.5)*SOCKET_HEIGHT + HEADER_HEIGHT)
@@ -49,10 +50,10 @@ class UINode(UI):
         return self.outputs() + self.inputs()
 
     def outputs(self) -> [bpy.types.NodeSocket]:
-        return [output for output in self.node.outputs.values() if not output.hide]
+        return [output for output in self.node.outputs.values() if all([not output.hide, output.enabled, not output.is_unavailable])]
     
     def inputs(self) -> [bpy.types.NodeSocket]:
-        return [input for input in self.node.inputs.values() if not input.hide]
+        return [input for input in self.node.inputs.values() if all([not input.hide, input.enabled, not input.is_unavailable])]
 
     def svg(self) -> ET.Element:
         group = ET.Element('g', transform=f"translate({self.x},{self.y})")
