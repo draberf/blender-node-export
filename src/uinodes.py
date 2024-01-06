@@ -2,6 +2,12 @@ import bpy
 import mathutils
 import xml.etree.ElementTree as ET
 
+<<<<<<< HEAD
+=======
+SOCKET_HEIGHT = 25
+HEADER_HEIGHT = 20
+
+>>>>>>> exploration
 # in: mathutils.Color with r, g, b, methods
 # out: color representation in SVG-compliant format
 def blColorToSVGColor(color: mathutils.Color) -> str:
@@ -32,6 +38,19 @@ class UINode(UI):
         self.y = -node.location[1]
         self.sockets = self.sockets_like()
         self.socket_count = len(self.sockets)
+<<<<<<< HEAD
+=======
+        self.socket_coords = {}
+
+    def get_socket_coords(self):
+        print("Hey")
+        self.socket_coords = {}
+        for i, socket in enumerate(self.outputs()):
+            self.socket_coords[str(socket.as_pointer())] = (self.x+self.w,self.y+(i+0.5)*SOCKET_HEIGHT + HEADER_HEIGHT)
+        for i, socket in enumerate(self.inputs()):
+            self.socket_coords[str(socket.as_pointer())] = (self.x, self.y+self.h-(i+0.5)*SOCKET_HEIGHT)
+        return self.socket_coords
+>>>>>>> exploration
 
     def sockets_like(self) -> [bpy.types.NodeSocket]:
         return self.outputs() + self.inputs()
@@ -79,7 +98,11 @@ class UISocket(UI):
     width : float
     height : float
 
+<<<<<<< HEAD
     def __init__(self, socket: bpy.types.NodeSocket, width: float = 100, height: float = 25) -> None:
+=======
+    def __init__(self, socket: bpy.types.NodeSocket, width: float = 100, height: float = SOCKET_HEIGHT) -> None:
+>>>>>>> exploration
         self.socket = socket
         self.width = width
         self.height = height
@@ -105,7 +128,11 @@ class UIHeader(UI):
 
     PADDING = 6
 
+<<<<<<< HEAD
     def __init__(self, name, width=100, height=20, color="gray"):
+=======
+    def __init__(self, name, width=100, height=HEADER_HEIGHT, color="gray"):
+>>>>>>> exploration
         self.name = name
         self.width = width
         self.height = height
