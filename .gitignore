@@ -160,8 +160,6 @@ cython_debug/
 #.idea/
 
 # custom ignores:
-output.svg
 install.sh
-test.svg
-output_close_touch.svg
+*.svg
 touch.png
