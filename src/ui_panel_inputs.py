@@ -33,28 +33,8 @@ class UIInspectOperator(bpy.types.Operator):
             links.append((link.from_socket.as_pointer(), link.to_socket.as_pointer()))
 
         for node in nodetree.nodes:
-            print(node)
-            break
-            for socketname, socket in node.outputs.items():
-                print("OUT:", "socketname", socketname,
-                      "bl_idname", socket.bl_idname,
-                      "bl_label", socket.bl_label,
-                      "description", socket.description,
-                      "label", socket.label,
-                      "name", socket.name,
-                      "id", socket.id_data)
-                for link_from, link_to in links:
-                    if socket.as_pointer() == link_from:
-                        print(">> Connects to", link_to)
-            for socketname, socket in node.inputs.items():
-                print("IN:", "socketname", socketname,
-                      "bl_idname", socket.bl_idname,
-                      "bl_label", socket.bl_label,
-                      "description", socket.description,
-                      "label", socket.label,
-                      "name", socket.name,
-                      "id", socket.id_data)
-                    
+            print(node, "parent", node.parent)
+            if isinstance(node, bpy.types.NodeFrame): print("parent", len(node.internal_links))                 
 
         node_to_svg.nodesToSvg(nodetree.nodes, nodetree.links)
         
