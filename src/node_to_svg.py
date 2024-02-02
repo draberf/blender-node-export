@@ -50,7 +50,6 @@ def nodesToSvg(nodes: [types.Node], links: [types.NodeLink] = []):
         svg.append(g)
 
     # add links
-    print(link_mapping)
     for link in links:
         from_x, from_y = link_mapping[str(link.from_socket.as_pointer())]
         to_x, to_y = link_mapping[str(link.to_socket.as_pointer())]
