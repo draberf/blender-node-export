@@ -51,7 +51,7 @@ class UINode(UI):
         return [input for input in self.node.inputs.values() if all([not input.hide, input.enabled, not input.is_unavailable])]
 
     def svg(self) -> ET.Element:
-        group = ET.Element('g', transform=f"translate({self.x},{self.y})")
+        group = ET.Element('svg', x=f"{self.x}", y=f"{self.y}")
 
         # frame
         rect = ET.Element('rect', width=f"{self.w}", height=f"{self.h}", fill=blColorToSVGColor(self.node.color), stroke="black")
