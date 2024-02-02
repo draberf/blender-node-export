@@ -19,6 +19,7 @@ class UI:
     def svg(self):
         return ET.Element('g')
 
+# class wrapper for a single node
 class UINode(UI):
 
     HEADER_HEIGHT = 25
