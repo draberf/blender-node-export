@@ -37,7 +37,7 @@ class UINode(UI):
         self.socket_coords = {}
         for i, socket in enumerate(self.outputs()):
             self.socket_coords[str(socket.as_pointer())] = (self.x+self.w,self.y+(i+0.5)*SOCKET_HEIGHT + HEADER_HEIGHT)
-        for i, socket in enumerate(self.inputs()):
+        for i, socket in enumerate(self.inputs()[::-1]):
             self.socket_coords[str(socket.as_pointer())] = (self.x, self.y+self.h-(i+0.5)*SOCKET_HEIGHT)
         return self.socket_coords
 
