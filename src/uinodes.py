@@ -13,6 +13,7 @@ def blColorToSVGColor(color: mathutils.Color) -> str:
     return "rgb("+",".join([str(round(x*255)) for x in [r,g,b]])+")"
     
 
+# encompassing SVG class
 class UI:
 
     def svg(self):
@@ -82,8 +83,11 @@ class UINode(UI):
             group.append(svg)
         return group
 
+
+# class for SVG of a socket
 class UISocket(UI):
     
+    # constants: TODO change
     PADDING = 6
     TEXT_Y = 16
 
@@ -113,6 +117,8 @@ class UISocket(UI):
         group.append(label)
         return group
     
+
+# class of SVG for a node header
 class UIHeader(UI):
 
     PADDING = 6
