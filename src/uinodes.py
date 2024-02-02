@@ -21,12 +21,6 @@ class UI:
 
 class UINode(UI):
 
-    node : bpy.types.Node
-    w : float
-    h : float
-    x : float
-    y : float
-
     HEADER_HEIGHT = 25
 
     def __init__(self, node: bpy.types.Node):
@@ -90,10 +84,6 @@ class UISocket(UI):
     # constants: TODO change
     PADDING = 6
     TEXT_Y = 16
-
-    socket : bpy.types.NodeSocket
-    width : float
-    height : float
 
     def __init__(self, socket: bpy.types.NodeSocket, width: float = 100, height: float = SOCKET_HEIGHT) -> None:
         self.socket = socket
