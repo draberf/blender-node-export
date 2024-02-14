@@ -38,7 +38,9 @@ class UIInspectOperator(bpy.types.Operator):
 
         for node in nodetree.nodes:
             print(node, "parent", node.parent)
-            if isinstance(node, bpy.types.NodeFrame): print("parent", len(node.internal_links))                 
+            if isinstance(node, bpy.types.NodeFrame): print("parent", len(node.internal_links))
+            for socket in node.inputs.values():
+                print(">>", socket.name, socket.type, socket)                 
 
         node_to_svg.nodesToSvg(nodetree.nodes, nodetree.links)
         
