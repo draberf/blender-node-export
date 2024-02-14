@@ -1,4 +1,6 @@
+import importlib
 from . import constants
+importlib.reload(constants)
 
 import bpy
 import mathutils
