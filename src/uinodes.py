@@ -87,6 +87,18 @@ class UINode(UI):
             group.append(svg)
         return group
 
+    def frame(self) -> ET.Element:
+        frame_items = ET.Element('svg')
+
+        bg = ET.Element('rect', width=f"{self.w}", height=f"{self.h}")
+        bg.set('class', 'nodeframe')
+
+        frame_items.append(bg)
+        
+
+
+        return frame_items
+
 
 # class for SVG of a socket
 class UISocket(UI):
