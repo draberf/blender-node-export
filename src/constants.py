@@ -1,5 +1,5 @@
 # ratio of actual node frame dimensions to the bpy object
-NODE_DIM_RATI0 = 0.8
+NODE_DIM_RATIO = 0.8
 
 # specific heights
 HEADER_HEIGHT = 20
