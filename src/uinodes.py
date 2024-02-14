@@ -43,9 +43,9 @@ class UINode(UI):
     def get_socket_coords(self):
         self.socket_coords = {}
         for i, socket in enumerate(self.outputs()):
-            self.socket_coords[str(socket.as_pointer())] = (self.x+self.w,self.y+(i+0.5)*SOCKET_HEIGHT + HEADER_HEIGHT)
+            self.socket_coords[str(socket.as_pointer())] = (self.x+self.w,self.y+(i+0.5)*constants.LINKED_SOCKET_HEIGHT + constants.HEADER_HEIGHT)
         for i, socket in enumerate(self.inputs()[::-1]):
-            self.socket_coords[str(socket.as_pointer())] = (self.x, self.y+self.h-(i+0.5)*SOCKET_HEIGHT)
+            self.socket_coords[str(socket.as_pointer())] = (self.x, self.y+self.h-(i+0.5)*constants.LINKED_SOCKET_HEIGHT)
         return self.socket_coords
 
     def sockets_like(self) -> list[bpy.types.NodeSocket]:
@@ -93,7 +93,7 @@ class UISocket(UI):
     PADDING = 6
     TEXT_Y = 16
 
-    def __init__(self, socket: bpy.types.NodeSocket, width: float = 100, height: float = SOCKET_HEIGHT) -> None:
+    def __init__(self, socket: bpy.types.NodeSocket, width: float = 100, height: float = constants.LINKED_SOCKET_HEIGHT) -> None:
         self.socket = socket
         self.width = width
         self.height = height
@@ -121,7 +121,7 @@ class UIHeader(UI):
 
     PADDING = 6
 
-    def __init__(self, name, width=100, height=HEADER_HEIGHT, color="gray"):
+    def __init__(self, name, width=100, height=constants.HEADER_HEIGHT, color="gray"):
         self.name = name
         self.width = width
         self.height = height
