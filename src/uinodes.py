@@ -105,16 +105,14 @@ class UISocket(UI):
     
     # constants: TODO change
     PADDING = 6
-    TEXT_Y = 16
 
-    def __init__(self, socket: bpy.types.NodeSocket, width: float = 100, height: float = constants.LINKED_SOCKET_HEIGHT) -> None:
+    def __init__(self, socket: bpy.types.NodeSocket, height: float = constants.LINKED_SOCKET_HEIGHT) -> None:
         self.socket = socket
-        self.width = width
         self.height = height
 
     # generic svg function
     def svg(self, width: float = 100) -> ET.Element:
-        if self.socket.is_linked:
+        if self.socket.is_linked or self.socket.is_output:
             return self.svg_linked(width)
         else:
             return self.svg_unlinked(width)
@@ -122,16 +120,15 @@ class UISocket(UI):
     # generic linked version
     def svg_linked(self, width: float = 100) -> ET.Element:
         group = ET.Element('g', id=f"Socket {self.socket.name}")
-        rect = ET.Element('rect', width=f"{self.width}", height=f"{self.height}", fill="none", stroke="black")
-        rect.set("stroke-width", "5")
+        rect = ET.Element('rect', width=f"{width}", height=f"{self.height}", fill="none", stroke="none")
         group.append(rect)
         # p272
         label = ET.Element('text')
         label.text = self.socket.name
-        label.set("y", f"{self.TEXT_Y}")
+        label.set("y", f"{constants.SOCKET_TEXT_HEIGHT}")
         if self.socket.is_output:
             label.set("text-anchor", "end")
-            label.set("x", f"{self.width - self.PADDING}")
+            label.set("x", f"{width - self.PADDING}")
         else:
             label.set("x", f"{self.PADDING}")
         group.append(label)
