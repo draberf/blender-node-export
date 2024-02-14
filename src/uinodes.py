@@ -1,3 +1,5 @@
+from . import constants
+
 import bpy
 import mathutils
 import xml.etree.ElementTree as ET
