@@ -10,7 +10,7 @@ PADDING = 3
 
 TARGET = "D:\\skola_mit\\dp\\blender-node-export\\output.svg"
 
-def nodesToSvg(nodes: [types.Node], links: [types.NodeLink] = []):
+def nodesToSvg(nodes: list[types.Node], links: list[types.NodeLink] = []):
 
     header = "<?xml version='1.0' encoding='utf-8'?>"
 
