@@ -14,7 +14,11 @@ class UIInspectOperator(bpy.types.Operator):
     def execute(self, context):
         # current material is accessed through bpy.context.material
         # presumably this always matches to Nodes on screen
+        print("     ")
+        print("     ")
         print(" === ")
+        print("     ")
+        print("     ")
 
         SELECT_ALL = True
 
