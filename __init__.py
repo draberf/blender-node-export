@@ -18,9 +18,16 @@ bl_info = {
 # this helps with reloads
 # https://blender.stackexchange.com/questions/28504/blender-ignores-changes-to-python-scripts/28505#28505
 if "bpy" in locals():
+    files = [
+        "constants", "node_to_svg", "ui_panel_inputs", "uinodes"
+    ]
     import importlib
-    if "ui_panel_inputs" in locals():
-        importlib.reload(ui_panel_inputs)
+    for file in files:
+        if file in locals():
+            importlib.reload(eval(file))
+        else:
+            print(f"file {file} not in locals")
+            print(locals())
 
 import bpy
 from .src import ui_panel_inputs
