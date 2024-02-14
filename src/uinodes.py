@@ -6,8 +6,14 @@ import bpy
 import mathutils
 import xml.etree.ElementTree as ET
 
-def socketFactory(socket: bpy.types.Socket) -> 'UISocket':
+def socketFactory(socket: bpy.types.NodeSocket) -> 'UISocket':
     match socket.type:
+        case "VALUE":
+            return UISocketValue(socket)
+        case "RGBA":
+            return UISocketRGBA(socket)
+        case "VECTOR":
+            return UISocketVector(socket)
         case _:
             return UISocket(socket)
 
