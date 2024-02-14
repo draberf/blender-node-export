@@ -54,8 +54,6 @@ class UI:
 # class wrapper for a single node
 class UINode(UI):
 
-    HEADER_HEIGHT = 25
-
     def __init__(self, node: bpy.types.Node):
         self.node = node
         self.w, self.h = node.dimensions
@@ -86,12 +84,14 @@ class UINode(UI):
 
     def svg(self) -> ET.Element:
         group = ET.Element('svg', x=f"{self.x}", y=f"{self.y}")
+        
+        # style
+        group.append(style())
 
         # frame
-        rect = ET.Element('rect', width=f"{self.w}", height=f"{self.h}", fill=blColorToSVGColor(self.node.color), stroke="black")
-        rect.set("stroke-width", "5")
-
+        rect = self.frame()
         group.append(rect)
+
 
         # header
         uiheader = UIHeader(self.node.name, self.w)
