@@ -58,7 +58,7 @@ def nodesToSvg(nodes: list[types.Node], links: list[types.NodeLink] = []):
                           y1=str(from_y),
                           x2=str(to_x),
                           y2=str(to_y),
-                          style="stroke:rgb(0,0,0);stroke-width:5")
+                          style="stroke:rgb(0,0,0);stroke-width:2")
         svg.append(line)
         
 
