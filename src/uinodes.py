@@ -98,7 +98,15 @@ class UISocket(UI):
         self.width = width
         self.height = height
 
-    def svg(self) -> ET.Element:
+    # generic svg function
+    def svg(self, width: float = 100) -> ET.Element:
+        if self.socket.is_linked:
+            return self.svg_linked(width)
+        else:
+            return self.svg_unlinked(width)
+
+    # generic linked version
+    def svg_linked(self, width: float = 100) -> ET.Element:
         group = ET.Element('g', id=f"Socket {self.socket.name}")
         rect = ET.Element('rect', width=f"{self.width}", height=f"{self.height}", fill="none", stroke="black")
         rect.set("stroke-width", "5")
@@ -114,6 +122,10 @@ class UISocket(UI):
             label.set("x", f"{self.PADDING}")
         group.append(label)
         return group
+
+    # specific unlinked version (varies from socket to socket)
+    def svg_unlinked(self, width: float = 100) -> ET.Element:
+        return self.svg_linked(width)
     
 
 # class of SVG for a node header
