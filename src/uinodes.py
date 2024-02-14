@@ -158,8 +158,7 @@ class UIHeader(UI):
         rect = ET.Element('rect', width=f"{self.width}", height=f"{self.height}")
         
         rect.set("fill", self.color)
-        rect.set("stroke", "black")
-        rect.set("stroke-width", "5")
+        rect.set("stroke", "none")
         group.append(rect)
 
         label = ET.Element('text', x=f"{self.PADDING}", y=f"{self.height/2}")
