@@ -2,8 +2,11 @@ import bpy
 import mathutils
 import xml.etree.ElementTree as ET
 
-SOCKET_HEIGHT = 25
-HEADER_HEIGHT = 20
+def socketFactory(socket: bpy.types.Socket) -> 'UISocket':
+    match socket.type:
+        case _:
+            return UISocket(socket)
+
 
 # in: mathutils.Color with r, g, b, methods
 # out: color representation in SVG-compliant format
