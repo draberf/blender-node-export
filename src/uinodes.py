@@ -48,13 +48,13 @@ class UINode(UI):
             self.socket_coords[str(socket.as_pointer())] = (self.x, self.y+self.h-(i+0.5)*SOCKET_HEIGHT)
         return self.socket_coords
 
-    def sockets_like(self) -> [bpy.types.NodeSocket]:
+    def sockets_like(self) -> list[bpy.types.NodeSocket]:
         return self.outputs() + self.inputs()
 
-    def outputs(self) -> [bpy.types.NodeSocket]:
+    def outputs(self) -> list[bpy.types.NodeSocket]:
         return [output for output in self.node.outputs.values() if all([not output.hide, output.enabled, not output.is_unavailable])]
     
-    def inputs(self) -> [bpy.types.NodeSocket]:
+    def inputs(self) -> list[bpy.types.NodeSocket]:
         return [input for input in self.node.inputs.values() if all([not input.hide, input.enabled, not input.is_unavailable])]
 
     def svg(self) -> ET.Element:
