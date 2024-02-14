@@ -137,7 +137,48 @@ class UISocket(UI):
     # specific unlinked version (varies from socket to socket)
     def svg_unlinked(self, width: float = 100) -> ET.Element:
         return self.svg_linked(width)
+        
     
+
+# SVG socket subclass: VALUE
+class UISocketValue(UISocket):
+
+    def svg_unlinked(self,width: float = 100) -> ET.Element:
+        group = self.svg_linked(width)
+        value = ET.Element('text')
+        value.text = getFloatString(self.socket.default_value)
+        value.set("y", f"{constants.SOCKET_TEXT_HEIGHT}")
+        value.set("text-anchor", "end")
+        value.set("x", f"{width - self.PADDING}")
+        group.append(value)
+        return group
+    
+class UISocketRGBA(UISocket):
+
+    def svg_unlinked(self, width: float = 100) -> ET.Element:
+        group = self.svg_linked(width)
+        color_rect = ET.Element('rect')
+        color_rect.set("x", str(0.45*width))
+        color_rect.set("y", "0")
+        color_rect.set("width", str(0.5*width))
+        color_rect.set("height", str(self.height))
+        color_rect.set("style", "stroke-width: 0")
+        color_rect.set("fill", "rgb("+",".join([str(round(x*255)) for x in self.socket.default_value[:3]])+")")
+        group.append(color_rect)
+        return group
+    
+class UISocketVector(UISocket):
+
+    def svg_unlinked(self, width: float = 100) -> ET.Element:
+        group = self.svg_linked(width)
+        value = ET.Element('text')
+        value.text = "(" + ', '.join([getFloatString(val) for val in self.socket.default_value]) + ")"
+        value.set("y", f"{constants.SOCKET_TEXT_HEIGHT}")
+        value.set("text-anchor", "end")
+        value.set("x", f"{width - self.PADDING}")
+        group.append(value)
+        return group
+
 
 # class of SVG for a node header
 class UIHeader(UI):
