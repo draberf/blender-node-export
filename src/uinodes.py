@@ -32,6 +32,8 @@ class UINode(UI):
     def __init__(self, node: bpy.types.Node):
         self.node = node
         self.w, self.h = node.dimensions
+        self.w *= constants.NODE_DIM_RATIO
+        self.h *= constants.NODE_DIM_RATIO
         self.x =  node.location[0]
         self.y = -node.location[1]
         self.sockets = self.sockets_like()
