@@ -6,6 +6,25 @@ import bpy
 import mathutils
 import xml.etree.ElementTree as ET
 
+def getFloatString(value: float, spaces: int = 5) -> str:
+
+    s = str(value)[:5]
+    s += (5-len(s))*"0"
+    return s
+
+def style() -> ET.Element:
+    
+    style_elem = ET.Element('style')
+
+    style_elem.text = '\n'.join([
+        ".nodeframe { fill: #333333 } ",
+        "text { font-family: Sans, Arial; font-size: 0.6em; fill: white }"
+        "rect { stroke: red; stroke-width: 0 }"
+    ])
+
+    return style_elem
+
+
 def socketFactory(socket: bpy.types.NodeSocket) -> 'UISocket':
     match socket.type:
         case "VALUE":
