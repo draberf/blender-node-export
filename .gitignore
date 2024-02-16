@@ -161,6 +161,7 @@ cython_debug/
 
 # custom ignores:
 all_nodes.txt
+checklist.txt
 install.sh
 *.svg
 *.png
