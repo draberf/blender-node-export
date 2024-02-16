@@ -30,6 +30,7 @@ class UIInspectOperator(bpy.types.Operator):
         #    bpy.ops.node.select_all(action='INVERT')
 
         nodetree = context.space_data.edit_tree
+
         links = []
         for link in nodetree.links:
             print("From Socket ID", link.from_socket.as_pointer())
@@ -37,10 +38,11 @@ class UIInspectOperator(bpy.types.Operator):
             links.append((link.from_socket.as_pointer(), link.to_socket.as_pointer()))
 
         for node in nodetree.nodes:
-            print(node, "parent", node.parent)
+            print(node, node.name, node.label)
             if isinstance(node, bpy.types.NodeFrame): print("parent", len(node.internal_links))
             for socket in node.inputs.values():
-                print(">>", socket.name, socket.type, socket)                 
+                print(">>", socket.name, socket.label, socket.type, socket)                 
+
 
         node_to_svg.nodesToSvg(nodetree.nodes, nodetree.links)
         
