@@ -56,6 +56,7 @@ class UINode(UI):
 
     def __init__(self, node: bpy.types.Node):
         self.node = node
+        self.name = node.label if node.label else node.name
         self.w, self.h = node.dimensions
         self.w *= constants.NODE_DIM_RATIO
         self.h *= constants.NODE_DIM_RATIO
@@ -94,7 +95,7 @@ class UINode(UI):
 
 
         # header
-        uiheader = UIHeader(self.node.name, self.w)
+        uiheader = UIHeader(self.name, self.w)
         header_svg = uiheader.svg()
 
         group.append(header_svg)
@@ -134,6 +135,7 @@ class UISocket(UI):
     def __init__(self, socket: bpy.types.NodeSocket, height: float = constants.LINKED_SOCKET_HEIGHT) -> None:
         self.socket = socket
         self.height = height
+        self.name = socket.label if socket.label else socket.name
 
     # generic svg function
     def svg(self, width: float = 100) -> ET.Element:
@@ -149,7 +151,7 @@ class UISocket(UI):
         group.append(rect)
         # p272
         label = ET.Element('text')
-        label.text = self.socket.name
+        label.text = self.name
         label.set("y", f"{constants.SOCKET_TEXT_HEIGHT}")
         if self.socket.is_output:
             label.set("text-anchor", "end")
