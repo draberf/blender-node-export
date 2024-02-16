@@ -160,6 +160,7 @@ cython_debug/
 #.idea/
 
 # custom ignores:
+allnodes.txt
 install.sh
 *.svg
 *.png
