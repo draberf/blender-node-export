@@ -38,7 +38,7 @@ class UIInspectOperator(bpy.types.Operator):
             links.append((link.from_socket.as_pointer(), link.to_socket.as_pointer()))
 
         for node in nodetree.nodes:
-            print(node, node.name, node.label)
+            print(node, node.name, node.label, "idname", node.bl_idname)
             if isinstance(node, bpy.types.NodeFrame): print("parent", len(node.internal_links))
             for socket in node.inputs.values():
                 print(">>", socket.name, socket.label, socket.type, socket)                 
