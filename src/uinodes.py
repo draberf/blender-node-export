@@ -180,6 +180,7 @@ class UISocketValue(UISocket):
         group.append(value)
         return group
     
+# SVG socket subclass: RGBA
 class UISocketRGBA(UISocket):
 
     def svg_unlinked(self, width: float = 100) -> ET.Element:
@@ -194,16 +195,157 @@ class UISocketRGBA(UISocket):
         group.append(color_rect)
         return group
     
+# SVG socket subclass: VECTOR
 class UISocketVector(UISocket):
+
+    def __init__(self, socket: bpy.types.NodeSocket, height: float = constants.LINKED_SOCKET_HEIGHT) -> None:
+        super().__init__(socket, height)
+        self.height = 4*height
+
+    def svg_unlinked(self, width: float = 100) -> ET.Element:
+        group = self.svg_linked(width)
+        for i, val in enumerate(self.socket.default_value):
+            value = ET.Element('text')
+            value.text = getFloatString(val)
+            value.set("y", f"{(i+1)*constants.LINKED_SOCKET_HEIGHT + constants.SOCKET_TEXT_HEIGHT}")
+            value.set("text-anchor", "end")
+            value.set("x", f"{width - self.PADDING}")
+            group.append(value)
+        return group
+
+# SVG socket subclass: INT
+class UISocketInt(UISocket):
 
     def svg_unlinked(self, width: float = 100) -> ET.Element:
         group = self.svg_linked(width)
         value = ET.Element('text')
-        value.text = "(" + ', '.join([getFloatString(val) for val in self.socket.default_value]) + ")"
+        value.text = str(self.socket.default_value)
         value.set("y", f"{constants.SOCKET_TEXT_HEIGHT}")
         value.set("text-anchor", "end")
         value.set("x", f"{width - self.PADDING}")
         group.append(value)
+        return group
+    
+# SVG socket subclass: IMAGE
+class UISocketImage(UISocket):
+
+    def svg_unlinked(self, width: float = 100) -> ET.Element:
+        group = self.svg_linked(width)
+        if not self.socket.default_value:
+            return group
+        value = ET.Element('text')
+        # check enum
+        match self.socket.default_value.source:
+            case 'FILE' | 'SEQUENCE' | 'MOVIE':
+                value.text = self.socket.default_value.filepath
+            case _:
+                value.text = self.socket.default_value.source
+        value.set("y", f"{constants.SOCKET_TEXT_HEIGHT}")
+        value.set("text-anchor", "end")
+        value.set("x", f"{width - self.PADDING}")
+        group.append(value)
+        return group
+    
+# SVG socket subclass: OBJECT
+class UISocketObject(UISocket):
+    
+    def svg_unlinked(self, width: float = 100) -> ET.Element:
+        group = self.svg_linked(width)
+        value = ET.Element('text')
+        value.text = self.socket.default_value.name
+        value.set("y", f"{constants.SOCKET_TEXT_HEIGHT}")
+        value.set("text-anchor", "end")
+        value.set("x", f"{width - self.PADDING}")
+        group.append(value)
+        return group
+    
+# SVG socket subclass: TEXTURE
+class UISocketTexture(UISocket):
+    
+    def svg_unlinked(self, width: float = 100) -> ET.Element:
+        group = self.svg_linked(width)
+        if not self.socket.default_value: return group
+        value = ET.Element('text')
+        value.text = self.socket.default_value.name
+        value.set("y", f"{constants.SOCKET_TEXT_HEIGHT}")
+        value.set("text-anchor", "end")
+        value.set("x", f"{width - self.PADDING}")
+        group.append(value)
+        return group
+    
+# SVG socket subclass: COLLECTION
+class UISocketCollection(UISocket):
+    
+    def svg_unlinked(self, width: float = 100) -> ET.Element:
+        group = self.svg_linked(width)
+        if not self.socket.default_value: return group
+        value = ET.Element('text')
+        value.text = self.socket.default_value.name
+        value.set("y", f"{constants.SOCKET_TEXT_HEIGHT}")
+        value.set("text-anchor", "end")
+        value.set("x", f"{width - self.PADDING}")
+        group.append(value)
+        return group
+    
+# SVG socket subclass: GEOMETRY
+class UISocketGeometry(UISocket):
+
+    def svg_unlinked(self, width: float = 100) -> ET.Element:
+        return super().svg_unlinked(width)
+
+# SVG socket subclass: MATERIAL
+class UISocketMaterial(UISocket):
+    
+    def svg_unlinked(self, width: float = 100) -> ET.Element:
+        group = self.svg_linked(width)
+        if not self.socket.default_value: return group
+        value = ET.Element('text')
+        value.text = self.socket.default_value.name
+        value.set("y", f"{constants.SOCKET_TEXT_HEIGHT}")
+        value.set("text-anchor", "end")
+        value.set("x", f"{width - self.PADDING}")
+        group.append(value)
+        return group
+
+# SVG socket subclass: STRING
+class UISocketString(UISocket):
+
+    def svg_unlinked(self, width: float = 100) -> ET.Element:
+        group = self.svg_linked(width)
+        value = ET.Element('text')
+        value.text = self.socket.default_value
+        value.set("y", f"{constants.SOCKET_TEXT_HEIGHT}")
+        value.set("text-anchor", "end")
+        value.set("x", f"{width - self.PADDING}")
+        group.append(value)
+        return group
+    
+# SVG socket subclass: BOOLEAN
+class UISocketBoolean(UISocket):
+
+    def svg_unlinked(self, width: float = 100) -> ET.Element:
+        group = self.svg_linked(width)
+        group[0].set("x", f"{self.PADDING + constants.LINKED_SOCKET_HEIGHT}")
+        rect = ET.Element('rect')
+        rect.set('x', f"{self.PADDING + constants.LINKED_SOCKET_HEIGHT*0.2}")
+        rect.set('y', f"{constants.LINKED_SOCKET_HEIGHT*0.2}")
+        rect.set('width',  f"{constants.LINKED_SOCKET_HEIGHT*0.6}")
+        rect.set('height', f"{constants.LINKED_SOCKET_HEIGHT*0.6}")
+        #rect.set('class', 'bool_rect')
+        rect.set('stroke', 'none')
+        group.append(rect)
+
+        if self.socket.default_value:
+            rect.set('fill', '#7777dd')
+            check = ET.Element('polyline', fill='none', stroke='white')
+            check.set('stroke-width', "1")
+            check.set('points', f"{self.PADDING + constants.LINKED_SOCKET_HEIGHT*0.4}, {constants.LINKED_SOCKET_HEIGHT*0.5},\
+                      {self.PADDING + constants.LINKED_SOCKET_HEIGHT*0.5}, {constants.LINKED_SOCKET_HEIGHT*0.6},\
+                        {self.PADDING + constants.LINKED_SOCKET_HEIGHT*0.7}, {constants.LINKED_SOCKET_HEIGHT*0.3}")
+            group.append(check)
+        else:
+            rect.set('fill', '#222222')
+        
         return group
 
 
