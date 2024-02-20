@@ -1,4 +1,5 @@
 import importlib
+
 from . import constants
 importlib.reload(constants)
 
@@ -84,12 +85,35 @@ class UINode(UI):
         self.socket_count = len(self.sockets)
         self.socket_coords = {}
 
+        # process header
+        self.uiheader = UIHeader(self.name, self.w)
+
+        # process sockets ahead of time
+        self.uioutputs = [socketFactory(socket) for socket in self.outputs()]
+        self.uiinputs = [socketFactory(socket) for socket in self.inputs()]
+
+
+        self.output_coords = []
+        next_output_coord = self.uiheader.height + constants.TOP_PADDING
+        for output in self.uioutputs:
+            self.output_coords.append(next_output_coord)
+            next_output_coord += output.height + constants.SOCKET_GAP
+
+        self.input_coords = []
+        next_input_coord = self.h - constants.BOTTOM_PADDING
+        for input in self.uiinputs[::-1]:
+            next_input_coord -= input.height
+            self.input_coords.append(next_input_coord)
+            next_input_coord -= constants.SOCKET_GAP
+
+        self.input_coords.reverse()
+
+
     def get_socket_coords(self):
         self.socket_coords = {}
-        for i, socket in enumerate(self.outputs()):
-            self.socket_coords[str(socket.as_pointer())] = (self.x+self.w,self.y+(i+0.5)*constants.LINKED_SOCKET_HEIGHT + constants.HEADER_HEIGHT)
-        for i, socket in enumerate(self.inputs()[::-1]):
-            self.socket_coords[str(socket.as_pointer())] = (self.x, self.y+self.h-(i+0.5)*constants.LINKED_SOCKET_HEIGHT)
+        for coord, uisocket in zip(self.output_coords + self.input_coords, self.uioutputs + self.uiinputs):
+            offset = 0 if not uisocket.socket.is_output else self.w
+            self.socket_coords[str(uisocket.socket.as_pointer())] = (self.x+offset,self.y+coord+(0.5)*constants.LINKED_SOCKET_HEIGHT)
         return self.socket_coords
 
     def sockets_like(self) -> list[bpy.types.NodeSocket]:
@@ -113,22 +137,22 @@ class UINode(UI):
 
 
         # header
-        uiheader = UIHeader(self.name, self.w)
+        uiheader = self.uiheader
         header_svg = uiheader.svg()
 
         group.append(header_svg)
         
+        print(self.output_coords, self.uioutputs)
+        for coord, uisocket in zip(self.output_coords, self.uioutputs):
+            svg = uisocket.svg(width=self.w)
+            svg.set("y", str(coord))
+            group.append(svg)
 
-        for i, socket in enumerate([output for output in self.outputs() if not output.hide]):
-            uisocket = socketFactory(socket)
+        for coord, uisocket in zip(self.input_coords, self.uiinputs):
             svg = uisocket.svg(width=self.w)
-            svg.set("transform", f"translate(0,{uiheader.height + i*uisocket.height})")
+            svg.set("y", str(coord))
             group.append(svg)
-        for i, socket in enumerate([input for input in self.inputs() if not input.hide]):
-            uisocket = socketFactory(socket)
-            svg = uisocket.svg(width=self.w)
-            svg.set("transform", f"translate(0,{self.h - (len(self.inputs()) - i)*uisocket.height})")
-            group.append(svg)
+
         return group
 
     def frame(self) -> ET.Element:
