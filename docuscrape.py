@@ -11,14 +11,18 @@ NODES_EXT = {
 
 if __name__=="__main__":
 
+    nodes = []
+
     for key, value in NODES_EXT.items():
         
         for subdir in [f.name for f in os.scandir(os.path.join(INDEX, value)) if f.is_dir()]:
 
-            ...
+            for file in os.scandir(os.path.join(INDEX, value, subdir)):
+                fn = file.name
+                if fn == "index.html": continue
+                bs = BeautifulSoup(open(os.path.join(INDEX, value, subdir, fn)), 'lxml')
+                for T in bs.recursiveChildGenerator():
+                    if T.name == "h1":
+                        print(key, subdir, T.text[:-1])
 
-            html = open(os.path.join(INDEX, value, "index.html"))
-            S = BeautifulSoup(html, 'lxml')
-
-        for T in S.recursiveChildGenerator():
-            if T.name: print(T.name)
+                        
