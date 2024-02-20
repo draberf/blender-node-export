@@ -33,6 +33,24 @@ def socketFactory(socket: bpy.types.NodeSocket) -> 'UISocket':
             return UISocketRGBA(socket)
         case "VECTOR":
             return UISocketVector(socket)
+        case "INT":
+            return UISocketInt(socket)
+        case "IMAGE":
+            return UISocketImage(socket)
+        case "OBJECT":
+            return UISocketObject(socket)
+        case "TEXTURE":
+            return UISocketTexture(socket)
+        case "COLLECTION":
+            return UISocketCollection(socket)
+        case "GEOMETRY":
+            return UISocketGeometry(socket)
+        case "MATERIAL":
+            return UISocketMaterial(socket)
+        case "STRING":
+            return UISocketString(socket)
+        case "BOOLEAN":
+            return UISocketBoolean(socket)
         case _:
             return UISocket(socket)
 
