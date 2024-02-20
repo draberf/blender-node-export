@@ -67,7 +67,7 @@ def blColorToSVGColor(color: mathutils.Color) -> str:
 class UI:
 
     def svg(self):
-        return ET.Element('g')
+        return ET.Element('svg')
 
 # class wrapper for a single node
 class UINode(UI):
