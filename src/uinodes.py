@@ -164,9 +164,7 @@ class UISocket(UI):
 
     # generic linked version
     def svg_linked(self, width: float = 100) -> ET.Element:
-        group = ET.Element('g', id=f"Socket {self.socket.name}")
-        rect = ET.Element('rect', width=f"{width}", height=f"{self.height}", fill="none", stroke="none")
-        group.append(rect)
+        group = ET.Element('svg', id=f"Socket {self.socket.name}")
         # p272
         label = ET.Element('text')
         label.text = self.name
