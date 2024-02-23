@@ -34,8 +34,10 @@ from .src import ui_panel_inputs
 
 def register():
     bpy.utils.register_class(ui_panel_inputs.UIInspectOperator)
+    bpy.utils.register_class(ui_panel_inputs.UIExportOperator)
     bpy.utils.register_class(ui_panel_inputs.UIInspectPanel)
 
 def unregister():
     bpy.utils.unregister_class(ui_panel_inputs.UIInspectOperator)
+    bpy.utils.unregister_class(ui_panel_inputs.UIExportOperator)
     bpy.utils.unregister_class(ui_panel_inputs.UIInspectPanel)
