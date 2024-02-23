@@ -7,20 +7,33 @@ import inspect
 from . import node_to_svg
 importlib.reload(node_to_svg)
 
+from .constants import DEFAULT_PROPERTIES
+
 class UIInspectOperator(bpy.types.Operator):
     bl_idname = "ui.inspector"
     bl_label = "Inspector"
 
     def execute(self, context):
-        # current material is accessed through bpy.context.material
-        # presumably this always matches to Nodes on screen
-        print("     ")
-        print("     ")
-        print(" === ")
-        print("     ")
-        print("     ")
+        
+        print("====")
 
-        SELECT_ALL = True
+        if not (nodes := context.selected_nodes):
+            print("No selected node")
+            return {'CANCELLED'}
+
+        for node in nodes:
+
+            print(node)
+
+            print("Sockets:")
+            for input in node.inputs:
+                print(input.name + " " + input.type, [hex(round(val*255)) for val in input.draw_color(context, node)[:3]])
+            print("Props:")
+            for prop in node.bl_rna.properties[DEFAULT_PROPERTIES:]:
+                print(prop.name + " " + prop.type + " " + prop.subtype)
+    
+        return {'FINISHED'}
+        
 
         #nodes = bpy.context.selected_nodes
 
