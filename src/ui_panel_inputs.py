@@ -35,6 +35,14 @@ class UIInspectOperator(bpy.types.Operator):
         return {'FINISHED'}
         
 
+class UIExportOperator(bpy.types.Operator):
+    bl_idname = "ui.exporter"
+    bl_label = "Exporter"
+
+    def execute(self, context):
+
+        #SELECT_ALL = True
+
         #nodes = bpy.context.selected_nodes
 
         #if SELECT_ALL:
@@ -42,31 +50,18 @@ class UIInspectOperator(bpy.types.Operator):
         #    nodes += bpy.context.selected_nodes
         #    bpy.ops.node.select_all(action='INVERT')
 
-        nodetree = context.space_data.edit_tree
+        nodetree = context.space_data.node_tree
 
-        links = []
-        for link in nodetree.links:
-            print("From Socket ID", link.from_socket.as_pointer())
-            print("  To Socket ID", link.to_socket.as_pointer())
-            links.append((link.from_socket.as_pointer(), link.to_socket.as_pointer()))
-
-        for node in nodetree.nodes:
-            print(node, node.name, node.label, "idname", node.bl_idname)
-            if isinstance(node, bpy.types.NodeFrame): print("parent", len(node.internal_links))
-            for socket in node.inputs.values():
-                print(">>", socket.name, socket.label, socket.type, socket)                 
-
-
-        node_to_svg.nodesToSvg(nodetree.nodes, nodetree.links)
+        node_to_svg.nodesToSvg(nodetree, context.preferences.themes[0].node_editor.noodle_curving)
         
         return {'FINISHED'}
 
 class UIInspectPanel(bpy.types.Panel):
     bl_space_type = 'NODE_EDITOR'
     bl_region_type = 'UI'
-    bl_category = "Inspect"
-    bl_idname = "NODE_EDITOR_PT_inspector"
-    bl_label = "Inspector"
+    bl_category = "Expoprt"
+    bl_idname = "NODE_EDITOR_PT_exporter"
+    bl_label = "Exporter"
 
     @classmethod
     def poll(cls, context):
@@ -75,12 +70,16 @@ class UIInspectPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
 
-        box = layout.box()
-        box.label(text="Inspect")
-        box.operator(
-            operator='ui.inspector',
+        layout.operator(
+            operator='ui.exporter',
             icon='NODETREE',
-            text='Inspect'
+            text='Export'
+        )
+
+        layout.operator(
+            operator='ui.inspector',
+            icon='NODE',
+            text='Inspect Selected'
         )
 
 if __name__=="__main__":
