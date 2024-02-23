@@ -172,7 +172,7 @@ class UINode(UI):
 class UISocket(UI):
     
     # constants: TODO change
-    PADDING = 6
+    PADDING = 10
 
     def __init__(self, socket: bpy.types.NodeSocket, height: float = constants.LINKED_SOCKET_HEIGHT) -> None:
         self.socket = socket
@@ -181,7 +181,7 @@ class UISocket(UI):
 
     # generic svg function
     def svg(self, width: float = 100) -> ET.Element:
-        if self.socket.is_linked or self.socket.is_output:
+        if self.socket.is_linked or self.socket.is_output or self.socket.hide_value:
             return self.svg_linked(width)
         else:
             return self.svg_unlinked(width)
@@ -199,6 +199,7 @@ class UISocket(UI):
         else:
             label.set("x", f"{self.PADDING}")
         group.append(label)
+        group.append(UIShape(self.socket).svg())
         return group
 
     # specific unlinked version (varies from socket to socket)
@@ -240,7 +241,7 @@ class UISocketVector(UISocket):
 
     def __init__(self, socket: bpy.types.NodeSocket, height: float = constants.LINKED_SOCKET_HEIGHT) -> None:
         super().__init__(socket, height)
-        self.height = 4*height
+        self.height = 4*height if not self.socket.hide_value else height
 
     def svg_unlinked(self, width: float = 100) -> ET.Element:
         group = self.svg_linked(width)
@@ -413,3 +414,12 @@ class UIHeader(UI):
         group.append(label)
 
         return group
+    
+class UIShape(UI):
+
+    def __init__(self, socket):
+        self.shape = socket.display_shape
+        self.color = constants.SOCKET_COLORS[socket.type]
+
+    def svg(self):
+        return ET.Element('rect', x="0", y="0", width="5", height="5", fill=self.color, stroke="none")
