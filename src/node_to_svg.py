@@ -27,6 +27,7 @@ def nodesToSvg(nodetree: types.NodeTree, curving=5, colors = {}):
     viewBox_maxX, viewBox_maxY = nodes[0].location
 
     link_mapping = {}
+    ui_nodes = []
 
     for i, node in enumerate(nodes):
         
@@ -46,24 +47,20 @@ def nodesToSvg(nodetree: types.NodeTree, curving=5, colors = {}):
         viewBox_maxY = max(viewBox_maxY, y+h)
 
         # create frame
-        ui = ui_node.svg()
-        g.append(ui)
+        ui_nodes.append(ui_node.svg())
 
-        # add group to svg
-        svg.append(g)
 
     # add links
+    fac = curving/10.0
     for link in links:
         from_x, from_y = link_mapping[str(link.from_socket.as_pointer())]
         to_x, to_y = link_mapping[str(link.to_socket.as_pointer())]
-        line = ET.Element('line',
-                          x1=str(from_x),
-                          y1=str(from_y),
-                          x2=str(to_x),
-                          y2=str(to_y),
-                          style="stroke:rgb(0,0,0);stroke-width:2")
+        diff_x = abs(to_x - from_x)
+        line = ET.Element('path', d=f"M {from_x},{from_y} C {from_x + fac*diff_x},{from_y} {to_x - fac*diff_x},{to_y} {to_x},{to_y}",
+                          style="stroke:rgb(0,0,0);stroke-width:2;fill:none")
         svg.append(line)
-        
+
+    svg.extend(ui_nodes)        
 
     svg.set("viewBox", f"{viewBox_minX-PADDING} {viewBox_minY-PADDING} {viewBox_maxX-viewBox_minX+PADDING} {viewBox_maxY-viewBox_minY+PADDING}")
 
