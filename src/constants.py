@@ -35,3 +35,9 @@ SOCKET_COLORS = {
     "TEXTURE": "#9e4fa3",
     "MATERIAL": "#eb7582"
 }
+
+# size of node anchor markers
+MARKER_SIZE = 7
+MARKER_LINE = 1
+MARKER_BOX_HALF = (MARKER_SIZE+MARKER_LINE)/2
+
