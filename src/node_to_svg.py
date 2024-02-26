@@ -10,14 +10,11 @@ PADDING = 3
 
 TARGET = "D:\\skola_mit\\dp\\blender-node-export\\output.svg"
 
-def nodesToSvg(nodetree: types.NodeTree, curving=5, colors = {}):
+def nodesToSvg(nodetree: types.NodeTree, context):
 
+    curving = context.preferences.themes[0].node_editor.noodle_curving
     nodes = nodetree.nodes
     links = nodetree.links
-
-    header = "<?xml version='1.0' encoding='utf-8'?>"
-
-    doctype = "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">"
 
     svg = ET.Element('svg', version="1.1", xmlns="http://www.w3.org/2000/svg")
 
@@ -28,6 +25,7 @@ def nodesToSvg(nodetree: types.NodeTree, curving=5, colors = {}):
 
     link_mapping = {}
     ui_nodes = []
+    ui_anchors = []
 
     for i, node in enumerate(nodes):
         
@@ -47,7 +45,9 @@ def nodesToSvg(nodetree: types.NodeTree, curving=5, colors = {}):
         viewBox_maxY = max(viewBox_maxY, y+h)
 
         # create frame
-        ui_nodes.append(ui_node.svg())
+        uinode, anchors = ui_node.svg()
+        ui_nodes.append(uinode)
+        ui_anchors.extend(anchors)
 
 
     # add links
@@ -60,22 +60,17 @@ def nodesToSvg(nodetree: types.NodeTree, curving=5, colors = {}):
                           style="stroke:rgb(0,0,0);stroke-width:2;fill:none")
         svg.append(line)
 
-    svg.extend(ui_nodes)        
+    svg.extend(ui_nodes)
+    svg.extend(ui_anchors)        
 
     svg.set("viewBox", f"{viewBox_minX-PADDING} {viewBox_minY-PADDING} {viewBox_maxX-viewBox_minX+PADDING} {viewBox_maxY-viewBox_minY+PADDING}")
 
-    tree = ET.ElementTree(svg)
-    ET.indent(tree, '  ')
     # svg_string = ET.tostring(tree, encoding='unicode')
     # msg = '\n'.join([header, doctype, svg_string])
 
     #print(msg)
 
-    with open(TARGET, "w") as f:
-        f.write(header)
-        f.write(doctype)
-        tree.write(f, encoding='unicode')
-
+    return svg
 
 if __name__=="__main__":
 
