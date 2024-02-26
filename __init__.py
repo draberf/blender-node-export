@@ -31,6 +31,10 @@ if "bpy" in locals():
 
 import bpy
 from .src import ui_panel_inputs
+import sys, importlib
+to_reload = [module for (m_name, module) in sys.modules.items() if m_name[:len("NodeExportToSVG.src.")] == "NodeExportToSVG.src."]
+for module in to_reload:
+    importlib.reload(module)
 
 def register():
     bpy.utils.register_class(ui_panel_inputs.UIInspectOperator)
