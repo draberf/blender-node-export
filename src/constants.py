@@ -41,3 +41,5 @@ MARKER_SIZE = 7
 MARKER_LINE = 1
 MARKER_BOX_HALF = (MARKER_SIZE+MARKER_LINE)/2
 
+# padding of the final tree viewbox
+VIEWBOX_PADDING = 3
