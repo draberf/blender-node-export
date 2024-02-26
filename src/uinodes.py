@@ -19,8 +19,9 @@ def style() -> ET.Element:
 
     style_elem.text = '\n'.join([
         ".nodeframe { fill: #333333 } ",
-        "text { font-family: Sans, Arial; font-size: 0.6em; fill: white }"
-        "rect { stroke: red; stroke-width: 0 }"
+        "text { font-family: Sans, Arial; font-size: 0.6em; fill: white }",
+        "rect { stroke: red; stroke-width: 0 }",
+        ".marker { stroke-width: "+str(constants.MARKER_LINE)+"px; stroke: black}"
     ])
 
     return style_elem
@@ -69,6 +70,99 @@ class UI:
 
     def svg(self):
         return ET.Element('svg')
+
+class UINodeTree(UI):
+
+    def __init__(self, nodetree, context) -> None:
+        
+        self.curving = context.preferences.themes[0].node_editor.noodle_curving
+        self.nodes = nodetree.nodes
+        self.links = nodetree.links
+
+
+    def svg(self):
+        
+        PADDING = constants.VIEWBOX_PADDING
+
+        svg = ET.Element('svg', version="1.1", xmlns="http://www.w3.org/2000/svg")
+
+        svg.append(style())
+
+        # add symbols
+        circle = ET.SubElement(svg, 'symbol', id='marker_circle')
+        ET.SubElement(circle, 'circle',
+                                 attrib={
+                                     'cx':f'{constants.MARKER_BOX_HALF}',
+                                     'cy':f'{constants.MARKER_BOX_HALF}',
+                                     'r':f'{constants.MARKER_SIZE/2}',
+                                     'class':'marker'
+                                     })
+        square = ET.SubElement(svg, 'symbol', id='marker_square')
+        ET.SubElement(square, 'rect',
+                                 attrib={
+                                     'x':'0',
+                                     'y':'0',
+                                     'width':f'{constants.MARKER_SIZE}',
+                                     'height':f'{constants.MARKER_SIZE}',
+                                     'class':'marker'
+                                     })
+        diamond = ET.SubElement(svg, 'symbol', id='marker_diamond')
+        ET.SubElement(diamond, 'polygon',
+                      attrib={
+                          'points':f'0 {constants.MARKER_SIZE/2} \
+                            {constants.MARKER_SIZE/2} {constants.MARKER_SIZE} \
+                                {constants.MARKER_SIZE} {constants.MARKER_SIZE/2} \
+                                    {constants.MARKER_SIZE/2} 0',
+                          'class':'marker'
+                      })
+        
+
+        viewBox_minX, viewBox_minY = self.nodes[0].location
+        viewBox_maxX, viewBox_maxY = self.nodes[0].location
+
+        link_mapping = {}
+        ui_nodes = []
+        ui_anchors = []
+
+        for i, node in enumerate(self.nodes):
+            
+            ui_node = UINode(node)
+            link_mapping.update(ui_node.get_socket_coords())
+
+            # create group
+            g = ET.Element('g', id=f"{node.name}_{i}")
+            w, h = node.dimensions
+            x = node.location[0]
+            y = -node.location[1]
+
+            viewBox_minX = min(viewBox_minX, x)
+            viewBox_minY = min(viewBox_minY, y)
+
+            viewBox_maxX = max(viewBox_maxX, x+w)
+            viewBox_maxY = max(viewBox_maxY, y+h)
+
+            # create frame
+            uinode, anchors = ui_node.svg()
+            ui_nodes.append(uinode)
+            ui_anchors.extend(anchors)
+
+        # add links
+        fac = self.curving/10.0
+        for link in self.links:
+            from_x, from_y = link_mapping[str(link.from_socket.as_pointer())]
+            to_x, to_y = link_mapping[str(link.to_socket.as_pointer())]
+            diff_x = abs(to_x - from_x)
+            ET.SubElement(svg, 'path', d=f"M {from_x},{from_y} C {from_x + fac*diff_x},{from_y} {to_x - fac*diff_x},{to_y} {to_x},{to_y}",
+                            style="stroke:#000000;stroke-width:4;fill:none")
+            ET.SubElement(svg, 'path', d=f"M {from_x},{from_y} C {from_x + fac*diff_x},{from_y} {to_x - fac*diff_x},{to_y} {to_x},{to_y}",
+                            style=f"stroke:#ffffff;stroke-width:2;fill:none")
+
+        svg.extend(ui_nodes)
+        svg.extend(ui_anchors)        
+
+        svg.set("viewBox", f"{viewBox_minX-PADDING} {viewBox_minY-PADDING} {viewBox_maxX-viewBox_minX+PADDING} {viewBox_maxY-viewBox_minY+PADDING}")
+
+        return svg        
 
 # class wrapper for a single node
 class UINode(UI):
@@ -128,9 +222,6 @@ class UINode(UI):
     def svg(self) -> ET.Element:
         group = ET.Element('svg', x=f"{self.x}", y=f"{self.y}")
         
-        # style
-        group.append(style())
-
         # frame
         rect = self.frame()
         group.append(rect)
@@ -140,20 +231,29 @@ class UINode(UI):
         uiheader = self.uiheader
         header_svg = uiheader.svg()
 
+        # anchors
+        anchorlist = []
+
         group.append(header_svg)
         
-        print(self.output_coords, self.uioutputs)
         for coord, uisocket in zip(self.output_coords, self.uioutputs):
-            svg = uisocket.svg(width=self.w)
+            svg, anchor = uisocket.svg(width=self.w)
+            anchor.set("x", str(self.x + self.w - constants.MARKER_SIZE/2))
+            anchor.set("y", str(self.y + coord + constants.LINKED_SOCKET_HEIGHT/2 - constants.MARKER_BOX_HALF))
+            anchorlist.append(anchor)
             svg.set("y", str(coord))
             group.append(svg)
 
         for coord, uisocket in zip(self.input_coords, self.uiinputs):
-            svg = uisocket.svg(width=self.w)
+            svg, anchor = uisocket.svg(width=self.w)
+            anchor.set("x", str(self.x - constants.MARKER_SIZE/2))
+            anchor.set("y", str(self.y + coord + constants.LINKED_SOCKET_HEIGHT/2 - constants.MARKER_BOX_HALF))
+            anchorlist.append(anchor)
             svg.set("y", str(coord))
             group.append(svg)
 
-        return group
+        print(anchorlist)
+        return group, anchorlist
 
     def frame(self) -> ET.Element:
         frame_items = ET.Element('svg')
@@ -182,9 +282,9 @@ class UISocket(UI):
     # generic svg function
     def svg(self, width: float = 100) -> ET.Element:
         if self.socket.is_linked or self.socket.is_output or self.socket.hide_value:
-            return self.svg_linked(width)
+            return self.svg_linked(width), UIShape(self.socket).svg()
         else:
-            return self.svg_unlinked(width)
+            return self.svg_unlinked(width), UIShape(self.socket).svg()
 
     # generic linked version
     def svg_linked(self, width: float = 100) -> ET.Element:
@@ -199,7 +299,6 @@ class UISocket(UI):
         else:
             label.set("x", f"{self.PADDING}")
         group.append(label)
-        group.append(UIShape(self.socket).svg())
         return group
 
     # specific unlinked version (varies from socket to socket)
@@ -417,9 +516,17 @@ class UIHeader(UI):
     
 class UIShape(UI):
 
+    shapes = {
+        "C": "circle",
+        "D": "diamond",
+        "S": "square"
+    }
+
     def __init__(self, socket):
-        self.shape = socket.display_shape
+        self.shape = self.shapes[socket.display_shape[0]]
+        self.has_dot = socket.display_shape[-1] == "T"
         self.color = constants.SOCKET_COLORS[socket.type]
 
     def svg(self):
-        return ET.Element('rect', x="0", y="0", width="5", height="5", fill=self.color, stroke="none")
+        return ET.Element('use', href=f'#marker_{self.shape}', fill=self.color)
+        return ET.Element('rect', width=f"{constants.MARKER_SIZE}", height=f"{constants.MARKER_SIZE}", fill=self.color, stroke="none")

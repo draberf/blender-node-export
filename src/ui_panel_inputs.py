@@ -3,11 +3,16 @@ import importlib
 
 # unncessary later
 import inspect
+import xml.etree.ElementTree as ET
 
-from . import node_to_svg
-importlib.reload(node_to_svg)
+
+from . import uinodes
+importlib.reload(uinodes)
+from .uinodes import UINodeTree
 
 from .constants import DEFAULT_PROPERTIES
+
+TARGET = "D:\\skola_mit\\dp\\blender-node-export\\output.svg"
 
 class UIInspectOperator(bpy.types.Operator):
     bl_idname = "ui.inspector"
@@ -52,8 +57,20 @@ class UIExportOperator(bpy.types.Operator):
 
         nodetree = context.space_data.node_tree
 
-        node_to_svg.nodesToSvg(nodetree, context.preferences.themes[0].node_editor.noodle_curving)
+
+        header = "<?xml version='1.0' encoding='utf-8'?>"
+
+        doctype = "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">"
+
+
+        tree = ET.ElementTree(UINodeTree(nodetree, context).svg())
         
+            
+        with open(TARGET, "w") as f:
+            f.write(header)
+            f.write(doctype)
+            tree.write(f, encoding='unicode')
+
         return {'FINISHED'}
 
 class UIInspectPanel(bpy.types.Panel):
