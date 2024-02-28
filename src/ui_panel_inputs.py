@@ -22,6 +22,10 @@ class UIInspectOperator(bpy.types.Operator):
         
         print("====")
 
+        print(bpy.types.UILayout)
+        return {'FINISHED'}
+
+
         if not (nodes := context.selected_nodes):
             print("No selected node")
             return {'CANCELLED'}
@@ -29,6 +33,9 @@ class UIInspectOperator(bpy.types.Operator):
         for node in nodes:
 
             print(node)
+            print(dir(node.bl_rna))
+            print(node.node_tree.name)
+            continue
 
             print("Sockets:")
             for input in node.inputs:
@@ -36,6 +43,7 @@ class UIInspectOperator(bpy.types.Operator):
             print("Props:")
             for prop in node.bl_rna.properties[DEFAULT_PROPERTIES:]:
                 print(prop.name + " " + prop.type + " " + prop.subtype)
+                if prop.name == "Type": print(prop.type)
     
         return {'FINISHED'}
         
