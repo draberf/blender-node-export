@@ -7,6 +7,37 @@ import bpy
 import mathutils
 import xml.etree.ElementTree as ET
 
+MARKER_DEFS = {
+    'circle': ('circle',{
+                            'cx':f'{constants.MARKER_BOX_HALF}',
+                            'cy':f'{constants.MARKER_BOX_HALF}',
+                            'r':f'{constants.MARKER_SIZE/2}',
+                            'class':'marker'
+                            }),
+    'square':('rect',{
+                            'x':'0',
+                            'y':'0',
+                            'width':f'{constants.MARKER_SIZE}',
+                            'height':f'{constants.MARKER_SIZE}',
+                            'class':'marker'
+                            }),
+    'diamond':('polygon',{
+                            'points':f'\
+                            {constants.MARKER_LINE/2} {constants.MARKER_BOX_HALF} \
+                            {constants.MARKER_BOX_HALF} {constants.MARKER_LINE/2} \
+                            {constants.MARKER_SIZE+constants.MARKER_LINE/2} {constants.MARKER_BOX_HALF} \
+                            {constants.MARKER_BOX_HALF} {constants.MARKER_SIZE+constants.MARKER_LINE/2} \
+                            ',
+                            'class':'marker'
+                            }),
+    'dot':('circle',{       
+                            'cx':f'{constants.MARKER_BOX_HALF}',
+                            'cy':f'{constants.MARKER_BOX_HALF}',
+                            'r':f'{constants.MARKER_DOT_RADIUS}',
+                            'class':'marker_dot'
+                            })
+    }
+
 def getFloatString(value: float, spaces: int = 5) -> str:
 
     s = str(value)[:5]
