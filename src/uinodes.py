@@ -521,7 +521,7 @@ class UIHeader(UI):
         rect.set("stroke", "none")
         group.append(rect)
 
-        label = ET.Element('text', x=f"{self.PADDING}", y=f"{self.height/2}")
+        label = ET.Element('text', x=f"{self.PADDING}", y=f"{self.height*3/4}")
         label.text = self.name
         group.append(label)
 
