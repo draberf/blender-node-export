@@ -541,5 +541,10 @@ class UIShape(UI):
         self.color = constants.SOCKET_COLORS[socket.type]
 
     def svg(self):
-        return ET.Element('use', href=f'#marker_{self.shape}', fill=self.color)
+        group = ET.Element('svg')
+
+        ET.SubElement(group, 'use', href=f'#marker_{self.shape}', fill=self.color)
+        if self.has_dot: ET.SubElement(group, 'use', href=f'#marker_dot', fill='black', stroke='none')
+
+        return group
         return ET.Element('rect', width=f"{constants.MARKER_SIZE}", height=f"{constants.MARKER_SIZE}", fill=self.color, stroke="none")
