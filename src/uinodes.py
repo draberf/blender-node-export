@@ -109,6 +109,7 @@ class UINodeTree(UI):
     def __init__(self, nodetree, context) -> None:
         
         self.curving = context.preferences.themes[0].node_editor.noodle_curving
+        self.colors = {k:blColorToSVGColor(v) for k, v in [(k, eval(f'bpy.context.preferences.themes[0].node_editor.{k}')) for k in categories.category_to_node.keys()]}
         self.nodes = nodetree.nodes
         self.links = nodetree.links
 
@@ -139,7 +140,12 @@ class UINodeTree(UI):
 
         for i, node in enumerate(self.nodes):
             
-            ui_node = UINode(node)
+            # if the name has a .### suffix (differentiate between multiple instances), remove it from key
+            key = node.name[:-4] if node.name[-4] == '.' else node.name
+            color = "gray"
+            if key in categories.node_to_category.keys():
+                color = self.colors[categories.node_to_category[key]]
+            ui_node = UINode(node, color)
             link_mapping.update(ui_node.get_socket_coords())
 
             # create group
@@ -159,16 +165,18 @@ class UINodeTree(UI):
             ui_nodes.append(uinode)
             ui_anchors.extend(anchors)
 
+        print(link_mapping)
+
         # add links
         fac = self.curving/10.0
         for link in self.links:
-            from_x, from_y = link_mapping[str(link.from_socket.as_pointer())]
-            to_x, to_y = link_mapping[str(link.to_socket.as_pointer())]
+            from_x, from_y, color1 = link_mapping[str(link.from_socket.as_pointer())]
+            to_x, to_y, _ = link_mapping[str(link.to_socket.as_pointer())]
             diff_x = abs(to_x - from_x)
             ET.SubElement(svg, 'path', d=f"M {from_x},{from_y} C {from_x + fac*diff_x},{from_y} {to_x - fac*diff_x},{to_y} {to_x},{to_y}",
-                            style="stroke:#000000;stroke-width:4;fill:none")
+                            style=f"stroke:#000000;stroke-width:4;fill:none")
             ET.SubElement(svg, 'path', d=f"M {from_x},{from_y} C {from_x + fac*diff_x},{from_y} {to_x - fac*diff_x},{to_y} {to_x},{to_y}",
-                            style=f"stroke:#ffffff;stroke-width:2;fill:none")
+                            style=f"stroke:{color1};stroke-width:2;fill:none")
 
         svg.extend(ui_nodes)
         svg.extend(ui_anchors)        
@@ -180,7 +188,7 @@ class UINodeTree(UI):
 # class wrapper for a single node
 class UINode(UI):
 
-    def __init__(self, node: bpy.types.Node):
+    def __init__(self, node: bpy.types.Node, color_string: str):
         self.node = node
         self.name = node.label if node.label else node.name
         self.w, self.h = node.dimensions
@@ -193,7 +201,7 @@ class UINode(UI):
         self.socket_coords = {}
 
         # process header
-        self.uiheader = UIHeader(self.name, self.w)
+        self.uiheader = UIHeader(self.name, self.w, color=color_string)
 
         # process sockets ahead of time
         self.uioutputs = [socketFactory(socket) for socket in self.outputs()]
@@ -207,7 +215,8 @@ class UINode(UI):
             next_output_coord += output.height + constants.SOCKET_GAP
 
         self.input_coords = []
-        next_input_coord = self.h - constants.BOTTOM_PADDING
+        #TODO: padding from bottom is inconsistent across nodes👍👍
+        next_input_coord = self.h - constants.TOP_PADDING
         for input in self.uiinputs[::-1]:
             next_input_coord -= input.height
             self.input_coords.append(next_input_coord)
@@ -220,7 +229,7 @@ class UINode(UI):
         self.socket_coords = {}
         for coord, uisocket in zip(self.output_coords + self.input_coords, self.uioutputs + self.uiinputs):
             offset = 0 if not uisocket.socket.is_output else self.w
-            self.socket_coords[str(uisocket.socket.as_pointer())] = (self.x+offset,self.y+coord+(0.5)*constants.LINKED_SOCKET_HEIGHT)
+            self.socket_coords[str(uisocket.socket.as_pointer())] = (self.x+offset,self.y+coord+(0.5)*constants.LINKED_SOCKET_HEIGHT,constants.SOCKET_COLORS[uisocket.socket.type])
         return self.socket_coords
 
     def sockets_like(self) -> list[bpy.types.NodeSocket]:
@@ -251,7 +260,7 @@ class UINode(UI):
         
         for coord, uisocket in zip(self.output_coords, self.uioutputs):
             svg, anchor = uisocket.svg(width=self.w)
-            anchor.set("x", str(self.x + self.w - constants.MARKER_SIZE/2))
+            anchor.set("x", str(self.x + self.w - constants.MARKER_BOX_HALF))
             anchor.set("y", str(self.y + coord + constants.LINKED_SOCKET_HEIGHT/2 - constants.MARKER_BOX_HALF))
             anchorlist.append(anchor)
             svg.set("y", str(coord))
@@ -259,13 +268,12 @@ class UINode(UI):
 
         for coord, uisocket in zip(self.input_coords, self.uiinputs):
             svg, anchor = uisocket.svg(width=self.w)
-            anchor.set("x", str(self.x - constants.MARKER_SIZE/2))
+            anchor.set("x", str(self.x - constants.MARKER_BOX_HALF))
             anchor.set("y", str(self.y + coord + constants.LINKED_SOCKET_HEIGHT/2 - constants.MARKER_BOX_HALF))
             anchorlist.append(anchor)
             svg.set("y", str(coord))
             group.append(svg)
 
-        print(anchorlist)
         return group, anchorlist
 
     def frame(self) -> ET.Element:
