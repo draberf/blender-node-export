@@ -3,6 +3,8 @@ import importlib
 from . import constants
 importlib.reload(constants)
 
+from . import categories
+
 import bpy
 import mathutils
 import xml.etree.ElementTree as ET
