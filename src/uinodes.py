@@ -122,33 +122,13 @@ class UINodeTree(UI):
         svg.append(style())
 
         # add symbols
-        circle = ET.SubElement(svg, 'symbol', id='marker_circle')
-        ET.SubElement(circle, 'circle',
-                                 attrib={
-                                     'cx':f'{constants.MARKER_BOX_HALF}',
-                                     'cy':f'{constants.MARKER_BOX_HALF}',
-                                     'r':f'{constants.MARKER_SIZE/2}',
-                                     'class':'marker'
-                                     })
-        square = ET.SubElement(svg, 'symbol', id='marker_square')
-        ET.SubElement(square, 'rect',
-                                 attrib={
-                                     'x':'0',
-                                     'y':'0',
-                                     'width':f'{constants.MARKER_SIZE}',
-                                     'height':f'{constants.MARKER_SIZE}',
-                                     'class':'marker'
-                                     })
-        diamond = ET.SubElement(svg, 'symbol', id='marker_diamond')
-        ET.SubElement(diamond, 'polygon',
-                      attrib={
-                          'points':f'0 {constants.MARKER_SIZE/2} \
-                            {constants.MARKER_SIZE/2} {constants.MARKER_SIZE} \
-                                {constants.MARKER_SIZE} {constants.MARKER_SIZE/2} \
-                                    {constants.MARKER_SIZE/2} 0',
-                          'class':'marker'
-                      })
+
+        for sym_name, (elem_name, elem_attrs) in MARKER_DEFS.items():
+            symbol = ET.SubElement(svg, 'symbol', id='marker_'+sym_name)
+            ET.SubElement(symbol, elem_name, attrib=elem_attrs)
+
         
+
 
         viewBox_minX, viewBox_minY = self.nodes[0].location
         viewBox_maxX, viewBox_maxY = self.nodes[0].location
