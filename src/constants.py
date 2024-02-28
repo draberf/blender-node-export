@@ -14,8 +14,8 @@ SOCKET_TEXT_HEIGHT = 11
 # colors
 HEADER_COLOR = "red"
 
-# properties
-DEFAULT_PROPERTIES = 32
+# properties to skip
+DEFAULT_PROPERTIES = 0
 
 # colors
 SOCKET_COLORS = {
