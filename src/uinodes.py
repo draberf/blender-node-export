@@ -141,7 +141,9 @@ class UINodeTree(UI):
         for i, node in enumerate(self.nodes):
             
             # if the name has a .### suffix (differentiate between multiple instances), remove it from key
-            key = node.name[:-4] if node.name[-4] == '.' else node.name
+            key = node.name
+            if len(key) > 4:
+                if node.name[-4] == '.': key = node.name[:-4]
             color = "gray"
             if key in categories.node_to_category.keys():
                 color = self.colors[categories.node_to_category[key]]
