@@ -22,9 +22,6 @@ class UIInspectOperator(bpy.types.Operator):
         
         print("====")
 
-        print(bpy.types.UILayout)
-        return {'FINISHED'}
-
 
         if not (nodes := context.selected_nodes):
             print("No selected node")
