@@ -14,6 +14,9 @@ from .constants import IGNORE_PROPS
 
 TARGET = "D:\\skola_mit\\dp\\blender-node-export\\output.svg"
 
+class ExportPropertyGroup(bpy.types.PropertyGroup):
+    output: bpy.props.StringProperty(name = "Output", subtype='FILE_PATH')
+
 class UIInspectOperator(bpy.types.Operator):
     bl_idname = "ui.inspector"
     bl_label = "Inspector"
@@ -53,7 +56,7 @@ class UIInspectOperator(bpy.types.Operator):
 class UIExportOperator(bpy.types.Operator):
     bl_idname = "ui.exporter"
     bl_label = "Exporter"
-
+    
     def execute(self, context):
 
         #SELECT_ALL = True
@@ -75,8 +78,9 @@ class UIExportOperator(bpy.types.Operator):
 
         tree = ET.ElementTree(UINodeTree(nodetree, context).svg())
         
-            
-        with open(TARGET, "w") as f:
+        print(context.scene.export_svg_props.output)
+
+        with open(bpy.path.abspath(context.scene.export_svg_props.output), "w+") as f:
             f.write(header)
             f.write(doctype)
             tree.write(f, encoding='unicode')
@@ -86,16 +90,26 @@ class UIExportOperator(bpy.types.Operator):
 class UIInspectPanel(bpy.types.Panel):
     bl_space_type = 'NODE_EDITOR'
     bl_region_type = 'UI'
-    bl_category = "Expoprt"
+    bl_category = "Export"
     bl_idname = "NODE_EDITOR_PT_exporter"
     bl_label = "Exporter"
+
 
     @classmethod
     def poll(cls, context):
         return (context.object is not None)
 
     def draw(self, context):
+
         layout = self.layout
+
+        
+
+        row = layout.row()
+        row.label(text="Export target")
+
+        row = layout.row()
+        row.prop(context.scene.export_svg_props, 'output', text="")
 
         layout.operator(
             operator='ui.exporter',

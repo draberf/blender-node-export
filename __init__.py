@@ -37,11 +37,21 @@ for module in to_reload:
     importlib.reload(module)
 
 def register():
+
+    # register properties
+    bpy.utils.register_class(ui_panel_inputs.ExportPropertyGroup)
+    bpy.types.Scene.export_svg_props = bpy.props.PointerProperty(type=ui_panel_inputs.ExportPropertyGroup)
+
     bpy.utils.register_class(ui_panel_inputs.UIInspectOperator)
     bpy.utils.register_class(ui_panel_inputs.UIExportOperator)
     bpy.utils.register_class(ui_panel_inputs.UIInspectPanel)
 
 def unregister():
+
+    # unregister properties
+    del bpy.types.Scene.export_svg_props
+    bpy.uitls.unregister_class(ui_panel_inputs.ExportPropertyGroup)
+
     bpy.utils.unregister_class(ui_panel_inputs.UIInspectOperator)
     bpy.utils.unregister_class(ui_panel_inputs.UIExportOperator)
     bpy.utils.unregister_class(ui_panel_inputs.UIInspectPanel)
