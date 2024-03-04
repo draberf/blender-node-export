@@ -109,7 +109,7 @@ class UINodeTree(UI):
     def __init__(self, nodetree, context) -> None:
         
         self.curving = context.preferences.themes[0].node_editor.noodle_curving
-        self.colors = {k:blColorToSVGColor(v) for k, v in [(k, eval(f'bpy.context.preferences.themes[0].node_editor.{k}')) for k in categories.category_to_node.keys()]}
+        self.colors = {k:blColorToSVGColor(v) for k, v in [(k, getattr(bpy.context.preferences.themes[0].node_editor, k)) for k in categories.category_to_node.keys()]}
         self.nodes = nodetree.nodes
         self.links = nodetree.links
 
@@ -141,9 +141,7 @@ class UINodeTree(UI):
         for i, node in enumerate(self.nodes):
             
             # if the name has a .### suffix (differentiate between multiple instances), remove it from key
-            key = node.name
-            if len(key) > 4:
-                if node.name[-4] == '.': key = node.name[:-4]
+            key = node.name[:-4] if node.name[-4] == '.' else node.name
             color = "gray"
             if key in categories.node_to_category.keys():
                 color = self.colors[categories.node_to_category[key]]
