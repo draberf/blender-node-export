@@ -16,6 +16,18 @@ HEADER_COLOR = "red"
 
 # properties to skip
 DEFAULT_PROPERTIES = 0
+IGNORE_PROPS = [
+    "rna_type", "type", "location", "width",
+    "width_hidden", "height", "dimensions", "name",
+    "label", "inputs", "outputs", "internal_links",
+    "parent", "use_custom_color", "color", "select",
+    "show_options", "show_preview", "hide", "mute",
+    "show_texture", "bl_idname", "bl_label",
+    "bl_description", "bl_icon", "bl_static_type",
+    "bl_width_default", "bl_width_min",
+    "bl_width_max", "bl_height_default",
+    "bl_height_min", "bl_height_max"
+]
 
 # colors
 SOCKET_COLORS = {
