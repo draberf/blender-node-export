@@ -10,7 +10,7 @@ from . import uinodes
 importlib.reload(uinodes)
 from .uinodes import UINodeTree
 
-from .constants import DEFAULT_PROPERTIES
+from .constants import IGNORE_PROPS
 
 TARGET = "D:\\skola_mit\\dp\\blender-node-export\\output.svg"
 
@@ -32,18 +32,23 @@ class UIInspectOperator(bpy.types.Operator):
 
         for node in nodes:
 
-            print(node)
-            print(dir(node.bl_rna))
-            print(node.node_tree.name)
-            continue
-
+            
             print("Sockets:")
             for input in node.inputs:
-                print(input.name + " " + input.type, [hex(round(val*255)) for val in input.draw_color(context, node)[:3]])
+                print(input.name + " " + input.type)
+                if input.type == "VALUE":
+                    print(input.bl_rna.properties["default_value"].hard_min)
+                    print(input.bl_rna.properties["default_value"].hard_max)
+                    print(input.bl_rna.properties["default_value"].soft_min)
+                    print(input.bl_rna.properties["default_value"].soft_max)
+                #for attr in input.bl_rna.properties:
+                #    print(">>", attr, getattr(input, attr.identifier))
             print("Props:")
-            for prop in node.bl_rna.properties[DEFAULT_PROPERTIES:]:
-                print(prop.name + " " + prop.type + " " + prop.subtype)
-                if prop.name == "Type": print(prop.type)
+            for prop in node.bl_rna.properties:
+                if prop.identifier in IGNORE_PROPS: continue
+                print(">", prop, prop.type, prop.subtype, " ... ", prop.fixed_type)
+                #for attr in prop.bl_rna.properties:
+                #    print("> >", attr, ":  ", getattr(prop, attr.identifier))
     
         return {'FINISHED'}
         
