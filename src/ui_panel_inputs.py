@@ -46,7 +46,7 @@ class UIInspectOperator(bpy.types.Operator):
             print("Props:")
             for prop in node.bl_rna.properties:
                 if prop.identifier in IGNORE_PROPS: continue
-                print(">", prop, prop.type, prop.subtype, " ... ", prop.fixed_type)
+                print(">", prop, prop.type, prop.subtype)
                 #for attr in prop.bl_rna.properties:
                 #    print("> >", attr, ":  ", getattr(prop, attr.identifier))
     
