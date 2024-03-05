@@ -1,9 +1,8 @@
 import importlib
 
 from . import constants
-importlib.reload(constants)
-
 from . import categories
+from . import widgets
 
 import bpy
 import mathutils
