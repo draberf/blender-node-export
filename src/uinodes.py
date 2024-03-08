@@ -149,6 +149,82 @@ def blColorToSVGColor(color: mathutils.Color) -> str:
     # compliant with specification at p85
     return "rgb("+",".join([str(round(x*255)) for x in [r,g,b]])+")"
     
+class Converter():
+
+    def __init__(self, context) -> None:
+        
+        nodetree = context.space_data.node_tree
+
+        self.nodes = []
+
+        self.links = [
+            (link.from_socket.as_pointer(), link.to_socket.as_pointer()) for link in nodetree.links
+        ]
+        self.curving = context.preferences.themes[0].node_editor.noodle_curving
+
+        self.anchor_refs = {}
+
+
+        self.vb_min_x = nodetree.nodes[0].location[0]
+        self.vb_min_y = nodetree.nodes[0].location[1]
+        self.vb_max_x = nodetree.nodes[0].location[0]
+        self.vb_max_y = nodetree.nodes[0].location[1]
+
+
+        for node in nodetree.nodes:
+            
+            # create node rep
+            node_object = UINode(node, "#cc4400")
+
+            # update viewbox corners
+            self.vb_min_x = min(self.vb_min_x, node_object.x)
+            self.vb_min_y = min(self.vb_min_y, node_object.y)
+            self.vb_max_x = max(self.vb_max_x, node_object.x+node_object.w)
+            self.vb_max_y = max(self.vb_max_y, node_object.y+node_object.h)
+
+            self.anchor_refs.update(node_object.anchors)
+            self.nodes.append(node_object)
+
+    def convert(self) -> ET.ElementTree:
+        
+        svg = ET.Element('svg', version="1.1", xmlns="http://www.w3.org/2000/svg")
+        svg.set('viewBox', ' '.join([str(f) for f in [
+            self.vb_min_x,
+            self.vb_min_y,
+            self.vb_max_x-self.vb_min_x,
+            self.vb_max_y-self.vb_min_y
+        ]]))
+
+        svg.append(style())
+
+        # add symbols
+
+        for sym_name, (elem_name, elem_attrs) in MARKER_DEFS.items():
+            symbol = ET.SubElement(svg, 'symbol', id='marker_'+sym_name)
+            ET.SubElement(symbol, elem_name, attrib=elem_attrs)
+
+        # add links to final SVG
+        fac = self.curving/10.0
+        for link in self.links:
+            
+            from_x, from_y, from_anchor_object = self.anchor_refs[link[0]]
+            to_x, to_y, _ = self.anchor_refs[link[1]]
+
+            color1 = from_anchor_object.color
+
+            diff_x = abs(to_x - from_x)
+            ET.SubElement(svg, 'path', d=f"M {from_x},{from_y} C {from_x + fac*diff_x},{from_y} {to_x - fac*diff_x},{to_y} {to_x},{to_y}",
+                            style=f"stroke:#000000;stroke-width:4;fill:none")
+            ET.SubElement(svg, 'path', d=f"M {from_x},{from_y} C {from_x + fac*diff_x},{from_y} {to_x - fac*diff_x},{to_y} {to_x},{to_y}",
+                            style=f"stroke:{color1};stroke-width:2;fill:none")
+
+        # add nodes to final SVG
+        svg.extend([node.svg() for node in self.nodes])
+
+        # add anchors to final SVG
+        svg.extend([anchor.svg(x=str(x-constants.MARKER_BOX_HALF), y=str(y-constants.MARKER_BOX_HALF)) for x, y, anchor in self.anchor_refs.values()])
+
+        return ET.ElementTree(svg)
 
 # encompassing SVG class
 class UI:
