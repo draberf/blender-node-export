@@ -9,6 +9,7 @@ import xml.etree.ElementTree as ET
 from . import uinodes
 importlib.reload(uinodes)
 from .uinodes import UINodeTree
+from .uinodes import Converter
 
 from .constants import IGNORE_PROPS
 
@@ -76,10 +77,9 @@ class UIExportOperator(bpy.types.Operator):
         doctype = "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">"
 
 
-        tree = ET.ElementTree(UINodeTree(nodetree, context).svg())
+        tree = Converter(context).convert()
+        #tree = ET.ElementTree(UINodeTree(nodetree, context).svg())
         
-        print(context.scene.export_svg_props.output)
-
         with open(bpy.path.abspath(context.scene.export_svg_props.output), "w+") as f:
             f.write(header)
             f.write(doctype)
