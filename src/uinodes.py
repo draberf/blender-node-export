@@ -135,6 +135,13 @@ SOCKET_WIDGET_DEFS = {
     'BOOLEAN': lambda socket: widgets.Boolean(name=socket.name, value=socket.default_value)
 }
 
+def widgetFactory(socket) -> widgets.Widget:
+    
+    if socket.is_output or socket.is_linked:
+        return widgets.Label(text=socket.name, align_right=True)
+
+    return SOCKET_WIDGET_DEFS[socket.type](socket)
+
 # in: mathutils.Color with r, g, b, methods
 # out: color representation in SVG-compliant format
 def blColorToSVGColor(color: mathutils.Color) -> str:
