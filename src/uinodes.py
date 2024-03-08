@@ -589,7 +589,7 @@ class UIHeader(UI):
 
         return group
     
-class UIShape(UI):
+class UIShape():
 
     shapes = {
         "C": "circle",
@@ -602,11 +602,10 @@ class UIShape(UI):
         self.has_dot = socket.display_shape[-1] == "T"
         self.color = constants.SOCKET_COLORS[socket.type]
 
-    def svg(self):
-        group = ET.Element('svg')
+    def svg(self, **kwargs):
+        group = ET.Element('svg', attrib=kwargs)
 
         ET.SubElement(group, 'use', href=f'#marker_{self.shape}', fill=self.color)
         if self.has_dot: ET.SubElement(group, 'use', href=f'#marker_dot', fill='black', stroke='none')
 
         return group
-        return ET.Element('rect', width=f"{constants.MARKER_SIZE}", height=f"{constants.MARKER_SIZE}", fill=self.color, stroke="none")
