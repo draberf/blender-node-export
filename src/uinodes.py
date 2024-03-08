@@ -92,6 +92,48 @@ def getImageWidgetString(socket):
         return socket.default_value.filepath
     return socket.default_value.source
 
+# convert unconnected input socket to widget
+SOCKET_WIDGET_DEFS = {
+    'VALUE': lambda socket: widgets.Columns(wids=[
+        widgets.Label(text=socket.name, align_right=False),
+        widgets.Label(text=str(socket.default_value), align_right=True)
+    ]),
+    'RGBA': lambda socket: widgets.Columns(wids=[
+        widgets.Label(text=socket.name, align_right=False),
+        widgets.RGBA(color="#ff0000")
+    ]),
+    'VECTOR': lambda socket: widgets.Vector(name=socket.name, values=socket.default_value),
+    'INT': lambda socket: widgets.Columns(wids=[
+        widgets.Label(text=socket.name, align_right=False),
+        widgets.Label(text=str(socket.default_value), align_right=True)
+    ]),
+    'IMAGE': lambda socket: widgets.Columns(wids=[
+        widgets.Label(text=socket.name, align_right=False),
+        widgets.Label(text=getImageWidgetString(socket), align_right=True)
+    ]),
+    'OBJECT': lambda socket: widgets.Columns(wids=[
+        widgets.Label(text=socket.name, align_right=False),
+        widgets.Label(text=socket.default_value.name, align_right=True)
+    ]),
+    'TEXTURE': lambda socket: widgets.Columns(wids=[
+        widgets.Label(text=socket.name, align_right=False),
+        widgets.Label(text=socket.default_value.name, align_right=True)
+    ]),
+    'COLLECTION': lambda socket: widgets.Columns(wids=[
+        widgets.Label(text=socket.name, align_right=False),
+        widgets.Label(text=socket.default_value.name, align_right=True)
+    ]),
+    'GEOMETRY': lambda socket: widgets.Label(text=socket.name, align_right=False),
+    'MATERIAL': lambda socket: widgets.Columns(wids=[
+        widgets.Label(text=socket.name, align_right=False),
+        widgets.Label(text=socket.default_value.name, align_right=True)
+    ]),
+    'STRING': lambda socket: widgets.Columns(wids=[
+        widgets.Label(text=socket.name, align_right=False),
+        widgets.Label(text=socket.default_value, align_right=True)
+    ]),
+    'BOOLEAN': lambda socket: widgets.Boolean(name=socket.name, value=socket.default_value)
+}
 
 # in: mathutils.Color with r, g, b, methods
 # out: color representation in SVG-compliant format
