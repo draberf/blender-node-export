@@ -122,6 +122,3 @@ class UIInspectPanel(bpy.types.Panel):
             icon='NODE',
             text='Inspect Selected'
         )
-
-if __name__=="__main__":
-    pass
