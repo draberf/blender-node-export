@@ -87,6 +87,11 @@ def socketFactory(socket: bpy.types.NodeSocket) -> 'UISocket':
         case _:
             return UISocket(socket)
 
+def getImageWidgetString(socket):
+    if socket.default_value.source in ['FILE', 'SEQUENCE', 'MOVIE']:
+        return socket.default_value.filepath
+    return socket.default_value.source
+
 
 # in: mathutils.Color with r, g, b, methods
 # out: color representation in SVG-compliant format
