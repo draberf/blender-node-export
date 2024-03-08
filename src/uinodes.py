@@ -52,7 +52,6 @@ def style() -> ET.Element:
     style_elem.text = '\n'.join([
         ".nodeframe { fill: #333333 } ",
         "text { font-family: Sans, Arial; font-size: 0.6em; fill: white }",
-        "rect { stroke: red; stroke-width: 0 }",
         ".marker { stroke-width: "+str(constants.MARKER_LINE)+"px; stroke: black}"
     ])
 
