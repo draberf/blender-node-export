@@ -240,26 +240,61 @@ class UINodeTree(UI):
         return svg        
 
 # class wrapper for a single node
-class UINode(UI):
+class UINode():
 
     def __init__(self, node: bpy.types.Node, color_string: str):
-        self.node = node
         self.name = node.label if node.label else node.name
         self.w, self.h = node.dimensions
         self.w *= constants.NODE_DIM_RATIO
         self.h *= constants.NODE_DIM_RATIO
         self.x =  node.location[0]
         self.y = -node.location[1]
-        self.sockets = self.sockets_like()
-        self.socket_count = len(self.sockets)
-        self.socket_coords = {}
+        self.outputs = [output for output in node.outputs.values() if all([not output.hide, output.enabled, not output.is_unavailable])]
+        self.inputs = [input for input in node.inputs.values() if all([not input.hide, input.enabled, not input.is_unavailable])]
+
+        print(self.inputs)
+
+        self.anchors = {}
 
         # process header
         self.uiheader = UIHeader(self.name, self.w, color=color_string)
 
+
+        # new Widget stack method + coords
+        self.height_widget_pairs = []
+        self.height = self.uiheader.height + constants.TOP_PADDING
+
+        def register_widget(widget):
+            self.height_widget_pairs.append((self.height, widget))
+            self.height += widget.height() + constants.SOCKET_GAP
+
+        def make_socket_widget(socket, is_offset):
+            self.anchors[socket.as_pointer()] = (
+                self.x + (self.w if is_offset else 0),
+                self.y+self.height+constants.LINKED_SOCKET_HEIGHT/2,
+                UIShape(socket))
+            print("registering widget", widgetFactory(socket))
+            register_widget(widgetFactory(socket))
+
+        for out_socket in self.outputs:
+            make_socket_widget(out_socket, True)
+        
+        register_widget(widgets.Placeholder())
+
+        for in_socket in self.inputs:
+            make_socket_widget(in_socket, False)
+
+        # adjust node height
+        self.h = max(self.h, self.height+constants.BOTTOM_PADDING)
+
+        print(self.height_widget_pairs)
+
+
+        ##### VVVV NO LONGER NEEDED VVVV ??
+
         # process sockets ahead of time
-        self.uioutputs = [socketFactory(socket) for socket in self.outputs()]
-        self.uiinputs = [socketFactory(socket) for socket in self.inputs()]
+        self.uioutputs = [socketFactory(socket) for socket in self.outputs]
+        self.uiinputs = [socketFactory(socket) for socket in self.inputs]
 
 
         self.output_coords = []
@@ -286,15 +321,6 @@ class UINode(UI):
             self.socket_coords[str(uisocket.socket.as_pointer())] = (self.x+offset,self.y+coord+(0.5)*constants.LINKED_SOCKET_HEIGHT,constants.SOCKET_COLORS[uisocket.socket.type])
         return self.socket_coords
 
-    def sockets_like(self) -> list[bpy.types.NodeSocket]:
-        return self.outputs() + self.inputs()
-
-    def outputs(self) -> list[bpy.types.NodeSocket]:
-        return [output for output in self.node.outputs.values() if all([not output.hide, output.enabled, not output.is_unavailable])]
-    
-    def inputs(self) -> list[bpy.types.NodeSocket]:
-        return [input for input in self.node.inputs.values() if all([not input.hide, input.enabled, not input.is_unavailable])]
-
     def svg(self) -> ET.Element:
         group = ET.Element('svg', x=f"{self.x}", y=f"{self.y}")
         
@@ -302,15 +328,16 @@ class UINode(UI):
         rect = self.frame()
         group.append(rect)
 
-
         # header
-        uiheader = self.uiheader
-        header_svg = uiheader.svg()
+        group.append(self.uiheader.svg())
+
+        # new widgets rendering
+        group.extend([widget.svg(width=self.w, y=str(height)) for height, widget in self.height_widget_pairs])
+
+        return group            
 
         # anchors
         anchorlist = []
-
-        group.append(header_svg)
         
         for coord, uisocket in zip(self.output_coords, self.uioutputs):
             svg, anchor = uisocket.svg(width=self.w)
