@@ -163,6 +163,7 @@ cython_debug/
 all_nodes.txt
 checklist.txt
 install.sh
+src/*_old.py
 *.svg
 *.png
 *.pdf
