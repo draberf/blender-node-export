@@ -154,12 +154,16 @@ class Converter():
     def __init__(self, context) -> None:
         
         nodetree = context.space_data.node_tree
+        self.colors = {k:blColorToSVGColor(v) for k, v in [
+            (k, getattr(context.preferences.themes[0].node_editor, k)) for k in categories.category_to_node.keys()
+        ]}
 
         self.nodes = []
 
         self.links = [
             (link.from_socket.as_pointer(), link.to_socket.as_pointer()) for link in nodetree.links
         ]
+
         self.curving = context.preferences.themes[0].node_editor.noodle_curving
 
         self.anchor_refs = {}
@@ -174,7 +178,13 @@ class Converter():
         for node in nodetree.nodes:
             
             # create node rep
-            node_object = UINode(node, "#cc4400")
+            key = node.name
+            if len(key) > 4:
+                if node.name[-4] == '.': key = node.name[:-4]
+            color = "gray"
+            if key in categories.node_to_category.keys():
+                color = self.colors[categories.node_to_category[key]]
+            node_object = UINode(node, color)
 
             # update viewbox corners
             self.vb_min_x = min(self.vb_min_x, node_object.x)
