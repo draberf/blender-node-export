@@ -238,6 +238,8 @@ class UINode():
         self.height_widget_pairs = []
         self.height = self.uiheader.height + constants.TOP_PADDING
 
+        specification = None if not node.bl_idname in categories.node_specifications else categories.node_specifications[node.bl_idname]
+
         def register_widget(widget):
             self.height_widget_pairs.append((self.height, widget))
             self.height += widget.height() + constants.SOCKET_GAP
@@ -247,13 +249,21 @@ class UINode():
                 self.x + (self.w if is_offset else 0),
                 self.y+self.height+constants.LINKED_SOCKET_HEIGHT/2,
                 UIShape(socket))
-            print("registering widget", widgetFactory(socket))
-            register_widget(widgetFactory(socket))
+            try:
+                register_widget(widgetFactory(socket))
+            except AttributeError as e:
+                print(node.name)
+                raise e
+
 
         for out_socket in self.outputs:
             make_socket_widget(out_socket, True)
         
-        register_widget(widgets.Placeholder())
+        if specification and 'props' in specification.keys():
+            for widget in specification['props'](node):
+                register_widget(widget)
+        else:
+            register_widget(widgets.Placeholder())
 
         for in_socket in self.inputs:
             make_socket_widget(in_socket, False)
