@@ -341,3 +341,64 @@ category_to_node = {
 node_to_category = {}
 for c, nodes in category_to_node.items():
     node_to_category.update({node:c for node in nodes})
+
+node_specifications = {
+    "ShaderNodeAmbientOcclusion": {
+        "props": lambda node: [
+            widgets.Value(name="Samples", value=str(node.samples)),
+            widgets.Boolean(name="Inside", value=node.inside),
+            widgets.Boolean(name="Only Local", value=node.only_local)
+        ]
+    },
+    "ShaderNodeAttribute": {
+        "props": lambda node: [
+            widgets.Columns(wids=[
+                widgets.Label(text="Type:", align_right=False),
+                widgets.Dropdown(value=node.attribute_type)
+            ]),
+            widgets.Value(name="Name:", value=node.attribute_name)
+        ]
+    },
+    "ShaderNodeBevel": {
+        "props": lambda node: [
+            widgets.Value(name="Samples", value=str(node.samples))
+        ]
+    },
+    "ShaderNodeOutputAOV": {
+        "props": lambda node: [
+            widgets.Value(name="Name:", value=node.name)
+        ]
+    },
+    "ShaderNodeOutputMaterial": {
+        "props": lambda node: [
+            widgets.Dropdown(value=node.target)
+        ]
+    },
+    "ShaderNodeRGB": {
+        "props": lambda node: [
+            widgets.RGBA(color="#ffcc00")
+        ]
+    },
+    "ShaderNodeTangent": {
+        "props": lambda node: [
+            widgets.Columns(wids=[
+                widgets.Dropdown(value=node.direction_type),
+                widgets.Label(text=(node.axis if node.direction_type[0]=="R" else node.uv_map), align_right=True)
+            ])
+        ]
+    },
+    "ShaderNodeTexCoord": {
+        "props": lambda node: [
+            widgets.Columns(wids=[
+                widgets.Label(text="Object:", align_right=False),
+                widgets.Label(text="" if not node.object else node.object.name, align_right=True)
+            ]),
+            widgets.Boolean(name="From Instancer", value=node.from_instancer)
+        ]
+    },
+    "ShaderNodeVertexColor": {
+        "props": lambda node: [
+            widgets.Label(text=node.layer_name, align_right=True)
+        ]
+    },
+}
