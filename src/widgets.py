@@ -52,7 +52,7 @@ class Label(Widget):
         return constants.LINKED_SOCKET_HEIGHT
 
     def svg(self, width=DEFAULT_WIDTH, **attrs) -> ET.Element:
-        grp = super().svg(**attrs)
+        grp = super().svg(width, **attrs)
         label = ET.SubElement(grp, 'text', y=f"{constants.SOCKET_TEXT_HEIGHT}")
         label.text = self.kwargs['text']
         if self.kwargs['align_right']:
@@ -67,23 +67,18 @@ class Boolean(Widget):
     req_kwargs = ['name', 'value']
 
 
-    def __init__(self, **kwargs) -> None:
-        if (w := kwargs['width']) < constants.LINKED_SOCKET_HEIGHT:
-            return ValueError(f"Width value of {w} too small for Boolean widget.")
-        super().__init__(**kwargs)
-    
     def height(self) -> ET.Element:
         return constants.LINKED_SOCKET_HEIGHT
 
     def svg(self, width=DEFAULT_WIDTH, **attrs) -> ET.Element:
-        grp = super().svg(**attrs)
+        grp = super().svg(width, **attrs)
 
         if width < constants.LINKED_SOCKET_HEIGHT:
             return ValueError(f"Width value of {width} too small for Boolean widget.")
 
         # add rectangle for checkbox
         rect = ET.SubElement(grp, 'rect')
-        rect.set('x', f"{self.PADDING + constants.LINKED_SOCKET_HEIGHT*0.2}")
+        rect.set('x', f"{constants.SOCKET_TEXT_PADDING + constants.LINKED_SOCKET_HEIGHT*0.2}")
         rect.set('y', f"{constants.LINKED_SOCKET_HEIGHT*0.2}")
         rect.set('width',  f"{constants.LINKED_SOCKET_HEIGHT*0.6}")
         rect.set('height', f"{constants.LINKED_SOCKET_HEIGHT*0.6}")
@@ -94,14 +89,15 @@ class Boolean(Widget):
             rect.set('fill', '#7777dd')
             check = ET.SubElement(grp,'polyline', fill='none', stroke='white')
             check.set('stroke-width', "1")
-            check.set('points', f"{self.PADDING + constants.LINKED_SOCKET_HEIGHT*0.4}, {constants.LINKED_SOCKET_HEIGHT*0.5},\
-                      {self.PADDING + constants.LINKED_SOCKET_HEIGHT*0.5}, {constants.LINKED_SOCKET_HEIGHT*0.6},\
-                        {self.PADDING + constants.LINKED_SOCKET_HEIGHT*0.7}, {constants.LINKED_SOCKET_HEIGHT*0.3}")
+            check.set('points', f"{constants.SOCKET_TEXT_PADDING + constants.LINKED_SOCKET_HEIGHT*0.4}, {constants.LINKED_SOCKET_HEIGHT*0.5},\
+                      {constants.SOCKET_TEXT_PADDING + constants.LINKED_SOCKET_HEIGHT*0.5}, {constants.LINKED_SOCKET_HEIGHT*0.6},\
+                        {constants.SOCKET_TEXT_PADDING + constants.LINKED_SOCKET_HEIGHT*0.7}, {constants.LINKED_SOCKET_HEIGHT*0.3}")
         else:
             rect.set('fill', '#222222')
 
         # add nameplate (svg offset by button width)
-        grp.append(Label(width=width-constants.LINKED_SOCKET_HEIGHT, text=self.kwargs['name'], align_right=False).svg(x=constants.LINKED_SOCKET_HEIGHT))
+        grp.append(Label(width=width-constants.LINKED_SOCKET_HEIGHT, text=self.kwargs['name'], align_right=False).svg(x=str(constants.LINKED_SOCKET_HEIGHT)))
+        return grp
 
 class Columns(Widget):
     
