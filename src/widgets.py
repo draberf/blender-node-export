@@ -14,7 +14,7 @@ class Widget():
             if kwarg not in kwargs: raise AttributeError(f"Attribute {kwarg} not specified for Widget of class {__class__}")
 
     def svg(self, width=DEFAULT_WIDTH, **attrs) -> ET.Element:
-        attrs.update({'class': 'widget'})
+        attrs.update({'class': self.__class__.css_classname})
         return ET.Element('svg', attrib=attrs)
 
 class Empty(Widget):
