@@ -168,5 +168,31 @@ class Vector(Widget):
         
         return grp
     
-    
+class Dropdown(Widget):
 
+    css_classname = 'dropdown'
+
+    req_kwargs = ['value']
+
+    def height(self):
+        return constants.LINKED_SOCKET_HEIGHT
+    
+    def svg(self, width=DEFAULT_WIDTH, **attrs):
+        grp = super().svg(width=width, **attrs)
+
+        rect = ET.SubElement(grp, 'rect',
+                      x=str(0.05*width), y=str(0.05*self.height()),
+                      width=str(0.9*width), height=str(0.9*self.height()))
+
+        vee = ET.SubElement(grp, 'polyline',
+                      points=f"\
+                        {0.82*width} {0.4*self.height()} \
+                        {0.85*width} {0.6*self.height()} \
+                        {0.88*width} {0.4*self.height()}",
+                        stroke="white")
+        
+        grp.append(Label(text=self.kwargs['value'], align_right=False).svg(width=width, x=str(0.1*width)))
+
+        vee.set('stroke-width', "1")
+
+        return grp
