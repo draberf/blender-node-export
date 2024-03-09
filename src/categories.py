@@ -1,5 +1,7 @@
 # node.name -- needs to remove .### in case of multiple nodes
 
+from . import widgets
+
 category_to_node = {    
     "input_node": [
         "Ambient Occlusion",
