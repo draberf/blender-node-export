@@ -28,9 +28,10 @@ class UIInspectOperator(bpy.types.Operator):
 
         for node in nodes:
 
-            
-            print("Sockets:")
+            print(">>>", node.bl_idname)
+            #print("Sockets:")
             for input in node.inputs:
+                break
                 print(input.name + " " + input.type)
                 if input.type == "VALUE":
                     print(input.bl_rna.properties["default_value"].hard_min)
