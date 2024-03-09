@@ -1,14 +1,9 @@
 import bpy
 import importlib
 
-# unncessary later
-import inspect
-import xml.etree.ElementTree as ET
-
 
 from . import uinodes
 importlib.reload(uinodes)
-from .uinodes import UINodeTree
 from .uinodes import Converter
 
 from .constants import IGNORE_PROPS
@@ -78,7 +73,6 @@ class UIExportOperator(bpy.types.Operator):
 
 
         tree = Converter(context).convert()
-        #tree = ET.ElementTree(UINodeTree(nodetree, context).svg())
         
         with open(bpy.path.abspath(context.scene.export_svg_props.output), "w+") as f:
             f.write(header)
