@@ -75,9 +75,9 @@ SOCKET_WIDGET_DEFS = {
     ]),
     'RGBA': lambda socket: widgets.Columns(wids=[
         widgets.Label(text=socket.name, align_right=False),
-        widgets.RGBA(color="#ff0000")
+        widgets.RGBA(color="rgb("+",".join([str(round(x*255)) for x in socket.default_value[:3]])+")")
     ]),
-    'VECTOR': lambda socket: widgets.Vector(name=socket.name, values=[getFloatString(f) for f in socket.default_value]),
+    'VECTOR': lambda socket: widgets.Vector(name=socket.name, values=[getFloatString(f) for f in socket.default_value]) if not socket.hide_value else widgets.Label(text=socket.name, align_right=False),
     'INT': lambda socket: widgets.Columns(wids=[
         widgets.Label(text=socket.name, align_right=False),
         widgets.Label(text=str(socket.default_value), align_right=True)
@@ -88,20 +88,21 @@ SOCKET_WIDGET_DEFS = {
     ]),
     'OBJECT': lambda socket: widgets.Columns(wids=[
         widgets.Label(text=socket.name, align_right=False),
-        widgets.Label(text=socket.default_value.name, align_right=True)
+        widgets.Label(text=getObjectName(socket), align_right=True)
     ]),
     'TEXTURE': lambda socket: widgets.Columns(wids=[
         widgets.Label(text=socket.name, align_right=False),
-        widgets.Label(text=socket.default_value.name, align_right=True)
+        widgets.Label(text=getObjectName(socket), align_right=True)
     ]),
     'COLLECTION': lambda socket: widgets.Columns(wids=[
         widgets.Label(text=socket.name, align_right=False),
-        widgets.Label(text=socket.default_value.name, align_right=True)
+        widgets.Label(text=getObjectName(socket), align_right=True)
     ]),
     'GEOMETRY': lambda socket: widgets.Label(text=socket.name, align_right=False),
+    'SHADER': lambda socket: widgets.Label(text=socket.name, align_right=False),
     'MATERIAL': lambda socket: widgets.Columns(wids=[
         widgets.Label(text=socket.name, align_right=False),
-        widgets.Label(text=socket.default_value.name, align_right=True)
+        widgets.Label(text=getObjectName(socket), align_right=True)
     ]),
     'STRING': lambda socket: widgets.Columns(wids=[
         widgets.Label(text=socket.name, align_right=False),
