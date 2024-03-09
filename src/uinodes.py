@@ -102,7 +102,7 @@ SOCKET_WIDGET_DEFS = {
         widgets.Label(text=socket.name, align_right=False),
         widgets.RGBA(color="#ff0000")
     ]),
-    'VECTOR': lambda socket: widgets.Vector(name=socket.name, values=socket.default_value),
+    'VECTOR': lambda socket: widgets.Vector(name=socket.name, values=[getFloatString(f) for f in socket.default_value]),
     'INT': lambda socket: widgets.Columns(wids=[
         widgets.Label(text=socket.name, align_right=False),
         widgets.Label(text=str(socket.default_value), align_right=True)
