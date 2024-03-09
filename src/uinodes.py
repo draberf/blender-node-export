@@ -58,9 +58,14 @@ def style() -> ET.Element:
     return style_elem
 
 def getImageWidgetString(socket):
+    if not socket.default_value: return ""
     if socket.default_value.source in ['FILE', 'SEQUENCE', 'MOVIE']:
         return socket.default_value.filepath
     return socket.default_value.source
+
+def getObjectName(socket):
+    if not socket.default_value: return ""
+    return socket.default_value.name
 
 # convert unconnected input socket to widget
 SOCKET_WIDGET_DEFS = {
