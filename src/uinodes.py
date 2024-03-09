@@ -108,7 +108,8 @@ SOCKET_WIDGET_DEFS = {
         widgets.Label(text=socket.name, align_right=False),
         widgets.Label(text=socket.default_value, align_right=True)
     ]),
-    'BOOLEAN': lambda socket: widgets.Boolean(name=socket.name, value=socket.default_value)
+    'BOOLEAN': lambda socket: widgets.Boolean(name=socket.name, value=socket.default_value),
+    'CUSTOM': lambda socket: widgets.Label(text=socket.name, align_right=False)
 }
 
 def widgetFactory(socket) -> widgets.Widget:
