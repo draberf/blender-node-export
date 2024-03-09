@@ -57,36 +57,6 @@ def style() -> ET.Element:
 
     return style_elem
 
-
-def socketFactory(socket: bpy.types.NodeSocket) -> 'UISocket':
-    match socket.type:
-        case "VALUE":
-            return UISocketValue(socket)
-        case "RGBA":
-            return UISocketRGBA(socket)
-        case "VECTOR":
-            return UISocketVector(socket)
-        case "INT":
-            return UISocketInt(socket)
-        case "IMAGE":
-            return UISocketImage(socket)
-        case "OBJECT":
-            return UISocketObject(socket)
-        case "TEXTURE":
-            return UISocketTexture(socket)
-        case "COLLECTION":
-            return UISocketCollection(socket)
-        case "GEOMETRY":
-            return UISocketGeometry(socket)
-        case "MATERIAL":
-            return UISocketMaterial(socket)
-        case "STRING":
-            return UISocketString(socket)
-        case "BOOLEAN":
-            return UISocketBoolean(socket)
-        case _:
-            return UISocket(socket)
-
 def getImageWidgetString(socket):
     if socket.default_value.source in ['FILE', 'SEQUENCE', 'MOVIE']:
         return socket.default_value.filepath
