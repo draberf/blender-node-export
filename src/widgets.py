@@ -132,7 +132,7 @@ class Value(Widget):
         return self.wid.height()
 
     def svg(self, width=DEFAULT_WIDTH, **attrs):
-        return self.wid.svg(width=DEFAULT_WIDTH, **attrs)    
+        return self.wid.svg(width=width, **attrs)    
 
 class RGBA(Widget):
 
@@ -142,7 +142,7 @@ class RGBA(Widget):
         return constants.LINKED_SOCKET_HEIGHT
 
     def svg(self, width=DEFAULT_WIDTH, **attrs) -> ET.Element:
-        grp = super().svg(**attrs)
+        grp = super().svg(width, **attrs)
         color_rect = ET.SubElement(grp, 'rect')
         color_rect.set('x', str(0.1*width))
         color_rect.set('y', "0")
@@ -160,7 +160,7 @@ class Vector(Widget):
         return 4*constants.LINKED_SOCKET_HEIGHT
     
     def svg(self, width=DEFAULT_WIDTH, **attrs) -> ET.Element:
-        grp = super().svg(**attrs)
+        grp = super().svg(width=width, **attrs)
 
         grp.append(Label(text=self.kwargs['name'], align_right=False).svg(width=width, y="0"))
         for i, value in enumerate(self.kwargs['values']):
