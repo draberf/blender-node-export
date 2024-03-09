@@ -273,31 +273,6 @@ class UINode():
 
         print(self.height_widget_pairs)
 
-
-        ##### VVVV NO LONGER NEEDED VVVV ??
-
-        # process sockets ahead of time
-        self.uioutputs = [socketFactory(socket) for socket in self.outputs]
-        self.uiinputs = [socketFactory(socket) for socket in self.inputs]
-
-
-        self.output_coords = []
-        next_output_coord = self.uiheader.height + constants.TOP_PADDING
-        for output in self.uioutputs:
-            self.output_coords.append(next_output_coord)
-            next_output_coord += output.height + constants.SOCKET_GAP
-
-        self.input_coords = []
-        #TODO: padding from bottom is inconsistent across nodes👍👍
-        next_input_coord = self.h - constants.TOP_PADDING
-        for input in self.uiinputs[::-1]:
-            next_input_coord -= input.height
-            self.input_coords.append(next_input_coord)
-            next_input_coord -= constants.SOCKET_GAP
-
-        self.input_coords.reverse()
-
-
     def get_socket_coords(self):
         self.socket_coords = {}
         for coord, uisocket in zip(self.output_coords + self.input_coords, self.uioutputs + self.uiinputs):
