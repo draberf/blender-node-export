@@ -268,9 +268,11 @@ class UINode():
         for out_socket in self.outputs:
             make_socket_widget(out_socket, True)
         
-        if specification and 'props' in specification.keys():
-            for widget in specification['props'](node):
-                register_widget(widget)
+        if specification:
+            if 'props' in specification:
+                for widget in specification['props'](node):
+                    if not widget: continue
+                    register_widget(widget)
         else:
             register_widget(widgets.Placeholder())
 
@@ -279,6 +281,8 @@ class UINode():
 
         # adjust node height
         self.h = max(self.h, self.height+constants.BOTTOM_PADDING)
+
+        print(self.height_widget_pairs)
 
     def get_socket_coords(self):
         self.socket_coords = {}
