@@ -3,6 +3,7 @@ import importlib
 from . import constants
 from . import categories
 from . import widgets
+from . import methods
 
 import bpy
 import mathutils
