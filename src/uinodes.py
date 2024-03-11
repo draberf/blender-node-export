@@ -125,7 +125,7 @@ class Converter():
     def __init__(self, context) -> None:
         
         nodetree = context.space_data.node_tree
-        self.colors = {k:blColorToSVGColor(v) for k, v in [
+        self.colors = {k:methods.blColorToSVGColor(v) for k, v in [
             (k, getattr(context.preferences.themes[0].node_editor, k)) for k in categories.category_to_node.keys()
         ]}
 
