@@ -260,9 +260,8 @@ class UINode():
                 UIShape(socket))
             try:
                 register_widget(widgetFactory(socket))
-            except AttributeError as e:
-                print(node.name)
-                raise e
+            except AttributeError:
+                raise Exception(node.name)
 
 
         for out_socket in self.outputs:
