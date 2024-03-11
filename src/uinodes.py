@@ -149,12 +149,17 @@ class Converter():
         for node in nodetree.nodes:
             
             # create node rep
-            key = node.name
-            if len(key) > 4:
-                if node.name[-4] == '.': key = node.name[:-4]
-            color = "gray"
-            if key in categories.node_to_category.keys():
-                color = self.colors[categories.node_to_category[key]]
+            if node.bl_idname in categories.node_specifications:
+                color_class = categories.node_specifications[node.bl_idname]['class']
+                if not color_class: color_class = categories.node_specifications[node.bl_idname]['class_behavior'](node)
+                color = self.colors[color_class]
+            else:
+                key = node.name
+                if len(key) > 4:
+                    if node.name[-4] == '.': key = node.name[:-4]
+                color = "gray"
+                if key in categories.node_to_category.keys():
+                    color = self.colors[categories.node_to_category[key]]
             node_object = UINode(node, color)
 
             # update viewbox corners
