@@ -281,8 +281,6 @@ class UINode():
         # adjust node height
         self.h = max(self.h, self.height+constants.BOTTOM_PADDING)
 
-        print(self.height_widget_pairs)
-
     def get_socket_coords(self):
         self.socket_coords = {}
         for coord, uisocket in zip(self.output_coords + self.input_coords, self.uioutputs + self.uiinputs):
