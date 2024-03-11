@@ -260,8 +260,9 @@ class UINode():
                 UIShape(socket))
             try:
                 register_widget(widgetFactory(socket))
-            except AttributeError:
-                raise Exception(node.name)
+            except AttributeError as e:
+                print(node.name)
+                raise e
 
 
         for out_socket in self.outputs:
@@ -278,8 +279,6 @@ class UINode():
 
         # adjust node height
         self.h = max(self.h, self.height+constants.BOTTOM_PADDING)
-
-        print(self.height_widget_pairs)
 
     def get_socket_coords(self):
         self.socket_coords = {}
