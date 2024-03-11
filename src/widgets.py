@@ -54,7 +54,7 @@ class Label(Widget):
     def svg(self, width=DEFAULT_WIDTH, **attrs) -> ET.Element:
         grp = super().svg(width, **attrs)
         label = ET.SubElement(grp, 'text', y=f"{constants.SOCKET_TEXT_HEIGHT}")
-        label.text = self.kwargs['text']
+        label.text = str(self.kwargs['text'])
         if self.kwargs['align_right']:
             label.set('text-anchor', 'end')
             label.set('x', str(width - constants.SOCKET_TEXT_PADDING))
