@@ -171,6 +171,22 @@ class Converter():
             self.anchor_refs.update(node_object.anchors)
             self.nodes.append(node_object)
 
+    def makeDefs(self) -> ET.Element:
+
+        defs = ET.Element('defs')
+
+        defs.append(style())
+
+        # add symbols
+
+        ## markers
+        for sym_name, (elem_name, elem_attrs) in MARKER_DEFS.items():
+            symbol = ET.SubElement(defs, 'symbol', id='marker_'+sym_name)
+            ET.SubElement(symbol, elem_name, attrib=elem_attrs)
+
+        return defs
+
+
     def convert(self) -> ET.ElementTree:
         
         svg = ET.Element('svg', version="1.1", xmlns="http://www.w3.org/2000/svg")
@@ -181,13 +197,9 @@ class Converter():
             self.vb_max_y-self.vb_min_y
         ]]))
 
-        svg.append(style())
+        svg.append(self.makeDefs())
 
-        # add symbols
-
-        for sym_name, (elem_name, elem_attrs) in MARKER_DEFS.items():
-            symbol = ET.SubElement(svg, 'symbol', id='marker_'+sym_name)
-            ET.SubElement(symbol, elem_name, attrib=elem_attrs)
+        
 
         # add links to final SVG
         fac = self.curving/10.0
