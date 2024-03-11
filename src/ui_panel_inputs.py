@@ -28,7 +28,7 @@ class UIInspectOperator(bpy.types.Operator):
 
         for node in nodes:
 
-            print(">>>", node.bl_idname)
+            print(">>>", node.bl_idname, node.name)
             #print("Sockets:")
             for input in node.inputs:
                 break
@@ -44,6 +44,9 @@ class UIInspectOperator(bpy.types.Operator):
             for prop in node.bl_rna.properties:
                 if prop.identifier in IGNORE_PROPS: continue
                 print(">", prop, prop.type, prop.subtype)
+                if prop.type == "ENUM":
+                    for key, item in prop.enum_items.items():
+                        print(">>", key, item.name)
                 #for attr in prop.bl_rna.properties:
                 #    print("> >", attr, ":  ", getattr(prop, attr.identifier))
     
