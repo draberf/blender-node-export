@@ -196,3 +196,66 @@ class Dropdown(Widget):
         vee.set('stroke-width', "1")
 
         return grp
+
+class ColorPickerNew(Widget):
+
+    css_classname = 'color_picker'
+
+    req_kwargs = ['exp_width', 'color']
+
+    def height(self):
+        return self.kwargs['exp_width']*0.8
+    
+    def svg(self, width=DEFAULT_WIDTH, **attrs):
+        grp = super().svg(width=width, **attrs)
+        
+        ET.SubElement(grp, 'use', href='#color_wheel')
+        ET.SubElement(grp, 'rect', attrib={
+            'x': str(0.81*self.kwargs['exp_width']),
+            'y': '0',
+            'width': str(0.18*self.kwargs['exp_width']),
+            'height': str(self.height())
+        })
+        ...
+
+class ColorPicker(Placeholder):
+    ...
+
+class Object(Placeholder):
+    ...
+
+class UVMap(Placeholder):
+    ...
+
+class SelectBar(Placeholder):
+    ...
+
+class FloatFac(Placeholder):
+    ...
+
+class Image(Placeholder):
+    ...
+
+class IES(Placeholder):
+    ...
+
+class File(Placeholder):
+    ...
+
+class Curves(Placeholder):
+    ...
+
+class Ramp(Placeholder):
+    ...
+
+class Script(Placeholder):
+    ...
+
+class Texture(Placeholder):
+    ...
+
+class Mapping(Placeholder):
+    ...
+
+class Tracking(Placeholder):
+    ...
