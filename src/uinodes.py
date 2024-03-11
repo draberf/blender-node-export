@@ -237,8 +237,6 @@ class UINode():
         self.outputs = [output for output in node.outputs.values() if all([not output.hide, output.enabled, not output.is_unavailable])]
         self.inputs = [input for input in node.inputs.values() if all([not input.hide, input.enabled, not input.is_unavailable])]
 
-        print(self.inputs)
-
         self.anchors = {}
 
         # process header
