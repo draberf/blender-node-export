@@ -259,3 +259,9 @@ class Mapping(Placeholder):
 
 class Tracking(Placeholder):
     ...
+
+class Material(Placeholder):
+    ...
+
+class Font(Placeholder):
+    ...
