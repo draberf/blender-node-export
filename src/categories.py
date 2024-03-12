@@ -897,6 +897,12 @@ node_specifications = {
     'CompositorNodePixelate': {
         'class': 'filter_node'
     },
+    'CompositorNodePlaneTrackDeform': {
+        'class': 'distor_node',
+        'props': lambda node: [
+            widgets.Placeholder()
+        ]
+    },
     'CompositorNodePosterize': {
         'class': 'color_node'
     },
@@ -928,6 +934,25 @@ node_specifications = {
             widgets.Placeholder()
         ]
     },
+    'CompositorNodeRotate': {
+        'class': 'distor_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'filter_type'))
+        ]
+    },
+    'CompositorNodeScale': {
+        'class': 'distor_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'space')),
+            *([
+                widgets.SelectBar(), #frame_method
+                widgets.Columns(wids=[
+                    widgets.Value(name="", value=node.offset_x),
+                    widgets.Value(name="", value=node.offset_y)
+                ])
+            ] if node.space == 'RENDER_SIZE' else [])
+        ]
+    },
     'CompositorNodeSeparateColor': {
         'class': 'converter_node',
         'props': lambda node: [
@@ -945,6 +970,12 @@ node_specifications = {
                 widgets.Label(text="Mode:", align_right=False),
                 widgets.Dropdown(value=enumName(node, 'mode'))
             ])
+        ]
+    },
+    'CompositorNodeStabilize': {
+        'class': 'distor_node',
+        'props': lambda node: [
+            widgets.Placeholder()
         ]
     },
     'CompositorNodeSunBeams': {
@@ -982,6 +1013,12 @@ node_specifications = {
     'CompositorNodeSceneTime': {
         'class': 'input_node'
     },
+    'CompositorNodeSwitch': {
+        'class': 'switch_node',
+        'props': lambda node: [
+            widgets.Boolean(name="Switch", value=node.check)
+        ]
+    },
     'CompositorNodeTimeCurve': {
         'class': 'input_node',
         'props': lambda node: [
@@ -994,6 +1031,22 @@ node_specifications = {
         'class': 'input_node',
         'props': lambda node: [
             widgets.Placeholder()
+        ]
+    },
+    'CompositorNodeTransform': {
+        'class': 'distor_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'filter_type'))
+        ]
+    },
+    'CompositorNodeTranslate': {
+        'class': 'distor_node',
+        'props': lambda node: [
+            widgets.Boolean(name="Relative", value=node.use_relative),
+            widgets.Columns(wids=[
+                widgets.Label(text="Wrapping:", align_right=False),
+                widgets.Dropdown(value=enumName(node, 'wrap_axis'))
+            ])
         ]
     },
     'CompositorNodeValToRGB': {
@@ -1025,6 +1078,711 @@ node_specifications = {
             widgets.Boolean(name="Use Alpha", value=node.use_alpha),
             widgets.Boolean(name="Anti-Alias Z", value=node.use_antialias_z)
         ]
+    },
+
+
+    ### FUNCTION NODES ###
+
+    'FunctionNodeBooleanMath': {
+        'class': 'converter_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'operation'))
+        ],
+        'name_behavior': lambda node: enumName(node, 'operation')
+    },
+    'FunctionNodeCombineColor': {
+        'class': 'converter_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'mode'))
+        ]
+    },
+    'FunctionNodeCompare': {
+        'class': 'converter_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'data_type')),
+            widgets.Dropdown(value=enumName(node, 'mode')) if node.data_type == 'VECTOR' else None,
+            widgets.Dropdown(value=enumName(node, 'operation')),
+        ],
+        'name_behavior': lambda node: enumName(node, 'operation')
+    },
+    'FunctionNodeFloatToInt': {
+        'class': 'converter_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'rounding_mode'))
+        ],
+        'name_behavior': lambda node: enumName(node, 'rounding_mode')
+    },
+    'FunctionNodeInputBool': {
+        'class': 'input_node'
+    },
+    'FunctionNodeInputColor': {
+        'class': 'input_node',
+        'props': lambda node: [
+            widgets.ColorPicker(color=node.outputs[0].default_value),
+            widgets.RGBA(color=node.outputs[0].default_value)
+        ]
+    },
+    'FunctionNodeInputInt': {
+        'class': 'input_node',
+        'props': lambda node: [
+            widgets.Value(name="", value=node.outputs[0].default_value)
+        ]
+    },
+    'FunctionNodeInputSpecialCharacters': {
+        'class': 'input_node'
+    },
+    'FunctionNodeInputString': {
+        'class': 'input_node',
+        'props': lambda node: [
+            widgets.Value(name="", value=node.outputs[0].default_value)
+        ]
+    },
+    'FunctionNodeInputVector': {
+        'class': 'input_node',
+        'props': lambda node: [
+            widgets.Value(name="X", value=node.outputs[0].default_value[0]),
+            widgets.Value(name="Y", value=node.outputs[0].default_value[1]),
+            widgets.Value(name="Z", value=node.outputs[0].default_value[2]),
+        ]
+    },
+    'FunctionNodeRandomValue': {
+        'class': 'converter_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'data_type'))
+        ]
+    },
+    'FunctionNodeRotateEuler': {
+        'class': 'converter_node',
+        'props': lambda node: [
+            widgets.SelectBar(), #type
+            widgets.SelectBar(), #space
+        ]
+    },
+    'FunctionNodeSeparateColor': {
+        'class': 'converter_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'mode'))
+        ]
+    },
+    'FunctionNodeValueToString': {
+        'class': 'converter_node'
+    },
+
+
+    ### GEOMETRY NODES ###
+
+    'GeometryNodeAccumualteField': {
+        'class': 'converter_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'data_type')),
+            widgets.Dropdown(value=enumName(node, 'domain'))
+        ]
+    },
+    'GeometryNodeAlignEulerToVector': {
+        'class': 'converter_node',
+        'props': lambda node: [
+            widgets.SelectBar(), #axis
+            widgets.Columns(wids=[
+                widgets.Label(text="Pivot", align_right=True),
+                widgets.Dropdown(value=enumName(node, 'pivot_axis'))
+            ])
+        ]
+    },
+    'GeometryNodeAttributeDomainSize': {
+        'class': 'attribute_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'component')),
+        ]
+    },
+    'GeometryNodeAttributeStatistic': {
+        'class': 'attribute_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'data_type')),
+            widgets.Dropdown(value=enumName(node, 'domain'))
+        ]
+    },
+    'GeometryNodeBoundingBox': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeCaptureAttribute': {
+        'class': 'attribute_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'data_type')),
+            widgets.Dropdown(value=enumName(node, 'domain'))
+        ]
+    },
+    'GeometryNodeCollectionInfo': {
+        'class': 'input_node',
+        'props': lambda node: [
+            widgets.SelectBar() #transform_space
+        ]
+    },
+    'GeometryNodeConvexHull': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeCornersOfFace': {
+        'class': 'input_node'
+    },
+    'GeometryNodeCornersOfVertex': {
+        'class': 'input_node'
+    },
+    'GeometryNodeEdgesOfCorner': {
+        'class': 'input_node'
+    },
+    'GeometryNodeEdgesOfVertex': {
+        'class': 'input_node'
+    },
+    'GeometryNodeFaceOfCorner': {
+        'class': 'input_node'
+    },
+    'GeometryNodeCurveArc': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.SelectBar() #mode
+        ]
+    },
+    'GeometryNodeCurvePrimitiveBezierSegment': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.SelectBar() #mode
+        ]
+    },
+    'GeometryNodeCurvePrimitiveCircle': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.SelectBar() #mode
+        ]
+    },
+    'GeometryNodeCurvePrimitiveLine': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.SelectBar() #mode
+        ]
+    },
+    'GeometryNodeCurvePrimitiveQuadrilateral': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'mode'))
+        ]
+    },
+    'GeometryNodeCurveLength': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeCurveOfPoint': {
+        'class': 'input_node'
+    },
+    'GeometryNodeCurveQuadraticBezier': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeCurveSpiral': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeCurveStar': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeCurveToMesh': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeCurveToPoints': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'mode'))
+        ]
+    },
+    'GeometryNodeDeformCurvesOnSurface': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeDeleteGeometry': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'mode')),
+            widgets.Dropdown(value=enumName(node, 'domain'))
+        ]
+    },
+    'GeometryNodeDistributePointsInVolume': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'mode'))
+        ]
+    },
+    'GeometryNodeDistributePointsOnFaces': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'distribute_method'))
+        ]
+    },
+    'GeometryNodeDualMesh': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeDuplicateElements': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'domain'))
+        ]
+    },
+    'GeometryNodeEdgePathsToCurves': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeEdgePathsToSelection': {
+        'class': 'input_node'
+    },
+    'GeometryNodeExtrudeMesh': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'mode'))
+        ]
+    },
+    'GeometryNodeFieldAtIndex': {
+        'class': 'converter_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'data_type')),
+            widgets.Dropdown(value=enumName(node, 'domain')),
+        ]
+    },
+    'GeometryNodeFieldOnDomain': {
+        'class': 'converter_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'data_type')),
+            widgets.Dropdown(value=enumName(node, 'domain')),
+        ]
+    },
+    'GeometryNodeFillCurve': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'mode'))
+        ]
+    },
+    'GeometryNodeFilletCurve': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'mode'))
+        ]
+    },
+    'GeometryNodeFlipFaces': {
+        'class': 'geometry_node',
+    },
+    'GeometryNodeGeometryToInstance': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeImageTexture': {
+        'class': 'texture_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'interpolation')),
+            widgets.Dropdown(value=enumName(node, 'extension'))
+        ]
+    },
+    'GeometryNodeInputID': {
+        'class': 'input_node'
+    },
+    'GeometryNodeInputIndex': {
+        'class': 'input_node'
+    },
+    'GeometryNodeInputInstanceRotation': {
+        'class': 'input_node'
+    },
+    'GeometryNodeInputInstanceScale': {
+        'class': 'input_node'
+    },
+    'GeometryNodeInputMaterial': {
+        'class': 'input_node',
+        'props': lambda node: [
+            widgets.Material()
+        ]
+    },
+    'GeometryNodeInputMaterialIndex': {
+        'class': 'input_node'
+    },
+    'GeometryNodeInputMeshEdgeAngle': {
+        'class': 'input_node'
+    },
+    'GeometryNodeInputMeshEdgeNeighbors': {
+        'class': 'input_node'
+    },
+    'GeometryNodeInputMeshEdgeVertices': {
+        'class': 'input_node'
+    },
+    'GeometryNodeInputMeshFaceArea': {
+        'class': 'input_node'
+    },
+    'GeometryNodeInputMeshFaceIsPlanar': {
+        'class': 'input_node'
+    },
+    'GeometryNodeInputMeshFaceNeighbors': {
+        'class': 'input_node'
+    },
+    'GeometryNodeInputMeshFaceSetBoundaries': {
+        'class': 'input_node'
+    },
+    'GeometryNodeInputMeshIsland': {
+        'class': 'input_node'
+    },
+    'GeometryNodeInputMeshVertexNeighbors': {
+        'class': 'input_node'
+    },
+    'GeometryNodeInputNamedAttribute': {
+        'class': 'input_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'data_type'))
+        ]
+    },
+    'GeometryNodeInputNormal': {
+        'class': 'input_node'
+    },
+    'GeometryNodeInputPosition': {
+        'class': 'input_node'
+    },
+    'GeometryNodeInputRadius': {
+        'class': 'input_node'
+    },
+    'GeometryNodeInputSceneTime': {
+        'class': 'input_node'
+    },
+    'GeometryNodeInputShadeSmooth': {
+        'class': 'input_node'
+    },
+    'GeometryNodeInputShortestEdgePaths': {
+        'class': 'input_node'
+    },
+    'GeometryNodeInstanceOnPoints': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeInstancesToPoints': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeIsViewport': {
+        'class': 'input_node'
+    },
+    'GeometryNodeJoinGeometry': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeMaterialSelection': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeMergeByDistance': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'mode'))
+        ]
+    },
+    'GeometryNodeMeshBoolean': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'operation'))
+        ]
+    },
+    'GeometryNodeMeshCircle': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Columns(wids=[
+                widgets.Label(text="Fill Type", align_right=True),
+                widgets.Dropdown(value=enumName(node, 'fill_type'))
+            ])
+        ]
+    },
+    'GeometryNodeMeshCone': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Columns(wids=[
+                widgets.Label(text="Fill Type", align_right=True),
+                widgets.Dropdown(value=enumName(node, 'fill_type'))
+            ])
+        ]
+    },
+    'GeometryNodeMeshCube': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeMeshCylinder': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Columns(wids=[
+                widgets.Label(text="Fill Type", align_right=True),
+                widgets.Dropdown(value=enumName(node, 'fill_type'))
+            ])
+        ]
+    },
+    'GeometryNodeMeshGrid': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeMeshIcoSphere': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeMeshLine': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'mode')),
+            widgets.Dropdown(value=enumName(node, 'count_mode')) if node.mode == 'END_POINTS' else None
+        ]
+    },
+    'GeometryNodeMeshUVSphere': {
+        'class': 'geometry_node',
+    },
+    'GeometryNodeMeshToCurve': {
+        'class': 'geometry_node',
+    },
+    'GeometryNodeMeshToPoints': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'mode'))
+        ]
+    },
+    'GeometryNodeMeshToVolume': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Columns(wids=[
+                widgets.Label(text="Resolution", align_right=True),
+                widgets.Dropdown(value=enumName(node, 'resolution_mode'))
+            ])
+        ]
+    },
+    'GeometryNodeObjectInfo': {
+        'class': 'input_node',
+        'props': lambda node: [
+            widgets.SelectBar() #transform_space
+        ]
+    },
+    'GeometryNodeOffsetCornerInFace': {
+        'class': 'input_node'
+    },
+    'GeometryNodeOffsetPointInCurve': {
+        'class': 'input_node'
+    },
+    'GeometryNodePoints': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodePointsOfCurve': {
+        'class': 'input_node'
+    },
+    'GeometryNodePointsToVertices': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodePointsToVolume': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Columns(wids=[
+                widgets.Label(text="Resolution", align_right=True),
+                widgets.Dropdown(value=enumName(node, 'resolution_mode'))
+            ])
+        ]
+    },
+    'GeometryNodeProximity': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'target_element'))
+        ]
+    },
+    'GeometryNodeRaycast': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'data_type')),
+            widgets.Dropdown(value=enumName(node, 'mapping'))
+        ]
+    },
+    'GeometryNodeRealizeInstances': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeRemoveAttribute': {
+        'class': 'attribute_node'
+    },
+    'GeometryNodeReplaceMaterial': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeReplaceString': {
+        'class': 'converter_node'
+    },
+    'GeometryNodeResampleCurve': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'mode'))
+        ]
+    },
+    'GeometryNodeReverseCurve': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeRotateInstances': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeSampleCurve': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'data_type')),
+            widgets.SelectBar(), #mode
+            widgets.Boolean(name="All Curves", value=node.use_all_curves)
+        ]
+    },
+    'GeometryNodeSampleIndex': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'data_type')),
+            widgets.Dropdown(value=enumName(node, 'domain')),
+            widgets.Boolean(name="Clamp", value=node.clamp)
+        ]
+    },
+    'GeometryNodeSampleNearest': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'domain'))
+        ]
+    },
+    'GeometryNodeSampleNearestSurface': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'data_type'))
+        ]
+    },
+    'GeometryNodeSampleUVSurface': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'data_type'))
+        ]
+    },
+    'GeometryNodeScaleElements': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'domain')),
+            widgets.Dropdown(value=enumName(node, 'scale_mode'))
+        ]
+    },
+    'GeometryNodeScaleInstances': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeSelfObject': {
+        'class': 'input_node'
+    },
+    'GeometryNodeSeparateComponents': {
+        'class': 'geometry_node',
+    },
+    'GeometryNodeSeparateGeometry': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'domain'))
+        ]
+    },
+    'GeometryNodeSetID': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeSetMaterial': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeSetMaterialIndex': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeSetPointsRadius': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeSetPosition': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeSetShadeSmooth': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeSliceString': {
+        'class': 'converter_node'
+    },
+    'GeometryNodeSplitEdges': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeStoreNamedAttribute': {
+        'class': 'attribute_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'data_type')),
+            widgets.Dropdown(value=enumName(node, 'domain'))
+        ]
+    },
+    'GeometryNodeStringJoin': {
+        'class': 'converter_node'
+    },
+    'GeometryNodeStringLength': {
+        'class': 'converter_node'
+    },
+    'GeometryNodeStringToCurves': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Font(),
+            widgets.Dropdown(value=enumName(node, 'overflow')),
+            widgets.Dropdown(value=enumName(node, 'align_x')),
+            widgets.Dropdown(value=enumName(node, 'align_y')),
+            widgets.Columns(wids=[
+                widgets.Label(text="Pivot Point", align_right=True),
+                widgets.Dropdown(value=enumName(node, 'pivot_mode'))
+            ])
+        ]
+    },
+    'GeometryNodeSubdivideCurve': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeSubdivideMesh': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeSubdivisionSurface': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'uv_smooth')),
+            widgets.Dropdown(value=enumName(node, 'boundary_smooth')),
+        ]
+    },
+    'GeometryNodeSwitch': {
+        'class': 'converter_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'input_type'))
+        ]
+    },
+    'GeometryNodeTransform': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeTranslateInstances': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeTriangulate': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'quad_method')),
+            widgets.Dropdown(value=enumName(node, 'ngon_method'))
+        ]
+    },
+    'GeometryNodeTrimCurve': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.SelectBar()
+        ]
+    },
+    'GeometryNodeUVPackIslands': {
+        'class': 'converter_node'
+    },
+    'GeometryNodeUVUnwrap': {
+        'class': 'converter_node',
+        'props': lambda node: [
+            widgets.Dropdown(value=enumName(node, 'method'))
+        ]
+    },
+    'GeometryNodeVertexOfCorner': {
+        'class': 'input_node'
+    },
+    'GeometryNodeViewer': {
+        'class': 'output_node',
+        'props': lambda node: [
+            widgets.Placeholder()
+        ]
+    },
+    'GeometryNodeVolumeCube': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeVolumeToMesh': {
+        'class': 'geometry_node',
+        'props': lambda node: [
+            widgets.Columns(wids=[
+                widgets.Label(text="Resolution", align_right=True),
+                widgets.Dropdown(value=enumName(node, 'resolution_mode'))
+            ])
+        ]
+    },
+
+    ### NODE GROUPS ###
+
+    'NodeGroupInput': {
+        'class': 'group_node'
+    },
+    'NodeGroupOutput': {
+        'class': 'group_node'
     },
 
     ### SHADER NODES ###
