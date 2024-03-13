@@ -141,7 +141,19 @@ class Value(Widget):
         return self.wid.height()
 
     def svg(self, width=DEFAULT_WIDTH, **attrs):
-        return self.wid.svg(width=width, **attrs)    
+        grp = super().svg(width, **attrs)
+
+        ET.SubElement(grp, 'rect', attrib={
+            'x': '0',
+            'y': '0',
+            'width': str(width),
+            'height': str(self.height()),
+            'style': 'fill:#545454'
+        })
+
+        grp.extend([elem for elem in self.wid.svg(width=0.9*width, x=str(0.05*width), **attrs)])
+
+        return grp
 
 class RGBA(Widget):
 
