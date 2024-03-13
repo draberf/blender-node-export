@@ -43,7 +43,7 @@ class UIInspectOperator(bpy.types.Operator):
             print("Props:")
             for prop in node.bl_rna.properties:
                 if prop.identifier in IGNORE_PROPS: continue
-                print(">", prop, prop.type, prop.subtype)
+                print(">", prop, prop.type, prop.subtype, "name", prop.name)
                 if prop.type == "ENUM":
                     for key, item in prop.enum_items.items():
                         print(">>", key, item.name)
