@@ -218,7 +218,10 @@ class Converter():
         # add anchors to final SVG
         svg.extend([anchor.svg(x=str(x-constants.MARKER_BOX_HALF), y=str(y-constants.MARKER_BOX_HALF)) for x, y, anchor in self.anchor_refs.values()])
 
-        return ET.ElementTree(svg)
+        tree = ET.ElementTree(svg)
+        ET.indent(tree)
+
+        return tree
 
 # class wrapper for a single node
 class UINode():
