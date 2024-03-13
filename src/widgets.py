@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 from . import constants
 
-DEFAULT_WIDTH = 100
+DEFAULT_WIDTH = 100.0
 
 class Widget():
     
