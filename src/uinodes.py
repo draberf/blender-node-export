@@ -224,7 +224,11 @@ class Converter():
 class UINode():
 
     def __init__(self, node: bpy.types.Node, color_string: str):
-        self.name = node.label if node.label else node.name
+        self.name = node.name
+        if node.label:
+            self.name = node.label
+        elif 'name_behavior' in categories.node_specifications[node.bl_idname]:
+            self.name = categories.node_specifications[node.bl_idname]['name_behavior'](node)
         self.w, self.h = node.dimensions
         self.w *= constants.NODE_DIM_RATIO
         self.h *= constants.NODE_DIM_RATIO
