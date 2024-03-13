@@ -8,6 +8,13 @@ def dropdown(node, prop, label="") -> widgets.Widget:
         return widgets.Dropdown(value=enumName(node, prop))
     else:
         return widgets.LabeledDropdown(name=label, value=enumName(node, prop))
+
+
+def selectBar(node, prop) -> widgets.Widget:
+    options = [option.name for option in node.bl_rna.properties[prop].enum_items]
+    index = [option.identifier for option in node.bl_rna.properties[prop].enum_items].index(getattr(node, prop))
+    return widgets.SelectBar(options=options, select_index=index)
+
     
 CATEGORIES = [
     'input_node',
