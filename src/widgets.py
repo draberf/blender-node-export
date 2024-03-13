@@ -46,7 +46,9 @@ class Placeholder(Widget):
 
 class Label(Widget):
     
-    req_kwargs = ['text', 'align_right']
+    def __init__(self, text="", align_right=False, **kwargs) -> None:
+        kwargs.update({'text': text, 'align_right': align_right})
+        super().__init__(**kwargs)
 
     def height(self) -> float:
         return constants.LINKED_SOCKET_HEIGHT
@@ -64,8 +66,9 @@ class Label(Widget):
     
 class Boolean(Widget):
 
-    req_kwargs = ['name', 'value']
-
+    def __init__(self, name="", value=False, **kwargs) -> None:
+        kwargs.update({'name': name, 'value':value})
+        super().__init__(**kwargs)
 
     def height(self) -> ET.Element:
         return constants.LINKED_SOCKET_HEIGHT
@@ -101,10 +104,12 @@ class Boolean(Widget):
 
 class Columns(Widget):
     
-    req_kwargs = ['wids']
-
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, wids=[], ratios=[], **kwargs) -> None:
+        kwargs.update({'wids': wids})
         super().__init__(**kwargs)
+
+        self.ratio_sum = sum(ratios)
+        self.ratios = ratios
 
         self.elems = kwargs['wids']
 
@@ -112,16 +117,20 @@ class Columns(Widget):
         return max([elem.height() for elem in self.elems])
 
     def svg(self, width=DEFAULT_WIDTH, **attrs) -> ET.Element:
+
         col_width = width/len(self.elems)
         grp = super().svg(width=width, **attrs)
-        grp.extend([elem.svg(width=col_width, x=str(i*col_width)) for (i, elem) in enumerate(self.elems)])
+        offset=0.0
+        for i, elem in enumerate(self.elems):
+            elem_width = col_width if not self.ratios else width*self.ratios[i]/self.ratio_sum
+            grp.append(elem.svg(width=elem_width, x=str(offset)))
+            offset += elem_width
         return grp
 
 class Value(Widget):
 
-    req_kwargs = ['name', 'value']
-
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, name="", value=0, **kwargs) -> None:
+        kwargs.update({'name':name, 'value':value})
         super().__init__(**kwargs)
         self.wid = Columns(wids=[
             Label(text=kwargs['name'], align_right=False),
@@ -136,7 +145,9 @@ class Value(Widget):
 
 class RGBA(Widget):
 
-    req_kwags = ['color']
+    def __init__(self, color="gray", **kwargs) -> None:
+        kwargs.update({'color':color})
+        super().__init__(**kwargs)
 
     def height(self):
         return constants.LINKED_SOCKET_HEIGHT
@@ -154,7 +165,9 @@ class RGBA(Widget):
     
 class Vector(Widget):
 
-    req_kwargs = ['name', 'values']
+    def __init__(self, name="", values=[0,0,0], **kwargs) -> None:
+        kwargs.update({'name':name, 'values':values})
+        super().__init__(**kwargs)
 
     def height(self):
         return 4*constants.LINKED_SOCKET_HEIGHT
@@ -167,12 +180,40 @@ class Vector(Widget):
             grp.append(Label(text=str(value), align_right=True).svg(width=width, y=str(i*constants.LINKED_SOCKET_HEIGHT)))
         
         return grp
+
+class LabeledDropdown(Widget):
+
+    MIN_LABEL_WIDTH = 40
+
+    def __init__(self, name="", value="", **kwargs) -> None:
+        super().__init__(**kwargs)
+
+        self.name = name
+        self.value = value
+
+    def height(self):
+        return constants.LINKED_SOCKET_HEIGHT
     
+    def svg(self, width=DEFAULT_WIDTH, **attrs):
+        grp = super().svg(width=width, **attrs)
+
+        widths = [max(0.25*width, self.MIN_LABEL_WIDTH), min(0.75*width, width-self.MIN_LABEL_WIDTH)]
+
+        grp.append(Label(self.name).svg(widths[0]))
+        grp.append(Dropdown(self.value).svg(widths[1], x=str(widths[0])))
+
+        return grp
+
+
+
+
 class Dropdown(Widget):
 
     css_classname = 'dropdown'
 
-    req_kwargs = ['value']
+    def __init__(self, value="", **kwargs) -> None:
+        kwargs.update({'value':value})
+        super().__init__(**kwargs)
 
     def height(self):
         return constants.LINKED_SOCKET_HEIGHT
@@ -201,7 +242,9 @@ class ColorPickerNew(Widget):
 
     css_classname = 'color_picker'
 
-    req_kwargs = ['exp_width', 'color']
+    def __init__(self, exp_width=0, color=[0,0,0], **kwargs) -> None:
+        kwargs.update({'exp_width':exp_width, 'color':color})
+        super().__init__(**kwargs)
 
     def height(self):
         return self.kwargs['exp_width']*0.8
@@ -264,4 +307,10 @@ class Material(Placeholder):
     ...
 
 class Font(Placeholder):
+    ...
+
+class MovieClip(Placeholder):
+    ...
+
+class Scene(Placeholder):
     ...
