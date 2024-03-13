@@ -1058,8 +1058,8 @@ node_specifications = {
     'FunctionNodeInputColor': {
         'class': 'input_node',
         'props': lambda node: [
-            widgets.ColorPicker(color=node.outputs[0].default_value),
-            widgets.RGBA(color=node.outputs[0].default_value)
+            widgets.ColorPicker(color=socketColorToSVGColor(node.outputs[0].default_value)),
+            widgets.RGBA(color=socketColorToSVGColor(node.outputs[0].default_value))
         ]
     },
     'FunctionNodeInputInt': {
