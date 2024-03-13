@@ -143,7 +143,7 @@ node_specifications = {
     'CompositorNodeSplitViewer': {
         'class': 'output_node',
         'props': lambda node: [
-            widgets.SelectBar(), # axis
+            selectBar(node, 'axis'), # axis
             widgets.Value(name="Factor", value=node.factor)
         ]
     },
@@ -393,7 +393,7 @@ node_specifications = {
             widgets.Boolean(name="Relative", value=node.use_relative),
             *([
                 widgets.Label(text="Aspect Correction", align_right=False),
-                widgets.SelectBar(),
+                selectBar(node, 'aspect_correction'),
                 widgets.FloatFac(),
                 widgets.FloatFac()
             ] if node.use_relative else []),
@@ -594,11 +594,11 @@ node_specifications = {
         'class': 'matte_node',
         'props': lambda node: [
             widgets.Label(text="Despill Channel", align_right=False),
-            widgets.SelectBar(),
+            selectBar(node, 'channel'),
             dropdown(node, 'limit_method', label="Algorithm:"),
             *([
                 widgets.Label(text="Limiting Channel:", align_right=False),
-                widgets.SelectBar()
+                selectBar(node, 'limit_channel')
             ] if node.limit_method == 'SIMPLE' else []),
             widgets.FloatFac(), # ratio
             widgets.Boolean(name="Unspill", value=node.use_unspill),
@@ -634,7 +634,7 @@ node_specifications = {
             widgets.FloatFac(),
             widgets.FloatFac(),
             widgets.Label(text="Color Space:", align_right=False),
-            widgets.SelectBar()
+            selectBar(node, 'channel')
         ]
     },
     'CompositorNodeDoubleEdgeMask': {
@@ -762,7 +762,7 @@ node_specifications = {
         'props': lambda node: [
             dropdown(node, 'space'),
             *([
-                widgets.SelectBar(), #frame_method
+                selectBar(node, 'frame_method'),
                 widgets.Columns(wids=[
                     widgets.Value(name="", value=node.offset_x),
                     widgets.Value(name="", value=node.offset_y)
@@ -897,7 +897,7 @@ node_specifications = {
         'class': 'geometry_node',
         'props': lambda node: [
             dropdown(node, 'data_type'),
-            widgets.SelectBar(), #mode
+            selectBar(node, 'mode'), #mode
             widgets.Boolean(name="All Curves", value=node.use_all_curves)
         ]
     },
@@ -907,7 +907,7 @@ node_specifications = {
     'GeometryNodeTrimCurve': {
         'class': 'geometry_node',
         'props': lambda node: [
-            widgets.SelectBar()
+            selectBar(node, 'mode')
         ]
     },
 
@@ -916,25 +916,25 @@ node_specifications = {
     'GeometryNodeCurveArc': {
         'class': 'geometry_node',
         'props': lambda node: [
-            widgets.SelectBar() #mode
+            selectBar(node, 'mode')
         ]
     },
     'GeometryNodeCurvePrimitiveBezierSegment': {
         'class': 'geometry_node',
         'props': lambda node: [
-            widgets.SelectBar() #mode
+            selectBar(node, 'mode')
         ]
     },
     'GeometryNodeCurvePrimitiveCircle': {
         'class': 'geometry_node',
         'props': lambda node: [
-            widgets.SelectBar() #mode
+            selectBar(node, 'mode')
         ]
     },
     'GeometryNodeCurvePrimitiveLine': {
         'class': 'geometry_node',
         'props': lambda node: [
-            widgets.SelectBar() #mode
+            selectBar(node, 'mode')
         ]
     },
     'GeometryNodeCurveSpiral': {
@@ -1052,7 +1052,7 @@ node_specifications = {
     'GeometryNodeCollectionInfo': {
         'class': 'input_node',
         'props': lambda node: [
-            widgets.SelectBar() #transform_space
+            selectBar(node, 'transform_space')
         ]
     },
     'FunctionNodeInputColor': {
@@ -1080,7 +1080,7 @@ node_specifications = {
     'GeometryNodeObjectInfo': {
         'class': 'input_node',
         'props': lambda node: [
-            widgets.SelectBar() #transform_space
+            selectBar(node, 'transform_smace')
         ]
     },
     'GeometryNodeSelfObject': {
@@ -1456,7 +1456,7 @@ node_specifications = {
     'FunctionNodeAlignEulerToVector': {
         'class': 'converter_node',
         'props': lambda node: [
-            widgets.SelectBar(), #axis
+            selectBar(node, 'axis'),
             dropdown(node, 'pivot_axis', label="Pivot")
         ]
     },
@@ -1511,8 +1511,8 @@ node_specifications = {
     'FunctionNodeRotateEuler': {
         'class': 'converter_node',
         'props': lambda node: [
-            widgets.SelectBar(), #type
-            widgets.SelectBar(), #space
+            selectBar(node, 'type'),
+            selectBar(node, 'space')
         ]
     },
     'GeometryNodeSwitch': {
@@ -1635,7 +1635,7 @@ node_specifications = {
         'props': lambda node: [
             widgets.Columns(wids=[
                 dropdown(node, 'direction_type'),
-                widgets.SelectBar()
+                selectBar(node, 'axis')
             ])
         ]
     },
@@ -1811,7 +1811,7 @@ node_specifications = {
     'ShaderNodeTexIES': {
         'class': 'texture_node',
         'props': lambda node: [
-            widgets.SelectBar(),
+            selectBar(node, 'mode'),
             widgets.IES() if node.mode == 'INTERNAL' else widgets.File()
         ]
     },
@@ -1846,7 +1846,7 @@ node_specifications = {
     'ShaderNodeTexPointDensity': {
         'class': 'texture_node',
         'props': lambda node: [
-            widgets.SelectBar(value=node.point_source),
+            selectBar(node, 'point_source'),
             widgets.Object(),
             dropdown(node, 'space', "Space:"),
             widgets.Value(name="Radius", value=node.radius),
@@ -1969,7 +1969,7 @@ node_specifications = {
     'ShaderNodeVectorTransform': {
         'class': 'vector_node',
         'props': lambda node: [
-            widgets.SelectBar(),
+            selectBar(node, 'vector_type'),
             dropdown(node, 'convert_from'),
             dropdown(node, 'convert_to')
         ]
@@ -2056,7 +2056,7 @@ node_specifications = {
     'ShaderNodeScript': {
         'class': 'script_node',
         'props': lambda node: [
-            widgets.SelectBar(),
+            selectBar(node, 'mode'),
             widgets.Script() if node.mode[0] == "I" else widgets.File()
         ]
     }
