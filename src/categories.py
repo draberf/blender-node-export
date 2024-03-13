@@ -23,7 +23,8 @@ CATEGORIES = [
     'distor_node',
     'layout_node',
     'attribute_node',
-    'geometry_node'
+    'geometry_node',
+    'group_node'
 ]
 
 node_specifications = {
@@ -959,7 +960,7 @@ node_specifications = {
 
     # Geometry > Geometry
 
-    'GeometryNodeBoundingBox': {
+    'GeometryNodeBoundBox': {
         'class': 'geometry_node'
     },
     'GeometryNodeConvexHull': {
@@ -1261,7 +1262,7 @@ node_specifications = {
     'GeometryNodeInputMeshFaceNeighbors': {
         'class': 'input_node'
     },
-    'GeometryNodeInputMeshFaceSetBoundaries': {
+    'GeometryNodeMeshFaceSetBoundaries': {
         'class': 'input_node'
     },
     'GeometryNodeInputMeshFaceIsPlanar': {
@@ -1382,7 +1383,7 @@ node_specifications = {
             dropdown(node, 'resolution_mode', label="Resolution:")
         ]
     },
-    'GeometryNodeSetPointsRadius': {
+    'GeometryNodeSetPointRadius': {
         'class': 'geometry_node'
     },
     
@@ -1391,13 +1392,13 @@ node_specifications = {
     'GeometryNodeStringJoin': {
         'class': 'converter_node'
     },
-    'GeometryNodeReplaceString': {
+    'FunctionNodeReplaceString': {
         'class': 'converter_node'
     },
-    'GeometryNodeSliceString': {
+    'FunctionNodeSliceString': {
         'class': 'converter_node'
     },
-    'GeometryNodeStringLength': {
+    'FunctionNodeStringLength': {
         'class': 'converter_node'
     },
     'GeometryNodeStringToCurves': {
@@ -1438,14 +1439,14 @@ node_specifications = {
 
     # Geometry > Utilities
 
-    'GeometryNodeAccumualteField': {
+    'GeometryNodeAccumulateField': {
         'class': 'converter_node',
         'props': lambda node: [
             dropdown(node, 'data_type'),
             dropdown(node, 'domain')
         ]
     },
-    'GeometryNodeAlignEulerToVector': {
+    'FunctionNodeAlignEulerToVector': {
         'class': 'converter_node',
         'props': lambda node: [
             widgets.SelectBar(), #axis
