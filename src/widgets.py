@@ -270,8 +270,35 @@ class Object(Placeholder):
 class UVMap(Placeholder):
     ...
 
-class SelectBar(Placeholder):
-    ...
+class SelectBar(Widget):
+    
+    css_classname = 'selectbar'
+
+    def __init__(self, options=[], select_index=0, **kwargs) -> None:
+        self.options=options
+        self.select_index=select_index
+        super().__init__(**kwargs)
+
+    def height(self):
+        return constants.LINKED_SOCKET_HEIGHT
+    
+    def svg(self, width=DEFAULT_WIDTH, **attrs):
+        grp = super().svg(width=width, **attrs)
+        
+        w = width/len(self.options)
+        for i, opt in enumerate(self.options):
+            color = '#545454' if i != self.select_index else '#7777dd'
+            rect = ET.SubElement(grp, 'rect')
+            rect.set('x', str(i*w))
+            rect.set('y', '0')
+            rect.set('width', str(w))
+            rect.set('height', str(self.height()))
+            rect.set('style', f"fill:{color}")
+            
+            grp.append(Label(opt, x=str(i*w)).svg(width=w, x=str(i*w)))
+        
+        return grp
+
 
 class FloatFac(Placeholder):
     ...
