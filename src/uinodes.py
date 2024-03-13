@@ -126,8 +126,9 @@ class Converter():
         
         nodetree = context.space_data.node_tree
         self.colors = {k:methods.blColorToSVGColor(v) for k, v in [
-            (k, getattr(context.preferences.themes[0].node_editor, k)) for k in categories.category_to_node.keys()
+            (k, getattr(context.preferences.themes[0].node_editor, k)) for k in categories.CATEGORIES
         ]}
+        self.colors.update({'switch_node': 'gray'})
 
         self.nodes = []
 
