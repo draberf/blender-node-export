@@ -27,7 +27,8 @@ class Empty(Widget):
 
 class Placeholder(Widget):
     
-    req_kwargs = []
+    css_classname = 'placeholder'
+
 
     def height(self) -> float:
         return 4*constants.LINKED_SOCKET_HEIGHT
@@ -45,7 +46,10 @@ class Placeholder(Widget):
 
 
 class Label(Widget):
-    
+
+    css_classname = 'label'
+
+
     def __init__(self, text="", align_right=False, **kwargs) -> None:
         kwargs.update({'text': text, 'align_right': align_right})
         super().__init__(**kwargs)
@@ -65,6 +69,9 @@ class Label(Widget):
         return grp
     
 class Boolean(Widget):
+
+    css_classname = 'boolean'
+
 
     def __init__(self, name="", value=False, **kwargs) -> None:
         kwargs.update({'name': name, 'value':value})
@@ -104,6 +111,8 @@ class Boolean(Widget):
 
 class Columns(Widget):
     
+    css_classname = 'columns'
+    
     def __init__(self, wids=[], ratios=[], **kwargs) -> None:
         kwargs.update({'wids': wids})
         super().__init__(**kwargs)
@@ -128,6 +137,10 @@ class Columns(Widget):
         return grp
 
 class Value(Widget):
+
+    # color: #545454
+
+    css_classname = 'value'
 
     def __init__(self, name="", value=0, **kwargs) -> None:
         kwargs.update({'name':name, 'value':value})
@@ -157,6 +170,8 @@ class Value(Widget):
 
 class RGBA(Widget):
 
+    css_classname = 'rgba'
+
     def __init__(self, color="gray", **kwargs) -> None:
         kwargs.update({'color':color})
         super().__init__(**kwargs)
@@ -177,6 +192,8 @@ class RGBA(Widget):
     
 class Vector(Widget):
 
+    css_classname = 'vector'
+
     def __init__(self, name="", values=[0,0,0], **kwargs) -> None:
         kwargs.update({'name':name, 'values':values})
         super().__init__(**kwargs)
@@ -194,6 +211,8 @@ class Vector(Widget):
         return grp
 
 class LabeledDropdown(Widget):
+
+    css_classname = 'columns'
 
     MIN_LABEL_WIDTH = 40
 
@@ -215,9 +234,6 @@ class LabeledDropdown(Widget):
         grp.append(Dropdown(self.value).svg(widths[1], x=str(widths[0])))
 
         return grp
-
-
-
 
 class Dropdown(Widget):
 
