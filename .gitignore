@@ -167,3 +167,4 @@ src/*_old.py
 *.svg
 *.png
 *.pdf
+*.zip
