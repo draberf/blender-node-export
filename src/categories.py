@@ -12,7 +12,12 @@ def dropdown(node, prop, label="") -> widgets.Widget:
 
 def selectBar(node, prop) -> widgets.Widget:
     options = [option.name for option in node.bl_rna.properties[prop].enum_items]
-    index = [option.identifier for option in node.bl_rna.properties[prop].enum_items].index(getattr(node, prop))
+    try:
+        index = [option.identifier for option in node.bl_rna.properties[prop].enum_items].index(getattr(node, prop))
+    except ValueError as ve:
+        for key, item in node.bl_rna.properties[prop].enum_items.items():
+            print(">>", key, item.name)
+        raise ve
     return widgets.SelectBar(options=options, select_index=index)
 
     
