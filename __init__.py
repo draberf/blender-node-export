@@ -5,7 +5,7 @@ bl_info = {
     "name": "Node Exporter to SVG",
     "description": "Adds operator to export a node tree into an SVG image",
     "author": "Filip Dráber",
-    "version": (0, 0, 2),
+    "version": (0, 0, 1),
     "blender": (3, 4, 0),
     "location": "Node Editor",
     "warning": "",
@@ -19,7 +19,7 @@ bl_info = {
 # https://blender.stackexchange.com/questions/28504/blender-ignores-changes-to-python-scripts/28505#28505
 if "bpy" in locals():
     files = [
-        "constants", "node_to_svg", "ui_panel_inputs", "uinodes", "categories", "widgets"
+        'constants', 'node_to_svg', 'ui_panel_inputs', 'uinodes', 'categories', 'widgets', 'methods'
     ]
     import importlib
     for file in files:
