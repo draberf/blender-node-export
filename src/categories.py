@@ -1585,7 +1585,7 @@ node_specifications = {
     'ShaderNodeAttribute': {
         'class': 'input_node',
         "props": lambda node: [
-            dropdown(node, 'attribute_type', label=True),
+            dropdown(node, 'attribute_type', label="Type:"),
             widgets.Value(name="Name:", value=node.attribute_name)
         ]
     },
