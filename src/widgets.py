@@ -4,6 +4,7 @@ from . import constants
 from .methods import getFloatString
 
 DEFAULT_WIDTH = 100.0
+DEFAULT_PADDING = 0.06
 
 class Widget():
     
