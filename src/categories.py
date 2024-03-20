@@ -1516,7 +1516,7 @@ node_specifications = {
     'FunctionNodeRotateEuler': {
         'class': 'converter_node',
         'props': lambda node: [
-            selectBar(node, 'type'),
+            widgets.SelectBar(["Axis Angle", "Euler"], 0 if node.type == 'AXIS_ANGLE' else 1), ## needs to be specified due to override
             selectBar(node, 'space')
         ]
     },
