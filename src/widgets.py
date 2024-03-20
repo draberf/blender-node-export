@@ -1,6 +1,8 @@
 import xml.etree.ElementTree as ET
 from . import constants
 
+from .methods import getFloatString
+
 DEFAULT_WIDTH = 100.0
 
 class Widget():
