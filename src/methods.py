@@ -12,3 +12,9 @@ def socketColorToSVGColor(color: list[float]) -> str:
 
 def enumName(node, enum_name):
     return node.bl_rna.properties[enum_name].enum_items[getattr(node, enum_name)].name
+
+def getFloatString(value: float, decimal_points: int = 3) -> str:
+
+    rounded = round(abs(value)*(10**decimal_points))
+    s = ('-' if value<0 else '')+('0' if abs(value)<1 else '')+str(rounded)[:-decimal_points]+'.'+str(rounded)[-decimal_points:]
+    return s
