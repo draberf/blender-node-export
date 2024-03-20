@@ -5,7 +5,7 @@ bl_info = {
     "name": "Node Exporter to SVG",
     "description": "Adds operator to export a node tree into an SVG image",
     "author": "Filip Dráber",
-    "version": (0, 0, 1),
+    "version": (0, 0, 2),
     "blender": (3, 4, 0),
     "location": "Node Editor",
     "warning": "",
@@ -50,7 +50,7 @@ def unregister():
 
     # unregister properties
     del bpy.types.Scene.export_svg_props
-    bpy.uitls.unregister_class(ui_panel_inputs.ExportPropertyGroup)
+    bpy.utils.unregister_class(ui_panel_inputs.ExportPropertyGroup)
 
     bpy.utils.unregister_class(ui_panel_inputs.UIInspectOperator)
     bpy.utils.unregister_class(ui_panel_inputs.UIExportOperator)
