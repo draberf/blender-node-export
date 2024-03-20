@@ -2,6 +2,7 @@
 
 from . import widgets
 from .methods import socketColorToSVGColor, enumName
+from .constants import IGNORE_PROPS
 
 def dropdown(node, prop, label="") -> widgets.Widget:
     if not label:
@@ -19,6 +20,16 @@ def selectBar(node, prop) -> widgets.Widget:
             print(">>", key, item.name)
         raise ve
     return widgets.SelectBar(options=options, select_index=index)
+
+def generateCustomProps(node):
+    
+    wids = []
+    
+    for prop in node.bl_rna.properties:
+        if prop.identifier in IGNORE_PROPS: continue
+
+    
+    return [widgets.Placeholder()] if not wids else wids
 
     
 CATEGORIES = [
@@ -135,7 +146,7 @@ node_specifications = {
     'CompositorNodeOutputFile': {
         'class': 'output_node',
         'props': lambda node: [
-            widgets.Label(text="Base Path:", align_right=False),
+            widgets.Label(text="Base Path:"),
             widgets.File()
         ]
     },
@@ -190,23 +201,15 @@ node_specifications = {
                 widgets.Boolean(name="Blue", value=node.blue),
             ]),
             widgets.Columns(wids=[
-                widgets.Label(text="", align_right=False),
-                widgets.Label(text="Saturation", align_right=False),
-                widgets.Label(text="Contrast", align_right=False),
-                widgets.Label(text="Gamma", align_right=False),
-                widgets.Label(text="Gain", align_right=False),
-                widgets.Label(text="Lift", align_right=False),
+                widgets.Label(text=""),
+                widgets.Label(text="Saturation"),
+                widgets.Label(text="Contrast"),
+                widgets.Label(text="Gamma"),
+                widgets.Label(text="Gain"),
+                widgets.Label(text="Lift"),
             ]),
             widgets.Columns(wids=[
-                widgets.Label(text="Master", align_right=False),
-                widgets.FloatFac(),
-                widgets.FloatFac(),
-                widgets.FloatFac(),
-                widgets.FloatFac(),
-                widgets.FloatFac(),
-            ]),
-            widgets.Columns(wids=[
-                widgets.Label(text="Highlights", align_right=False),
+                widgets.Label(text="Master"),
                 widgets.FloatFac(),
                 widgets.FloatFac(),
                 widgets.FloatFac(),
@@ -214,7 +217,7 @@ node_specifications = {
                 widgets.FloatFac(),
             ]),
             widgets.Columns(wids=[
-                widgets.Label(text="Midtones", align_right=False),
+                widgets.Label(text="Highlights"),
                 widgets.FloatFac(),
                 widgets.FloatFac(),
                 widgets.FloatFac(),
@@ -222,7 +225,15 @@ node_specifications = {
                 widgets.FloatFac(),
             ]),
             widgets.Columns(wids=[
-                widgets.Label(text="Shadows", align_right=False),
+                widgets.Label(text="Midtones"),
+                widgets.FloatFac(),
+                widgets.FloatFac(),
+                widgets.FloatFac(),
+                widgets.FloatFac(),
+                widgets.FloatFac(),
+            ]),
+            widgets.Columns(wids=[
+                widgets.Label(text="Shadows"),
                 widgets.FloatFac(),
                 widgets.FloatFac(),
                 widgets.FloatFac(),
@@ -397,7 +408,7 @@ node_specifications = {
             ] if node.filter_type != 'FAST_GAUSS' else []),
             widgets.Boolean(name="Relative", value=node.use_relative),
             *([
-                widgets.Label(text="Aspect Correction", align_right=False),
+                widgets.Label(text="Aspect Correction"),
                 selectBar(node, 'aspect_correction'),
                 widgets.FloatFac(),
                 widgets.FloatFac()
@@ -420,7 +431,7 @@ node_specifications = {
     'CompositorNodeDefocus': {
         'class': 'filter_node',
         'props': lambda node: [
-            widgets.Label(text="Bokeh Type:", align_right=False),
+            widgets.Label(text="Bokeh Type:"),
             dropdown(node, 'bokeh'),
             widgets.Value(name="Angle", value=node.angle),
             widgets.Boolean(name="Gamma Correction", value=node.use_gamma_correction),
@@ -436,7 +447,7 @@ node_specifications = {
     'CompositorNodeDenoise': {
         'class': 'filter_node',
         'props': lambda node: [
-            widgets.Label(text="Prefilter", align_right=False),
+            widgets.Label(text="Prefilter"),
             dropdown(node, 'prefilter'),
             widgets.Boolean(name="HDR", value=node.use_hdr)
         ]
@@ -455,7 +466,7 @@ node_specifications = {
         'props': lambda node: [
             widgets.Value(name="Iterations", value=node.iterations),
             widgets.Boolean(name="Wrap", value=node.use_wrap),
-            widgets.Label(text="Center:", align_right=False),
+            widgets.Label(text="Center:"),
             widgets.Value(name="X", value=node.center_x),
             widgets.Value(name="Y", value=node.center_y),
             widgets.Value(name="Distance", value=node.distance),
@@ -510,7 +521,7 @@ node_specifications = {
         'props': lambda node: [
             widgets.Value(name="Samples", value=node.samples),
             widgets.Value(name="Blur", value=node.factor),
-            widgets.Label(text="Speed:", align_right=False),
+            widgets.Label(text="Speed:"),
             widgets.Value(name="Min", value=node.speed_min),
             widgets.Value(name="Max", value=node.speed_max),
             widgets.Boolean(name="Curved", value=node.use_curved)
@@ -528,9 +539,9 @@ node_specifications = {
     'CompositorNodeMapValue': {
         'class': 'vector_node',
         'props': lambda node: [
-            widgets.Label(text="Offset:", align_right=False),
+            widgets.Label(text="Offset:"),
             widgets.Value(name="", value=node.offset),
-            widgets.Label(text="Size:", align_right=False),
+            widgets.Label(text="Size:"),
             widgets.Value(name="", value=node.size),
             widgets.Boolean(name="Use Minimum", value=node.use_min),
             widgets.Value(name="", value=node.min),
@@ -598,11 +609,11 @@ node_specifications = {
     'CompositorNodeColorSpill': {
         'class': 'matte_node',
         'props': lambda node: [
-            widgets.Label(text="Despill Channel", align_right=False),
+            widgets.Label(text="Despill Channel"),
             selectBar(node, 'channel'),
             dropdown(node, 'limit_method', label="Algorithm:"),
             *([
-                widgets.Label(text="Limiting Channel:", align_right=False),
+                widgets.Label(text="Limiting Channel:"),
                 selectBar(node, 'limit_channel')
             ] if node.limit_method == 'SIMPLE' else []),
             widgets.FloatFac(), # ratio
@@ -638,16 +649,16 @@ node_specifications = {
         'props': lambda node: [
             widgets.FloatFac(),
             widgets.FloatFac(),
-            widgets.Label(text="Color Space:", align_right=False),
+            widgets.Label(text="Color Space:"),
             selectBar(node, 'channel')
         ]
     },
     'CompositorNodeDoubleEdgeMask': {
         'class': 'matte_node',
         'props': lambda node: [
-            widgets.Label(text="Inner Edge:", align_right=False),
+            widgets.Label(text="Inner Edge:"),
             widgets.Dropdown(value=enumName(node, 'inner_mode')),
-            widgets.Label(text="Buffer Edge:", align_right=False),
+            widgets.Label(text="Buffer Edge:"),
             widgets.Dropdown(value=enumName(node, 'edge_mode')),
         ]
     },
@@ -1215,7 +1226,7 @@ node_specifications = {
         'class': 'geometry_node',
         'props': lambda node: [
             widgets.Columns(wids=[
-                widgets.Label(text="Resolution", align_right=True),
+                widgets.Label(text="Resolution", alignment='R'),
                 widgets.Dropdown(value=enumName(node, 'resolution_mode'))
             ])
         ]
@@ -1601,7 +1612,7 @@ node_specifications = {
     'ShaderNodeVertexColor': {
         'class': 'input_node',
         'props': lambda node: [
-            widgets.Label(text=node.layer_name, align_right=True)
+            widgets.Label(text=node.layer_name, alignment='R')
         ]
     },
         'ShaderNodeHairInfo': {
@@ -1648,7 +1659,7 @@ node_specifications = {
         'class': 'input_node',
         'props': lambda node: [
             widgets.Columns(wids=[
-                widgets.Label(text="Object:", align_right=False),
+                widgets.Label(text="Object:"),
                 widgets.Object()
             ]),
             widgets.Boolean(name="From Instancer", value=node.from_instancer)
@@ -1664,7 +1675,7 @@ node_specifications = {
     'ShaderNodeValue': {
         'class': 'input_node',
         'props': lambda node: [
-            widgets.Value(name="", value=node.outputs[0].default_value)
+            widgets.Float(name="", value=node.outputs[0].default_value)
         ]
     },
     'ShaderNodeVolumeInfo': {
@@ -1690,7 +1701,8 @@ node_specifications = {
         'class': 'output_node',
         'props': lambda node: [
             widgets.Value(name="Name:", value=node.name)
-        ]
+        ],
+        'name_behavior': lambda _: 'AOV Output'
     },
     'ShaderNodeOutputMaterial': {
         'class': 'output_node',
@@ -1790,7 +1802,7 @@ node_specifications = {
     'ShaderNodeTexBrick': {
         'class': 'texture_node',
         'props': lambda node: [
-            widgets.FloatFac(),
+            widgets.Value(name="Offset", value=node.offset, minmax=(0.0, 1.0)),
             widgets.Value(name="Frequency", value=node.offset_frequency),
             widgets.Value(name="Squash", value=node.squash),
             widgets.Value(name="Frequency", value=node.squash_frequency)
@@ -1958,7 +1970,7 @@ node_specifications = {
             widgets.Curves()
         ]
     },
-    'ShaderNodeVectorDisplacement': {
+    'BLAHBLAHShaderNodeVectorDisplacement': {
         'class': 'vector_node',
         'props': lambda node: [
             dropdown(node, 'space')
@@ -2064,5 +2076,14 @@ node_specifications = {
             selectBar(node, 'mode'),
             widgets.Script() if node.mode[0] == "I" else widgets.File()
         ]
+    },
+
+
+    ### PLACEHOLDER ###
+
+    'PlaceholderNode': {
+        'class': 'script_node',
+        'props': lambda node: generateCustomProps(node)
     }
+
 }
