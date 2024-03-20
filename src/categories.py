@@ -1085,7 +1085,7 @@ node_specifications = {
     'GeometryNodeObjectInfo': {
         'class': 'input_node',
         'props': lambda node: [
-            selectBar(node, 'transform_smace')
+            selectBar(node, 'transform_space')
         ]
     },
     'GeometryNodeSelfObject': {
