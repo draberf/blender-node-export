@@ -70,53 +70,50 @@ def getObjectName(socket):
 
 # convert unconnected input socket to widget
 SOCKET_WIDGET_DEFS = {
-    'VALUE': lambda socket: widgets.Columns(wids=[
-        widgets.Label(text=socket.name, align_right=False),
-        widgets.Label(text=str(socket.default_value), align_right=True)
-    ]),
-    'RGBA': lambda socket: widgets.Columns(wids=[
-        widgets.Label(text=socket.name, align_right=False),
+    'VALUE': lambda socket: widgets.Float(name=socket.name, value=socket.default_value),
+    'RGBA': lambda socket: widgets.FortySixty(wids=[
+        widgets.Label(text=socket.name),
         widgets.RGBA(color="rgb("+",".join([str(round(x*255)) for x in socket.default_value[:3]])+")")
     ]),
-    'VECTOR': lambda socket: widgets.Vector(name=socket.name, values=[getFloatString(f) for f in socket.default_value]) if not socket.hide_value else widgets.Label(text=socket.name, align_right=False),
-    'INT': lambda socket: widgets.Columns(wids=[
-        widgets.Label(text=socket.name, align_right=False),
-        widgets.Label(text=str(socket.default_value), align_right=True)
+    'VECTOR': lambda socket: widgets.Vector(name=socket.name, values=[getFloatString(f) for f in socket.default_value]) if not socket.hide_value else widgets.Label(text=socket.name),
+    'INT': lambda socket: widgets.FortySixty(wids=[
+        widgets.Label(text=socket.name),
+        widgets.Label(text=str(socket.default_value), alignment='R')
     ]),
-    'IMAGE': lambda socket: widgets.Columns(wids=[
-        widgets.Label(text=socket.name, align_right=False),
-        widgets.Label(text=getImageWidgetString(socket), align_right=True)
+    'IMAGE': lambda socket: widgets.FortySixty(wids=[
+        widgets.Label(text=socket.name),
+        widgets.Label(text=getImageWidgetString(socket), alignment='R')
     ]),
-    'OBJECT': lambda socket: widgets.Columns(wids=[
-        widgets.Label(text=socket.name, align_right=False),
-        widgets.Label(text=getObjectName(socket), align_right=True)
+    'OBJECT': lambda socket: widgets.FortySixty(wids=[
+        widgets.Label(text=socket.name),
+        widgets.Label(text=getObjectName(socket), alignment='R')
     ]),
-    'TEXTURE': lambda socket: widgets.Columns(wids=[
-        widgets.Label(text=socket.name, align_right=False),
-        widgets.Label(text=getObjectName(socket), align_right=True)
+    'TEXTURE': lambda socket: widgets.FortySixty(wids=[
+        widgets.Label(text=socket.name),
+        widgets.Label(text=getObjectName(socket), alignment='R')
     ]),
-    'COLLECTION': lambda socket: widgets.Columns(wids=[
-        widgets.Label(text=socket.name, align_right=False),
-        widgets.Label(text=getObjectName(socket), align_right=True)
+    'COLLECTION': lambda socket: widgets.FortySixty(wids=[
+        widgets.Label(text=socket.name),
+        widgets.Label(text=getObjectName(socket), alignment='R')
     ]),
-    'GEOMETRY': lambda socket: widgets.Label(text=socket.name, align_right=False),
-    'SHADER': lambda socket: widgets.Label(text=socket.name, align_right=False),
-    'MATERIAL': lambda socket: widgets.Columns(wids=[
-        widgets.Label(text=socket.name, align_right=False),
-        widgets.Label(text=getObjectName(socket), align_right=True)
+    'GEOMETRY': lambda socket: widgets.Label(text=socket.name),
+    'SHADER': lambda socket: widgets.Label(text=socket.name),
+    'MATERIAL': lambda socket: widgets.FortySixty(wids=[
+        widgets.Label(text=socket.name),
+        widgets.Label(text=getObjectName(socket), alignment='R')
     ]),
-    'STRING': lambda socket: widgets.Columns(wids=[
-        widgets.Label(text=socket.name, align_right=False),
-        widgets.Label(text=socket.default_value, align_right=True)
+    'STRING': lambda socket: widgets.FortySixty(wids=[
+        widgets.Label(text=socket.name),
+        widgets.Label(text=socket.default_value, alignment='R')
     ]),
     'BOOLEAN': lambda socket: widgets.Boolean(name=socket.name, value=socket.default_value),
-    'CUSTOM': lambda socket: widgets.Label(text=socket.name, align_right=False)
+    'CUSTOM': lambda socket: widgets.Label(text=socket.name)
 }
 
 def widgetFactory(socket) -> widgets.Widget:
     
     if socket.is_output or socket.is_linked:
-        return widgets.Label(text=socket.name, align_right=True)
+        return widgets.Label(text=socket.name, alignment='R')
 
     return SOCKET_WIDGET_DEFS[socket.type](socket)
     
@@ -149,15 +146,8 @@ class Converter():
         for node in nodetree.nodes:
             
             # create node rep
-            if node.bl_idname in categories.node_specifications:
-                color_class = categories.node_specifications[node.bl_idname]['class']
-                if not color_class: color_class = categories.node_specifications[node.bl_idname]['class_behavior'](node)
-                color = self.colors[color_class]
-            else:
-                raise Exception(f"node {node.bl_idname} has no specification")
-            node_object = UINode(node, color)
+            node_object = UINode(node, self.colors)
 
-            # update viewbox corners
             self.vb_min_x = min(self.vb_min_x, node_object.x)
             self.vb_min_y = min(self.vb_min_y, node_object.y)
             self.vb_max_x = max(self.vb_max_x, node_object.x+node_object.w)
@@ -165,7 +155,7 @@ class Converter():
 
             self.anchor_refs.update(node_object.anchors)
             self.nodes.append(node_object)
-
+        
     def makeDefs(self) -> ET.Element:
 
         defs = ET.Element('defs')
@@ -229,12 +219,20 @@ class Converter():
 # class wrapper for a single node
 class UINode():
 
-    def __init__(self, node: bpy.types.Node, color_string: str):
+    def __init__(self, node: bpy.types.Node, colors: {str}):
+        specification = {}
+        self.is_placeholder = False
+        if not node.bl_idname in categories.node_specifications:
+            specification = categories.node_specifications['PlaceholderNode']
+            self.is_placeholder = True
+        else:
+            specification = categories.node_specifications[node.bl_idname]
+
         self.name = node.name
         if node.label:
             self.name = node.label
-        elif 'name_behavior' in categories.node_specifications[node.bl_idname]:
-            self.name = categories.node_specifications[node.bl_idname]['name_behavior'](node)
+        elif 'name_behavior' in specification:
+            self.name = specification['name_behavior'](node)
         self.w, self.h = node.dimensions
         self.w *= constants.NODE_DIM_RATIO
         self.h *= constants.NODE_DIM_RATIO
@@ -245,15 +243,21 @@ class UINode():
 
         self.anchors = {}
 
+
         # process header
-        self.uiheader = UIHeader(self.name, self.w, color=color_string)
+        if not self.is_placeholder:
+            self.color_class = specification['class'] if specification['class'] else specification['class_behavior'](node)
+        else:
+            print(f"WARNING: Node {node.bl_idname} does not have a default specification. Placeholder object will be used instead.")
+            self.color_class = 'switch_node'
+
+        self.uiheader = UIHeader(self.name, self.w, color=colors[self.color_class])
 
 
         # new Widget stack method + coords
         self.height_widget_pairs = []
         self.height = self.uiheader.height + constants.TOP_PADDING
 
-        specification = None if not node.bl_idname in categories.node_specifications else categories.node_specifications[node.bl_idname]
 
         def register_widget(widget):
             self.height_widget_pairs.append((self.height, widget))
@@ -295,7 +299,7 @@ class UINode():
         return self.socket_coords
 
     def svg(self) -> ET.Element:
-        group = ET.Element('svg', x=f"{self.x}", y=f"{self.y}")
+        group = ET.Element('svg', x=f"{self.x}", y=f"{self.y}", width=str(self.w), height=str(self.h), viewBox=f"0 0 {self.w} {self.h}")
         
         # frame
         rect = self.frame()
@@ -305,7 +309,7 @@ class UINode():
         group.append(self.uiheader.svg())
 
         # new widgets rendering
-        group.extend([widget.svg(width=self.w, y=str(height)) for height, widget in self.height_widget_pairs])
+        group.extend([widget.svg(width=self.w, attrib={'y':str(height)}) for height, widget in self.height_widget_pairs])
 
         return group
 
