@@ -141,11 +141,10 @@ class Converter():
         self.anchor_refs = {}
 
 
-        self.vb_min_x = nodetree.nodes[0].location[0]
-        self.vb_min_y = nodetree.nodes[0].location[1]
-        self.vb_max_x = nodetree.nodes[0].location[0]
-        self.vb_max_y = nodetree.nodes[0].location[1]
-
+        self.vb_min_x =  nodetree.nodes[0].location[0]
+        self.vb_min_y = -nodetree.nodes[0].location[1]
+        self.vb_max_x =  nodetree.nodes[0].location[0]
+        self.vb_max_y = -nodetree.nodes[0].location[1]
 
         for node in nodetree.nodes:
             
