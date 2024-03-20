@@ -186,11 +186,15 @@ class Converter():
     def convert(self) -> ET.ElementTree:
         
         svg = ET.Element('svg', version="1.1", xmlns="http://www.w3.org/2000/svg")
+        svg_w = self.vb_max_x-self.vb_min_x + 2*constants.VIEWBOX_PADDING
+        svg_h = self.vb_max_y-self.vb_min_y + 2*constants.VIEWBOX_PADDING
+        svg.set('width',  str(svg_w))
+        svg.set('height', str(svg_h))
         svg.set('viewBox', ' '.join([str(f) for f in [
-            self.vb_min_x,
-            self.vb_min_y,
-            self.vb_max_x-self.vb_min_x,
-            self.vb_max_y-self.vb_min_y
+            self.vb_min_x - constants.VIEWBOX_PADDING,
+            self.vb_min_y - constants.VIEWBOX_PADDING,
+            svg_w,
+            svg_h
         ]]))
 
         svg.append(self.makeDefs())
