@@ -118,10 +118,7 @@ SOCKET_WIDGET_DEFS = {
         widgets.Label(text=socket.name),
         widgets.Label(text=getObjectName(socket), alignment='R')
     ]),
-    'STRING': lambda socket: widgets.FortySixty(wids=[
-        widgets.Label(text=socket.name),
-        widgets.Label(text=socket.default_value, alignment='R')
-    ]),
+    'STRING': lambda socket: widgets.String(value=socket.default_value, name=socket.name),
     'BOOLEAN': lambda socket: widgets.Boolean(name=socket.name, value=socket.default_value),
     'CUSTOM': lambda socket: widgets.Label(text=socket.name)
 }
