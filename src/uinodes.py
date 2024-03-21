@@ -365,6 +365,6 @@ class UIShape():
         group = ET.Element('svg', attrib=kwargs)
 
         ET.SubElement(group, 'use', href=f'#marker_{self.shape}', fill=self.color)
-        if self.has_dot: ET.SubElement(group, 'use', href=f'#marker_dot', fill='black', stroke='none')
+        if self.has_dot: ET.SubElement(group, 'use', href='#marker_dot', fill='black', stroke='none')
 
         return group
