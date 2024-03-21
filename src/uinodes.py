@@ -40,6 +40,21 @@ MARKER_DEFS = {
                             })
     }
 
+ARROW_DEFS = {
+    'left':('polyline',{
+        'points': '5 2 2 5 5 8',
+        'class': 'arrow'
+    }),
+    'right':('polyline',{
+        'points': '5 2 8 5 5 8',
+        'class': 'arrow'
+    }),
+    'down':('polyline', {
+        'points': '2 5 5 8 8 5',
+        'class': 'arrow'
+    })
+}
+
 def getFloatString(value: float, spaces: int = 5) -> str:
 
     s = str(value)[:5]
@@ -53,7 +68,8 @@ def style() -> ET.Element:
     style_elem.text = '\n'.join([
         ".nodeframe { fill: #333333 } ",
         "text { font-family: Sans, Arial; font-size: 0.6em; fill: white }",
-        ".marker { stroke-width: "+str(constants.MARKER_LINE)+"px; stroke: black}"
+        ".marker { stroke-width: "+str(constants.MARKER_LINE)+"px; stroke: black}",
+        ".arrow { stroke-width: 1; stroke: white; fill:none}"
     ])
 
     return style_elem
@@ -168,6 +184,12 @@ class Converter():
         for sym_name, (elem_name, elem_attrs) in MARKER_DEFS.items():
             symbol = ET.SubElement(defs, 'symbol', id='marker_'+sym_name)
             ET.SubElement(symbol, elem_name, attrib=elem_attrs)
+
+        ## arrows
+        for sym_name, (elem_name, elem_attrs) in ARROW_DEFS.items():
+            symbol = ET.SubElement(defs, 'symbol', id=sym_name+'_arrow')
+            arrow = ET.SubElement(symbol, elem_name, attrib=elem_attrs)
+
 
         return defs
 
