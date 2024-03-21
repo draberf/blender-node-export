@@ -31,15 +31,12 @@ class UIInspectOperator(bpy.types.Operator):
             print(">>>", node.bl_idname, node.name)
             #print("Sockets:")
             for input in node.inputs:
-                break
-                print(input.name + " " + input.type)
-                if input.type == "VALUE":
-                    print(input.bl_rna.properties["default_value"].hard_min)
-                    print(input.bl_rna.properties["default_value"].hard_max)
-                    print(input.bl_rna.properties["default_value"].soft_min)
-                    print(input.bl_rna.properties["default_value"].soft_max)
-                #for attr in input.bl_rna.properties:
-                #    print(">>", attr, getattr(input, attr.identifier))
+                print(">", input.name)
+                for attr in input.bl_rna.properties:
+                    if attr.name != 'Default Value': continue
+                    print(">>", attr, attr.subtype)
+                    if attr.subtype == 'FACTOR':
+                        print(attr.hard_min, attr.soft_min, attr.hard_max, attr.soft_max)
             print("Props:")
             for prop in node.bl_rna.properties:
                 if prop.identifier in IGNORE_PROPS: continue
