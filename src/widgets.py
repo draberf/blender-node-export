@@ -202,11 +202,16 @@ class Value(Widget):
                     'style': 'fill:#7777dd'
                 })
 
+        # label
         if not self.name:
             grp.append(Label(str(self.value), alignment='C').svg(width=self.width-2*PADDING, x=PADDING, resize=False))
         else:
             grp.append(Label(self.name).svg(width=(self.width/2.0)-PADDING, x=PADDING, resize=False))
             grp.append(Label(str(self.value), alignment='R').svg(width=(self.width/2.0)-PADDING, x=self.width/2.0, resize=False))
+
+        # arrows
+        ET.SubElement(grp, 'use', href='#left_arrow',  x='3', y=str(self.height()/2.0-5.0))
+        ET.SubElement(grp, 'use', href='#right_arrow', x=str(self.width-13.0), y=str(self.height()/2.0-5.0))
 
         return grp
 
@@ -303,16 +308,9 @@ class Dropdown(Widget):
                       x='0', y='0',
                       width=str(self.width), height=str(self.height()))
 
-        vee = ET.SubElement(grp, 'polyline',
-                      points=f"\
-                        {0.82*self.width} {0.4*self.height()} \
-                        {0.85*self.width} {0.6*self.height()} \
-                        {0.88*self.width} {0.4*self.height()}",
-                        stroke="white")
+        vee = ET.SubElement(grp, 'use', href='#down_arrow', x=str(self.width*0.8), y=str(self.height()/2.0-6.0))
         
         grp.append(Label(text=self.value).svg(width=self.width))
-
-        vee.set('stroke-width', "1")
 
         return grp
 
