@@ -191,7 +191,7 @@ class Value(Widget):
         # progressive paint in
         if self.minmax:
             lo, hi = self.minmax
-            proportion = (self.value-lo)/(hi-lo)
+            proportion = (float(self.value)-lo)/(hi-lo)
             if proportion >= 1.0: rect.set('style', 'fill:#7777dd')
             elif proportion >= 0.0:
                 ET.SubElement(grp, 'rect', attrib={
