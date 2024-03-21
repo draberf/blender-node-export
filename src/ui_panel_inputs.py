@@ -32,18 +32,15 @@ class UIInspectOperator(bpy.types.Operator):
             #print("Sockets:")
             for input in node.inputs:
                 print(">", input.name)
-                for attr in input.bl_rna.properties:
-                    if attr.name != 'Default Value': continue
-                    print(">>", attr, attr.subtype)
-                    if attr.subtype == 'FACTOR':
-                        print(attr.hard_min, attr.soft_min, attr.hard_max, attr.soft_max)
             print("Props:")
             for prop in node.bl_rna.properties:
                 if prop.identifier in IGNORE_PROPS: continue
-                print(">", prop, prop.type, prop.subtype, "name", prop.name)
-                if prop.type == "ENUM":
-                    for key, item in prop.enum_items.items():
-                        print(">>", key, item.name)
+                if prop.identifier == "image":
+                    print(getattr(node, prop.identifier))
+                #print(">", prop, prop.type, prop.subtype, "name", prop.name)
+                #if prop.type == "ENUM":
+                #    for key, item in prop.enum_items.items():
+                #        print(">>", key, item.name)
                 #for attr in prop.bl_rna.properties:
                 #    print("> >", attr, ":  ", getattr(prop, attr.identifier))
     
