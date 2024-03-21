@@ -84,9 +84,16 @@ def getObjectName(socket):
     if not socket.default_value: return ""
     return socket.default_value.name
 
+def value_socket(socket) -> widgets.Widget:
+    prop = socket.bl_rna.properties['default_value']
+    if prop.subtype == 'FACTOR':
+        return widgets.Float(socket.name, socket.default_value, minmax=(prop.soft_min, prop.soft_max))
+    else:
+        return widgets.Float(socket.name, socket.default_value)
+
 # convert unconnected input socket to widget
 SOCKET_WIDGET_DEFS = {
-    'VALUE': lambda socket: widgets.Float(name=socket.name, value=socket.default_value),
+    'VALUE': lambda socket: value_socket(socket),
     'RGBA': lambda socket: widgets.FortySixty(wids=[
         widgets.Label(text=socket.name),
         widgets.RGBA(color="rgb("+",".join([str(round(x*255)) for x in socket.default_value[:3]])+")")
