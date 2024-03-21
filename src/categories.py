@@ -1970,7 +1970,7 @@ node_specifications = {
             widgets.Curves()
         ]
     },
-    'BLAHBLAHShaderNodeVectorDisplacement': {
+    'ShaderNodeVectorDisplacement': {
         'class': 'vector_node',
         'props': lambda node: [
             dropdown(node, 'space')
