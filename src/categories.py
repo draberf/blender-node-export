@@ -21,6 +21,14 @@ def selectBar(node, prop) -> widgets.Widget:
         raise ve
     return widgets.SelectBar(options=options, select_index=index)
 
+def object(object) -> widgets.Widget:
+    if not object: return widgets.String(name="Object:", value="")
+    return widgets.String(name="Object:", value=object.name)
+
+def image(image) -> widgets.Widget:
+    if not image: return widgets.SelectBar(["New", "Open"], -1)
+    return widgets.String(value=image.name)
+
 def generateCustomProps(node):
     
     wids = []
@@ -1612,7 +1620,7 @@ node_specifications = {
     'ShaderNodeVertexColor': {
         'class': 'input_node',
         'props': lambda node: [
-            widgets.Label(text=node.layer_name, alignment='R')
+            widgets.String(value=node.layer_name)
         ]
     },
         'ShaderNodeHairInfo': {
@@ -1658,10 +1666,7 @@ node_specifications = {
     'ShaderNodeTexCoord': {
         'class': 'input_node',
         'props': lambda node: [
-            widgets.Columns(wids=[
-                widgets.Label(text="Object:"),
-                widgets.Object()
-            ]),
+            object(node.object),
             widgets.Boolean(name="From Instancer", value=node.from_instancer)
         ]
     },
@@ -1669,7 +1674,7 @@ node_specifications = {
         'class': 'input_node',
         'props': lambda node: [
             widgets.Boolean(name="From Instancer", value=node.from_instancer),
-            widgets.UVMap()
+            widgets.String(value=node.uv_map)
         ]
     },
     'ShaderNodeValue': {
@@ -1814,10 +1819,16 @@ node_specifications = {
     'ShaderNodeTexEnvironment': {
         'class': 'texture_node',
         'props': lambda node: [
-            widgets.Image(),
+            image(node.image),
             dropdown(node, 'interpolation'),
-            dropdown(node, 'projection')
-        ]
+            dropdown(node, 'projection'),
+            *([
+                dropdown(node.image, 'source'),
+                widgets.LabeledDropdown(name="Color Space", value="") if not node.image.colorspace_settings.name else dropdown(node.image.colorspace_settings, 'name', label="Color Space"),
+                dropdown(node.image, 'alpha_mode', label="Alpha")
+            ] if node.image else [])
+        ],
+        'name_behavior': lambda node: "Environment Texture" if not node.image else node.image.name
     },
     'ShaderNodeTexGradient': {
         'class': 'texture_node',
@@ -1835,11 +1846,12 @@ node_specifications = {
     'ShaderNodeTexImage': {
         'class': 'texture_node',
         'props': lambda node: [
-            widgets.Image(),
+            image(node.image),
             dropdown(node, 'interpolation'),
             dropdown(node, 'projection'),
             dropdown(node, 'extension')
-        ]
+        ],
+        'name_behavior': lambda node: "Image Texture" if not node.image else node.image.name
     },
     'ShaderNodeTexMagic': {
         'class': 'texture_node',
