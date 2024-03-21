@@ -1597,7 +1597,7 @@ node_specifications = {
         'class': 'input_node',
         "props": lambda node: [
             dropdown(node, 'attribute_type', label="Type:"),
-            widgets.Value(name="Name:", value=node.attribute_name)
+            widgets.String(name="Name:", value=node.attribute_name)
         ]
     },
     'ShaderNodeBevel': {
@@ -1700,7 +1700,7 @@ node_specifications = {
     'ShaderNodeOutputAOV': {
         'class': 'output_node',
         'props': lambda node: [
-            widgets.Value(name="Name:", value=node.name)
+            widgets.String(name="Name:", value=node.name)
         ],
         'name_behavior': lambda _: 'AOV Output'
     },
