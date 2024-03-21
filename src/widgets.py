@@ -417,3 +417,34 @@ class MovieClip(Placeholder):
 
 class Scene(Placeholder):
     ...
+
+class String(Widget):
+
+    def __init__(self, value="", name="") -> None:
+        super().__init__()
+        self.value = value
+        self.name = name
+
+    def height(self):
+        return constants.LINKED_SOCKET_HEIGHT
+    
+    def svg(self, width=DEFAULT_WIDTH, attrib={}, x=0, resize=True) -> ET.Element:
+        grp = super().svg(width, attrib, x, resize)
+
+        if self.name:
+            grp.append(FortySixty(wids=[
+                Label(text=self.name),
+                String(self.value)
+            ], resize_override=False).svg(width=self.width, resize=False))
+        else:
+            rect = ET.SubElement(grp, 'rect', attrib={
+                'x': '0',
+                'y': '0',
+                'width': str(self.width),
+                'height': str(self.height()),
+                'style': 'fill:black'
+            })
+            
+            grp.append(Label(text=self.value).svg(width=self.width))
+
+        return grp
