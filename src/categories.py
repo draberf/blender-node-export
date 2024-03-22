@@ -1998,9 +1998,14 @@ node_specifications = {
         }[node.data_type],
         'props': lambda node: [
             dropdown(node, 'data_type'),
-            widgets.Placeholder(),
+            dropdown(node, 'factor_mode') if node.data_type == 'VECTOR' else None,
+            *([
+                dropdown(node, 'blend_type'),
+                widgets.Boolean(name="Clamp Result", value=node.clamp_result)
+            ] if node.data_type == 'RGBA' else []),
             widgets.Boolean(name="Clamp Factor", value=node.clamp_factor),
-        ]
+        ],
+        'name_behavior': lambda node: "Mix" if node.data_type != 'RGBA' else enumName(node, 'blend_type')
     },
     'ShaderNodeRGBCurve': {
         'class': 'input_node',
