@@ -43,6 +43,8 @@ class Placeholder(Widget):
     
     css_classname = 'placeholder'
 
+    def __init__(self, **kwargs) -> None:
+        super().__init__()
 
     def height(self) -> float:
         return 4*constants.LINKED_SOCKET_HEIGHT
