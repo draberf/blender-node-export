@@ -29,6 +29,36 @@ def image(image) -> widgets.Widget:
     if not image: return widgets.SelectBar(["+ New", "Open"], -1)
     return widgets.String(value=image.name)
 
+def curve(curving, type="VALUE", sampling=40) -> widgets.Widget:
+    
+    def evaluate_curve_n(n):
+        pairs = []
+        for N in range(sampling+1):
+            x = curving.clip_min_x + N * (curving.clip_max_x-curving.clip_min_x) * (1.0 / sampling)
+            y = curving.evaluate(curving.curves[n], x)
+            pairs.append((
+                (x-curving.clip_min_x) / (curving.clip_max_x-curving.clip_min_x),
+                (y-curving.clip_min_y) / (curving.clip_max_y-curving.clip_min_y)
+            ))
+        return pairs
+    
+    match type:
+        case "VALUE":
+            points = evaluate_curve_n(0)
+            return widgets.Curves(curves=[('black', points, False)])
+        case "CRGB":
+            return widgets.Curves(curves=[
+                ('#222222', evaluate_curve_n(3), True),
+                *[(color, evaluate_curve_n(N), False) for N, color in enumerate(['red', 'green', 'blue'])]
+            ])
+        case "XYZ":
+            return widgets.Curves(curves=[
+                (color, evaluate_curve_n(N), False) for N, color in enumerate(['red', 'green', 'blue'])
+            ])
+        case _:
+            print(f"WARNING: Undefined curve type {type}.")
+            return widgets.Curves(curves=[('black'), evaluate_curve_n(0), False])
+
 def generateCustomProps(node):
     
     wids = []
