@@ -1906,24 +1906,49 @@ node_specifications = {
         'class': 'texture_node',
         'props': lambda node: [
             selectBar(node, 'point_source'),
-            widgets.Object(),
+            widgets.String(value="" if not node.object else node.object.name, name="Object:"),
+            widgets.String(value="" if not node.particle_system else node.particle_system.name, name="Particle System:"),
             dropdown(node, 'space', "Space:"),
             widgets.Value(name="Radius", value=node.radius),
             dropdown(node, 'interpolation', "Interpolation:"),
             widgets.Value(name="Resolution", value=node.resolution),
-            dropdown(node, 'particle_color_source', "Color Source:")
+            dropdown(node, 'particle_color_source' if node.point_source[0] == 'P' else 'vertex_color_source', "Color Source:")
         ]
     },
     'ShaderNodeTexSky': {
         'class': 'texture_node',
         'props': lambda node: [
-            widgets.Placeholder()
+            dropdown(node, 'sky_type'),
+            *([
+                widgets.Sphere(values=node.sun_direction),
+                widgets.Float(name="Turbidity", value=node.turbidity)
+            ] if node.sky_type[0] == 'P' else []),
+            *([
+                widgets.Sphere(values=node.sun_direction),
+                widgets.Float(name="Turbidity", value=node.turbidity),
+                widgets.Float(name="Ground Albedo", value=node.ground_albedo, minmax=(0.0, 1.0))
+            ] if node.sky_type[0] == 'H' else []),
+            *([
+                widgets.Boolean(name="Sun Disc", value=node.sun_disc),
+                *([
+                    widgets.Float(name="Sun Size", value=node.sun_size),
+                    widgets.Float(name="Sun Intensity", value=node.sun_intensity)
+                ] if node.sun_disc else []),
+                widgets.Float(name="Sun Elevation", value=node.sun_elevation),
+                widgets.Float(name="Sun Rotation", value=node.sun_rotation),
+                widgets.Float(name="Altitude", value=node.altitude),
+                widgets.Float(name="Air", value=node.air_density, minmax=(0.0, 10.0)),
+                widgets.Float(name="Dust", value=node.dust_density, minmax=(0.0, 10.0)),
+                widgets.Float(name="Ozone", value=node.ozone_density, minmax=(0.0, 10.0))
+            ] if node.sky_type[0] == 'N' else [])
         ]
     },
     'ShaderNodeTexVoronoi': {
         'class': 'texture_node',
         'props': lambda node: [
-            widgets.Placeholder()
+            dropdown(node, 'voronoi_dimensions'),
+            dropdown(node, 'feature'),
+            dropdown(node, 'distance') if node.voronoi_dimensions != '1D' and node.feature not in ['DISTANCE_TO_EDGE', 'N_SPHERE_RADIUS'] else None
         ]
     },
     'ShaderNodeTexWave': {
