@@ -310,7 +310,7 @@ class Dropdown(Widget):
                       x='0', y='0',
                       width=str(self.width), height=str(self.height()))
 
-        vee = ET.SubElement(grp, 'use', href='#down_arrow', x=str(self.width*0.8), y=str(self.height()/2.0-6.0))
+        vee = ET.SubElement(grp, 'use', href='#down_arrow', x=str(self.width-20.0), y=str(self.height()/2.0-6.0))
         
         grp.append(Label(text=self.value).svg(width=self.width))
 
