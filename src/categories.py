@@ -26,7 +26,7 @@ def object(object) -> widgets.Widget:
     return widgets.String(name="Object:", value=object.name)
 
 def image(image) -> widgets.Widget:
-    if not image: return widgets.SelectBar(["New", "Open"], -1)
+    if not image: return widgets.SelectBar(["+ New", "Open"], -1)
     return widgets.String(value=image.name)
 
 def generateCustomProps(node):
