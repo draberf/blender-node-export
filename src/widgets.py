@@ -345,8 +345,6 @@ class ColorPicker(Placeholder):
 class Object(Placeholder):
     ...
 
-class UVMap(Placeholder):
-    ...
 
 class SelectBar(Widget):
     
@@ -450,3 +448,5 @@ class String(Widget):
             grp.append(Label(text=self.value).svg(width=self.width))
 
         return grp
+class UVMap(String):
+    ...
