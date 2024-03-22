@@ -155,7 +155,7 @@ node_specifications = {
     'CompositorNodeTime': {
         'class': 'input_node',
         'props': lambda node: [
-            widgets.Curves(),
+            curve(node.curve, type='VALUE'),
             widgets.Value(name="Start", value=node.frame_start),
             widgets.Value(name="End", value=node.frame_end)
         ]
@@ -320,7 +320,7 @@ node_specifications = {
     'CompositorNodeCurveRGB': {
         'class': 'color_node',
         'props': lambda node: [
-            widgets.Placeholder()
+            curve(node.mapping, type='CRGB')
         ]
     },
     'CompositorNodeTonemap': {
@@ -599,7 +599,7 @@ node_specifications = {
     'CompositorNodeCurveVec': {
         'class': 'vector_node',
         'props': lambda node: [
-            widgets.Curves()
+            curve(node.mapping, type='XYZ')
         ]
     },
 
@@ -2008,9 +2008,9 @@ node_specifications = {
         'name_behavior': lambda node: "Mix" if node.data_type != 'RGBA' else enumName(node, 'blend_type')
     },
     'ShaderNodeRGBCurve': {
-        'class': 'input_node',
+        'class': 'color_node',
         'props': lambda node: [
-            widgets.Curves()
+            curve(node.mapping, type="CRGB")
         ]
     },
 
@@ -2044,7 +2044,7 @@ node_specifications = {
     'ShaderNodeVectorCurve': {
         'class': 'vector_node',
         'props': lambda node: [
-            widgets.Curves()
+            curve(node.mapping, type='XYZ')
         ]
     },
     'ShaderNodeVectorDisplacement': {
@@ -2098,7 +2098,7 @@ node_specifications = {
     'ShaderNodeFloatCurve': {
         'class': 'converter_node',
         'props': lambda node: [
-            widgets.Curves()
+            curve(node.mapping)
         ]
     },
     'ShaderNodeMapRange': {
