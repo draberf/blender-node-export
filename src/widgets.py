@@ -212,8 +212,8 @@ class Value(Widget):
             grp.append(Label(str(self.value), alignment='R').svg(width=(self.width/2.0)-PADDING, x=self.width/2.0, resize=False))
 
         # arrows
-        ET.SubElement(grp, 'use', href='#left_arrow',  x='3', y=str(self.height()/2.0-5.0))
-        ET.SubElement(grp, 'use', href='#right_arrow', x=str(self.width-13.0), y=str(self.height()/2.0-5.0))
+        #ET.SubElement(grp, 'use', href='#left_arrow',  x='3', y=str(self.height()/2.0-5.0))
+        #ET.SubElement(grp, 'use', href='#right_arrow', x=str(self.width-13.0), y=str(self.height()/2.0-5.0))
 
         return grp
 
