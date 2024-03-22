@@ -1704,7 +1704,7 @@ node_specifications = {
         'class': 'input_node',
         'props': lambda node: [
             widgets.Boolean(name="From Instancer", value=node.from_instancer),
-            widgets.String(value=node.uv_map)
+            widgets.UVMap(value=node.uv_map)
         ]
     },
     'ShaderNodeValue': {
@@ -2033,7 +2033,7 @@ node_specifications = {
         'class': 'vector_node',
         'props': lambda node: [
             dropdown(node, 'space'),
-            widgets.UVMap() if node.space[0] == "T" else None
+            widgets.UVMap() if node.space ==  'TANGENT' else None
         ]
     },
     'ShaderNodeVectorCurve': {
