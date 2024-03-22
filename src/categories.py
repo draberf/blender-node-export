@@ -1870,7 +1870,7 @@ node_specifications = {
         'class': 'texture_node',
         'props': lambda node: [
             selectBar(node, 'mode'),
-            widgets.IES() if node.mode == 'INTERNAL' else widgets.File()
+            widgets.IES(value="" if not node.ies else node.ies.name) if node.mode == 'INTERNAL' else widgets.File(value=node.filepath)
         ]
     },
     'ShaderNodeTexImage': {
@@ -1879,7 +1879,12 @@ node_specifications = {
             image(node.image),
             dropdown(node, 'interpolation'),
             dropdown(node, 'projection'),
-            dropdown(node, 'extension')
+            dropdown(node, 'extension'),
+            *([
+                dropdown(node.image, 'source'),
+                widgets.LabeledDropdown(name="Color Space", value="") if not node.image.colorspace_settings.name else dropdown(node.image.colorspace_settings, 'name', label="Color Space"),
+                dropdown(node.image, 'alpha_mode', label="Alpha")
+            ] if node.image else [])
         ],
         'name_behavior': lambda node: "Image Texture" if not node.image else node.image.name
     },
