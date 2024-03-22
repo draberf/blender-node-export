@@ -382,14 +382,47 @@ class FloatFac(Placeholder):
 class Image(Placeholder):
     ...
 
-class IES(Placeholder):
-    ...
 
-class File(Placeholder):
-    ...
+class Curves(Widget):
+    
+    def __init__(self, curves=[]) -> None:
+        super().__init__()
+        self.curves = curves
 
-class Curves(Placeholder):
-    ...
+    def height(self) -> float:
+        return 8 * constants.LINKED_SOCKET_HEIGHT
+    
+    def svg(self, width=DEFAULT_WIDTH, attrib={}, x=0, resize=True) -> ET.Element:
+        grp = super().svg(width, attrib, x, resize)
+
+        rect = ET.SubElement(grp, 'rect', attrib={
+            'x':'0',
+            'y':'0',
+            'width':str(self.width),
+            'height':str(self.height()),
+            'style':'fill:#545454'
+        })
+
+        for color, point_pairs, infill in self.curves:
+            max_y = max(y for _, y in point_pairs)
+            points = [(x*self.width, (max_y-y)*self.height()) for x, y in point_pairs]
+            stroke = 'none' if infill else color
+            fill =   color if infill else 'none'
+            if infill: points.extend([(self.width,self.height()),(0, self.height())])
+            line = ET.SubElement(grp, 'polyline' if not infill else 'polygon', attrib={
+                'points':(' '.join([f'{x} {y}' for x, y in points])),
+                'style':f'stroke-width:1; stroke:{stroke}; fill:{fill}'
+            })
+        
+        frame = ET.SubElement(grp, 'rect', attrib={
+            'x':'0',
+            'y':'0',
+            'width':str(self.width),
+            'height':str(self.height()),
+            'style':'fill:none; stroke:white; stroke-width:1'
+        })
+
+        return grp
 
 class Ramp(Placeholder):
     ...
@@ -448,5 +481,15 @@ class String(Widget):
             grp.append(Label(text=self.value).svg(width=self.width))
 
         return grp
+
+class IES(String):
+    ...
+
+class File(String):
+    ...
+
+class Sphere(Placeholder):
+    ...
+
 class UVMap(String):
     ...
