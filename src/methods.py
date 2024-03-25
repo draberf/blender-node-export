@@ -1,4 +1,5 @@
 import mathutils
+import cmath
 
 # in: mathutils.Color with r, g, b, methods
 # out: color representation in SVG-compliant format
@@ -18,3 +19,9 @@ def getFloatString(value: float, decimal_points: int = 3) -> str:
     rounded = round(abs(value)*(10**decimal_points))
     s = ('-' if value<0 else '')+('0' if abs(value)<1 else '')+str(rounded)[:-decimal_points]+'.'+str(rounded)[-decimal_points:]
     return s
+
+def cartesianToPolar(x: float, y: float) -> tuple[float, float]:
+    return cmath.polar(complex(x, y))
+
+def polarToCartesian(rho: float, phi: float) -> tuple[float, float]:
+    return (z := cmath.rect(rho, phi)).real, z.imag
