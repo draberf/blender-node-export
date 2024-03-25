@@ -1,7 +1,11 @@
 import xml.etree.ElementTree as ET
 from . import constants
 
-from .methods import getFloatString
+from math import pi
+
+from .methods import getFloatString, polarToCartesian
+
+from colorsys import rgb_to_hsv
 
 DEFAULT_WIDTH = 100.0
 DEFAULT_PADDING = 0.06
@@ -339,8 +343,47 @@ class ColorPickerNew(Widget):
         })
         ...
 
-class ColorPicker(Placeholder):
-    ...
+class ColorPicker(Widget):
+    
+    def __init__(self, color=[1.0,0.0,0.0], **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.color = color
+
+    def height(self) -> float:
+        return 90.0
+    
+    def svg(self, width=DEFAULT_WIDTH, attrib={}, **kwargs) -> ET.Element:
+        grp = super().svg(width, attrib, **kwargs)
+
+        defs = ET.SubElement(grp, 'defs')
+        grad = ET.SubElement(defs, 'linearGradient', id='vertical_grad', x1='0', x2='0', y1='0', y2='1')
+        ET.SubElement(grad, 'stop', attrib={'offset':  '0%', 'stop-color':'white'})
+        ET.SubElement(grad, 'stop', attrib={'offset':'100%', 'stop-color':'black'})
+
+        wheel_offset = (self.width-10.0)/2.0-45.0
+        bar_offset = self.width-10.0
+
+        ET.SubElement(grp, 'use', href='#color_wheel', x=str(wheel_offset), y='0')
+        ET.SubElement(grp, 'rect', x=str(bar_offset), y='0', width='10.0', height=str(self.height()), style='fill:url(#vertical_grad)')
+
+        r, g, b = self.color[:3]
+        h, s, v = rgb_to_hsv(r, g, b)
+        
+        # marker on wheel
+        polar = polarToCartesian(s, (h-0.75)*2*pi)
+        x = wheel_offset + 45.0 + polar[0]*45.0
+        y = 45.0 + polar[1]*45.0
+        ET.SubElement(grp, 'circle', cx=str(x), cy=str(y), r='2', style='fill:white; stroke:black; stroke-width:0.5')
+
+        # marker on bar
+        x = bar_offset + 5.0
+        y = 90.0*(1.0-v)
+        ET.SubElement(grp, 'circle', cx=str(x), cy=str(y), r='2', style='fill:white; stroke:black; stroke-width:0.5')
+
+        # marker on bar
+
+
+        return grp
 
 class Object(Placeholder):
     ...
