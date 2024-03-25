@@ -196,6 +196,17 @@ class Converter():
             symbol = ET.SubElement(defs, 'symbol', id=sym_name+'_arrow')
             arrow = ET.SubElement(symbol, elem_name, attrib=elem_attrs)
 
+        ## color wheel
+        color_wheel = ET.SubElement(defs, 'symbol', id='color_wheel')
+        grp = ET.SubElement(color_wheel, 'svg', viewBox='-50 -50 100 100', width='90', height='90')
+        steps=24
+        def angleToCoords(angle, radius):
+            return radius*cos(angle), radius*sin(angle)
+        for i in range(24):
+            point1_x, point1_y = angleToCoords(i*2*pi/steps, 50)
+            point2_x, point2_y = angleToCoords((i+1)*2*pi/steps, 50)
+            color = methods.socketColorToSVGColor(hsv_to_rgb((0.75 + i/steps), 1.0, 1.0))
+            ET.SubElement(grp, 'polygon', points=f"0 0 {point1_x} {point1_y} {point2_x} {point2_y}", style=f"fill:{color}; stroke:none")
 
         return defs
 
