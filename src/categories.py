@@ -1774,6 +1774,14 @@ node_specifications = {
     'ShaderNodeAddShader': {
         'class': 'shader_node'
     },
+
+    'ShaderNodeBsdfAnisotropic': {
+        'class': 'shader_node',
+        'props': lambda node: [
+            dropdown(node, 'distribution')
+        ]
+    },
+
     'ShaderNodeBsdfDiffuse': {
         'class': 'shader_node',
     },
@@ -1792,6 +1800,14 @@ node_specifications = {
             dropdown(node, 'distribution')
         ]
     },
+
+    'ShaderNodeBsdfHair': {
+        'class': 'shader_node',
+        'props': lambda node: [
+            dropdown(node, 'component')
+        ]
+    },
+
     'ShaderNodeHoldout': {
         'class': 'shader_node'
     },
@@ -1805,6 +1821,14 @@ node_specifications = {
             dropdown(node, 'subsurface_method')
         ]
     },
+
+    'ShaderNodeBsdfHairPrincipled': {
+        'class': 'shader_node',
+        'props': lambda node: [
+            dropdown(node, 'parametrization')
+        ]
+    },
+
     'ShaderNodeVolumePrincipled': {
         'class': 'shader_node'
     },
@@ -1823,12 +1847,22 @@ node_specifications = {
             dropdown(node, 'falloff')
         ]
     },
+
+    'ShaderNodeBsdfToon': {
+        'class': 'shader_node'
+    },
+
     'ShaderNodeBsdfTranslucent': {
         'class': 'shader_node'
     },
     'ShaderNodeBsdfTransparent': {
         'class': 'shader_node'
     },
+
+    'ShaderNodeBsdfVelvet': {
+        'class': 'shader_node'
+    },
+
     'ShaderNodeVolumeAbsorption': {
         'class': 'shader_node'
     },
