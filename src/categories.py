@@ -139,7 +139,7 @@ node_specifications = {
     'CompositorNodeRGB': {
         'class': 'input_node',
         'props': lambda node: [
-            widgets.ColorPicker(),
+            widgets.ColorPicker(color=node.outputs[0].default_value),
             widgets.RGBA(color=socketColorToSVGColor(node.outputs[0].default_value))
         ]
     },
@@ -227,7 +227,16 @@ node_specifications = {
         'class': 'color_node',
         'props': lambda node: [
             dropdown(node, 'correction_method', label="Correction Formula:"),
-            widgets.Placeholder()
+            widgets.Columns(wids=[
+                widgets.ColorPicker(color=node.lift),
+                widgets.ColorPicker(color=node.gamma),
+                widgets.ColorPicker(color=node.gain),
+            ]),
+            widgets.Columns(wids=[
+                widgets.Label(text="Lift:"), widgets.RGBA(color=socketColorToSVGColor(node.lift)),
+                widgets.Label(text="Gamma:"), widgets.RGBA(color=socketColorToSVGColor(node.gamma)),
+                widgets.Label(text="Gain:"), widgets.RGBA(color=socketColorToSVGColor(node.gain)),
+            ])
         ]
     },
     'CompositorNodeColorCorrection': {
@@ -1680,7 +1689,7 @@ node_specifications = {
     'ShaderNodeRGB': {
         'class': 'input_node',
         'props': lambda node: [
-            widgets.ColorPicker(),
+            widgets.ColorPicker(color=node.outputs[0].default_value),
             widgets.RGBA(color=socketColorToSVGColor(node.outputs[0].default_value))
         ]
     },
