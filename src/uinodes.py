@@ -6,8 +6,10 @@ from . import widgets
 from . import methods
 
 import bpy
-import mathutils
 import xml.etree.ElementTree as ET
+
+from colorsys import rgb_to_hsv, hsv_to_rgb
+from math import sin, cos, pi
 
 MARKER_DEFS = {
     'circle': ('circle',{
