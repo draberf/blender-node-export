@@ -1739,6 +1739,14 @@ node_specifications = {
         ],
         'name_behavior': lambda _: 'AOV Output'
     },
+
+    'ShaderNodeOutputLight': {
+        'class': 'output_node',
+        'props': lambda node: [
+            dropdown(node, 'target')
+        ]
+    },
+
     'ShaderNodeOutputMaterial': {
         'class': 'output_node',
         'props': lambda node: [
