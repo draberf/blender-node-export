@@ -102,19 +102,25 @@ node_specifications = {
             widgets.Value(name="Rounding", value=node.rounding),
             widgets.Value(name="Catadioptric", value=node.catadioptric),
             widgets.Value(name="Rounding", value=node.rounding),
-            widgets.FloatFac()
+            widgets.Value(name="Lens Shift", value=node.shift, minmax=(-1.0,1.0))
         ]
     },
     'CompositorNodeImage': {
         'class': 'input_node',
         'props': lambda node: [
-            widgets.Placeholder()
+            widgets.Placeholder() if node.image else None,
+            image(node.image),
+            *([
+                dropdown(node.image, 'source'),
+                widgets.LabeledDropdown(name="Color Space", value="") if not node.image.colorspace_settings.name else dropdown(node.image.colorspace_settings, 'name', label="Color Space"),
+                dropdown(node.image, 'alpha_mode', label="Alpha")
+            ] if node.image else []),
         ]
     },
     'CompositorNodeMask': {
         'class': 'input_node',
         'props': lambda node: [
-            widgets.Placeholder(),
+            widgets.String(value="" if not node.mask else node.mask.name),
             widgets.Boolean(name="Feather", value=node.use_feather),
             dropdown(node, 'size_source'),
             widgets.Value(name="X", value=node.size_x) if node.size_source != 'SCENE' else None,
@@ -127,13 +133,15 @@ node_specifications = {
     'CompositorNodeMovieClip': {
         'class': 'input_node',
         'props': lambda node: [
-            widgets.MovieClip()
+            widgets.Placeholder(),
+            widgets.String(value="" if not node.clip else node.clip.name)
         ]
     },
     'CompositorNodeRLayers': {
         'class': 'input_node',
         'props': lambda node: [
-            widgets.Placeholder()
+            widgets.String(value="" if not node.scene else node.scene.name),
+            widgets.Dropdown(value=node.layer) if node.scene else None
         ]
     },
     'CompositorNodeRGB': {
@@ -149,7 +157,8 @@ node_specifications = {
     'CompositorNodeTexture': {
         'class': 'input_node',
         'props': lambda node: [
-            widgets.Texture()
+            widgets.Placeholder(),
+            widgets.String(value="" if not node.texture else node.texture.name),
         ]
     },
     'CompositorNodeTime': {
@@ -163,7 +172,13 @@ node_specifications = {
     'CompositorNodeTrackPos': {
         'class': 'input_node',
         'props': lambda node: [
-            widgets.Placeholder()
+            widgets.String(value="" if not node.clip else node.clip.name),
+            *([
+                widgets.String(value=node.tracking_object),
+                widgets.String(value=node.track_name),
+                dropdown(node, 'position', label="Position:"),
+                widgets.Value(name="Frame", value=node.frame_relative) if node.position == 'RELATIVE_FRAME' else None
+            ] if node.clip else [])
         ]
     },
     'CompositorNodeValue': {
@@ -214,7 +229,7 @@ node_specifications = {
         'class': 'color_node',
         'props': lambda node: [
             widgets.Boolean(name="Convert Premultiplied", value=node.use_premultiply),
-            widgets.FloatFac()
+            widgets.Value(name="Premultiplied", value=node.premul, minmax=(0.0,1.0))
         ]
     },
     'CompositorNodeBrightContrast': {
@@ -257,39 +272,39 @@ node_specifications = {
             ]),
             widgets.Columns(wids=[
                 widgets.Label(text="Master"),
-                widgets.FloatFac(),
-                widgets.FloatFac(),
-                widgets.FloatFac(),
-                widgets.FloatFac(),
-                widgets.FloatFac(),
+                widgets.Value(value=node.master_saturation, minmax=(0.0,4.0)),
+                widgets.Value(value=node.master_contrast, minmax=(0.0,4.0)),
+                widgets.Value(value=node.master_gamma, minmax=(0.0,4.0)),
+                widgets.Value(value=node.master_gain, minmax=(0.0,4.0)),
+                widgets.Value(value=node.master_lift, minmax=(-1.0,1.0)),
             ]),
             widgets.Columns(wids=[
                 widgets.Label(text="Highlights"),
-                widgets.FloatFac(),
-                widgets.FloatFac(),
-                widgets.FloatFac(),
-                widgets.FloatFac(),
-                widgets.FloatFac(),
+                widgets.Value(value=node.highlights_saturation, minmax=(0.0,4.0)),
+                widgets.Value(value=node.highlights_contrast, minmax=(0.0,4.0)),
+                widgets.Value(value=node.highlights_gamma, minmax=(0.0,4.0)),
+                widgets.Value(value=node.highlights_gain, minmax=(0.0,4.0)),
+                widgets.Value(value=node.highlights_lift, minmax=(-1.0,1.0)),
             ]),
             widgets.Columns(wids=[
                 widgets.Label(text="Midtones"),
-                widgets.FloatFac(),
-                widgets.FloatFac(),
-                widgets.FloatFac(),
-                widgets.FloatFac(),
-                widgets.FloatFac(),
+                widgets.Value(value=node.midtones_saturation, minmax=(0.0,4.0)),
+                widgets.Value(value=node.midtones_contrast, minmax=(0.0,4.0)),
+                widgets.Value(value=node.midtones_gamma, minmax=(0.0,4.0)),
+                widgets.Value(value=node.midtones_gain, minmax=(0.0,4.0)),
+                widgets.Value(value=node.midtones_lift, minmax=(-1.0,1.0)),
             ]),
             widgets.Columns(wids=[
                 widgets.Label(text="Shadows"),
-                widgets.FloatFac(),
-                widgets.FloatFac(),
-                widgets.FloatFac(),
-                widgets.FloatFac(),
-                widgets.FloatFac(),
+                widgets.Value(value=node.shadows_saturation, minmax=(0.0,4.0)),
+                widgets.Value(value=node.shadows_contrast, minmax=(0.0,4.0)),
+                widgets.Value(value=node.shadows_gamma, minmax=(0.0,4.0)),
+                widgets.Value(value=node.shadows_gain, minmax=(0.0,4.0)),
+                widgets.Value(value=node.shadows_lift, minmax=(-1.0,1.0)),
             ]),
             widgets.Columns(wids=[
-                widgets.FloatFac(),
-                widgets.FloatFac()
+                widgets.Value(name="Midtones Start", value=node.midtones_start, minmax=(0.0,1.0)),
+                widgets.Value(name="Midtones End", value=node.midtones_end, minmax=(0.0,1.0))
             ])
         ]
     },
