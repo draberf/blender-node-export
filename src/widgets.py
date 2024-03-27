@@ -385,9 +385,6 @@ class ColorPicker(Widget):
 
         return grp
 
-class Object(Placeholder):
-    ...
-
 
 class SelectBar(Widget):
     
@@ -422,8 +419,6 @@ class SelectBar(Widget):
 class FloatFac(Placeholder):
     ...
 
-class Image(Placeholder):
-    ...
 
 
 class Curves(Widget):
@@ -479,20 +474,9 @@ class Texture(Placeholder):
 class Mapping(Placeholder):
     ...
 
-class Tracking(Placeholder):
-    ...
-
-class Material(Placeholder):
-    ...
-
 class Font(Placeholder):
     ...
 
-class MovieClip(Placeholder):
-    ...
-
-class Scene(Placeholder):
-    ...
 
 class String(Widget):
 
@@ -535,4 +519,22 @@ class Sphere(Placeholder):
     ...
 
 class UVMap(String):
+    ...
+
+class Image(String):
+    ...
+    
+class Scene(String):
+    ...
+
+class Tracking(String):
+    ...
+
+class Object(String):
+    ...
+
+class MovieClip(String):
+    ...
+
+class Material(String):
     ...
