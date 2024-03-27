@@ -4,6 +4,13 @@ from . import widgets
 from .methods import socketColorToSVGColor, enumName
 from .constants import IGNORE_PROPS
 
+CHANNEL_MATTE_OPTS = {
+    'RGB': ['R', 'G', 'B'],
+    'HSV': ['H', 'S', 'V'],
+    'YUV': ['Y', 'U', 'V'],
+    'YCC': ['Y', 'Cr', 'Cb']
+}
+
 def dropdown(node, prop, label="") -> widgets.Widget:
     if not label:
         return widgets.Dropdown(value=enumName(node, prop))
