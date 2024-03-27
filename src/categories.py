@@ -359,13 +359,13 @@ node_specifications = {
         'props': lambda node: [
             dropdown(node, 'tonemap_type'),
             *([
-                widgets.FloatFac(),
-                widgets.FloatFac(),
-                widgets.FloatFac(),
-                widgets.FloatFac()
+                widgets.Value(name="Intensity", value=node.intensity),
+                widgets.Value(name="Contrast", value=node.contrast, minmax=(0.0,1.0)),
+                widgets.Value(name="Adaptation", value=node.adaptation, minmax=(0.0,1.0)),
+                widgets.Value(name="Color Correction", value=node.correction, minmax=(0.0,1.0))
             ] if node.tonemap_type == "RD_PHOTORECEPTOR" else []),
             *([
-                widgets.FloatFac(),
+                widgets.Value(name="Key", value=node.key, minmax=(0.0,1.0)),
                 widgets.Value(name="Offset", value=node.offset),
                 widgets.Value(name="Gamma", value=node.gamma),
             ] if node.tonemap_type == "RH_SIMPLE" else [])
@@ -453,9 +453,9 @@ node_specifications = {
     'CompositorNodeAntiAliasing': {
         'class': 'filter_node',
         'props': lambda node: [
-            widgets.FloatFac(),
-            widgets.FloatFac(),
-            widgets.FloatFac()
+            widgets.Value(name="Threshold", value=node.threshold, minmax=(0.0,1.0)),
+            widgets.Value(name="Contrast Limit", value=node.contrast_limit, minmax=(0.0,1.0)),
+            widgets.Value(name="Corner Rounding", value=node.corner_rounding, minmax=(0.0,1.0))
         ]
     },
     'CompositorNodeBilateralblur': {
@@ -479,8 +479,8 @@ node_specifications = {
             *([
                 widgets.Label(text="Aspect Correction"),
                 selectBar(node, 'aspect_correction'),
-                widgets.FloatFac(),
-                widgets.FloatFac()
+                widgets.Value(name="X", value=node.factor_x, minmax=(0.0,100.0)),
+                widgets.Value(name="Y", value=node.factor_y, minmax=(0.0,100.0))
             ] if node.use_relative else []),
             *([
                 widgets.Value(name="X", value=node.size_x),
@@ -508,7 +508,7 @@ node_specifications = {
             widgets.Value(name="Max Blur", value=node.blur_max),
             widgets.Value(name="Threshold", value=node.threshold),
             widgets.Boolean(name="Preview", value=node.use_preview),
-            widgets.Scene(),
+            widgets.String(value="" if not node.scene else node.scene.name),
             widgets.Boolean(name="Use Z-Buffer", value=node.use_zbuffer),
             widgets.Value(name="Z-Scale", value=node.z_scale)
         ]
@@ -558,7 +558,7 @@ node_specifications = {
             dropdown(node, 'quality'),
             widgets.Value(name="Iterations", value=node.iterations) if node.glare_type != 'FOG_GLOW' else None,
             # color modulation
-            widgets.FloatFac() if node.glare_type == 'GHOSTS' or node.glare_type == 'STREAKS' else None,
+            widgets.Value(name="Color Modulation", value=node.color_modulation, minmax=(0.0,1.0)) if node.glare_type == 'GHOSTS' or node.glare_type == 'STREAKS' else None,
             widgets.Value(name="Mix", value=node.mix),
             widgets.Value(name="Threshold", value=node.threshold),
             *([
@@ -566,7 +566,7 @@ node_specifications = {
                 widgets.Value(name="Angle Offset", value=node.angle_offset),
             ] if node.glare_type == 'STREAKS' else []),
             widgets.Value(name="Size", value=node.size) if node.glare_type == 'FOG_GLOW' else None,
-            widgets.FloatFac() if node.glare_type == 'STREAKS' or node.glare_type == 'SIMPLE_STAR' else None, # fade
+            widgets.Value(name="Fade", value=node.fade, minmax=(0.75, 1.0)) if node.glare_type == 'STREAKS' or node.glare_type == 'SIMPLE_STAR' else None, # fade
             widgets.Boolean(name="Rotate 45", value=node.use_rotate_45) if node.glare_type == 'SIMPLE_STAR' else None
         ]
     },
@@ -582,7 +582,11 @@ node_specifications = {
     'CompositorNodeSunBeams': {
         'class': 'filter_node',
         'props': lambda node: [
-            widgets.Placeholder()
+            widgets.Columns(wids=[
+                widgets.Value(value=node.source[0]),
+                widgets.Value(value=node.source[1])
+            ], resize_override=False),
+            widgets.Value(name="Ray Length", value=node.ray_length, minmax=(0.0,1.0))
         ]
     },
     'CompositorNodeVecBlur': {
@@ -644,9 +648,9 @@ node_specifications = {
                 widgets.Value(name="", value=node.y)
             ]),
             widgets.Columns(wids=[
-                widgets.FloatFac(),
-                widgets.FloatFac()
-            ]),
+                widgets.Value(name="", value=node.width, minmax=(0.0,2.0)),
+                widgets.Value(name="", value=node.height, minmax=(0.0,2.0))
+            ], resize_override=False),
             widgets.Value(name="Rotation", value=node.rotation),
             dropdown(node, 'mask_type', label="Mask Type:")
         ]
@@ -654,7 +658,15 @@ node_specifications = {
     'CompositorNodeChannelMatte': {
         'class': 'matte_node',
         'props': lambda node: [
-            widgets.Placeholder()
+            widgets.Label(text="Color Space:"),
+            selectBar(node, 'color_space'),
+            widgets.Label(text="Key Channel:"),
+            widgets.SelectBar(options=CHANNEL_MATTE_OPTS[node.color_space], select_index=CHANNEL_MATTE_OPTS[node.color_space].index(node.matte_channel)),
+            dropdown(node, 'limit_method', "Algorithm:"),
+            widgets.Label(text="Limiting Channel:"),
+            widgets.SelectBar(options=CHANNEL_MATTE_OPTS[node.color_space], select_index=CHANNEL_MATTE_OPTS[node.color_space].index(node.limit_channel)) if node.limit_method == 'SINGLE' else None,
+            widgets.Value(name="High", value=node.limit_max, minmax=(0.0, 1.0)),
+            widgets.Value(name="Low", value=node.limit_min, minmax=(0.0, 1.0))
         ]
     },
     'CompositorNodeChromaMatte': {
@@ -670,9 +682,9 @@ node_specifications = {
     'CompositorNodeColorMatte': {
         'class': 'matte_node',
         'props': lambda node: [
-            widgets.FloatFac(),
-            widgets.FloatFac(),
-            widgets.FloatFac()
+            widgets.Value(name="H", value=node.color_hue, minmax=(0.0,1.0)),
+            widgets.Value(name="S", value=node.color_saturation, minmax=(0.0,1.0)),
+            widgets.Value(name="V", value=node.color_value, minmax=(0.0,1.0))
         ]
     },
     'CompositorNodeColorSpill': {
@@ -685,32 +697,48 @@ node_specifications = {
                 widgets.Label(text="Limiting Channel:"),
                 selectBar(node, 'limit_channel')
             ] if node.limit_method == 'SIMPLE' else []),
-            widgets.FloatFac(), # ratio
+            widgets.Value(name="Ratio", value=node.ratio, minmax=(0.5,1.5)),
             widgets.Boolean(name="Unspill", value=node.use_unspill),
             *([
-                widgets.FloatFac(),
-                widgets.FloatFac(),
-                widgets.FloatFac()
+                widgets.Value(name="R", value=node.unspill_red, minmax=(0.5,1.5)),
+                widgets.Value(name="G", value=node.unspill_green, minmax=(0.5,1.5)),
+                widgets.Value(name="B", value=node.unspill_blue, minmax=(0.5,1.5))
             ] if node.use_unspill else [])
         ]
     },
     'CompositorNodeCryptomatteV2': {
         'class': 'matte_node',
         'props': lambda node: [
-            widgets.Placeholder()
+            selectBar(node, 'source'),
+            widgets.Scene(value="" if not node.scene else node.scene.name) if node.source == 'SCENE' else None,
+            widgets.Image(value="" if not node.image else node.image.name) if node.source == 'IMAGE' else None,
+            *([
+                dropdown(node.image, 'source'),
+                *([
+                    widgets.Value(name="Frames", value=node.frame_duration),
+                    widgets.Value(name="Start Frame", value=node.frame_start),
+                    widgets.Value(name="Offset", value=node.frame_offset),
+                    widgets.Boolean(name="Cyclic", value=node.use_cyclic),
+                    widgets.Boolean(name="Auto-Refresh", value=node.use_auto_refresh)
+                ] if node.image.source in ['SEQUENCE', 'MOVIE'] else [])
+            ] if node.image else []),
+            widgets.Dropdown(value=node.layer_name),
+            widgets.Label(text="Matte ID:"),
+            widgets.String(value=node.matte_id)
         ]
     },
     'CompositorNodeCryptomatte': {
         'class': 'matte_node',
         'props': lambda node: [
-            widgets.Placeholder()
+            widgets.Label(text="Matte Objects:"),
+            widgets.String(value=node.matte_id)
         ]
     },
     'CompositorNodeDiffMatte': {
         'class': 'matte_node',
         'props': lambda node: [
-            widgets.FloatFac(),
-            widgets.FloatFac()
+            widgets.Value(name="Tolerance", value=node.tolerance, minmax=(0.0,1.0)),
+            widgets.Value(name="Falloff", value=node.tolerance, minmax=(0.0,1.0))
         ]
     },
     'CompositorNodeDistanceMatte': {
@@ -739,9 +767,9 @@ node_specifications = {
                 widgets.Value(name="Y", value=node.y)
             ]),
             widgets.Columns(wids=[
-                widgets.FloatFac(),
-                widgets.FloatFac()
-            ]),
+                widgets.Value(name="", value=node.width, minmax=(0.0,2.0)),
+                widgets.Value(name="", value=node.height, minmax=(0.0,2.0))
+            ], resize_override=False),
             widgets.Value(name="Rotation", value=node.rotation),
             dropdown(node, 'mask_type', label="Mask Type:"),
         ]
@@ -750,13 +778,13 @@ node_specifications = {
         'class': 'matte_node',
         'props': lambda node: [
             widgets.Value(name="Pre Blur", value=node.blur_pre),
-            widgets.FloatFac(), #screen_balance
-            widgets.FloatFac(), #despill_factor
-            widgets.FloatFac(), #despill_balance
+            widgets.Value(name="Screen Balance", value=node.screen_balance, minmax=(0.0,1.0)), #screen_balance
+            widgets.Value(name="Despill Factor", value=node.despill_factor, minmax=(0.0,1.0)), #despill_factor
+            widgets.Value(name="Despill Balance", value=node.despill_balance, minmax=(0.0,1.0)), #despill_balance
             widgets.Value(name="Edge Kernel Radius", value=node.edge_kernel_radius),
-            widgets.FloatFac(), #edge kernel tolerance
-            widgets.FloatFac(), #clip_black
-            widgets.FloatFac(), #clip_white
+            widgets.Value(name="Edge Kernel Tolerance", value=node.edge_kernel_tolerance, minmax=(0.0,1.0)), #edge kernel tolerance
+            widgets.Value(name="Clip Black", value=node.clip_black, minmax=(0.0,1.0)), #clip_black
+            widgets.Value(name="Clip White", value=node.clip_white, minmax=(0.0,1.0)), #clip_white
             widgets.Value(name="Dilate/Erode", value=node.dilate_distance),
             dropdown(node, 'feather_falloff', label="Feather Falloff"),
             widgets.Value(name="Feather Distance", value=node.feather_distance),
@@ -766,14 +794,15 @@ node_specifications = {
     'CompositorNodeKeyingScreen': {
         'class': 'matte_node',
         'props': lambda node: [
-            widgets.Tracking()
+            widgets.Tracking(value="" if not node.clip else node.clip.name),
+            widgets.Object(value=node.tracking_object) if node.clip else None
         ]
     },
     'CompositorNodeLumaMatte': {
         'class': 'matte_node',
         'props': lambda node: [
-            widgets.FloatFac(), #limit_max
-            widgets.FloatFac() #limit_min
+            widgets.Value(name="High", value=node.limit_max, minmax=(0.0,1.0)), #limit_max
+            widgets.Value(name="Low", value=node.limit_min, minmax=(0.0,1.0)) #limit_min
         ]
     },
 
@@ -827,13 +856,24 @@ node_specifications = {
     'CompositorNodeMovieDistortion': {
         'class': 'distor_node',
         'props': lambda node: [
-            widgets.Placeholder()
-        ]
+            widgets.MovieClip(value="" if not node.clip else node.clip.name),
+            dropdown(node, 'distortion_type'),
+        ],
+        'name_behavior': lambda node: "Undistortion" if node.distortion_type == 'UNDISTORT' else "Distortion"
     },
     'CompositorNodePlaneTrackDeform': {
         'class': 'distor_node',
         'props': lambda node: [
-            widgets.Placeholder()
+            widgets.MovieClip(value="" if not node.clip else node.clip.name),
+            *([
+                widgets.Object(value=node.tracking_object),
+                widgets.Tracking(value=node.plane_track_name)
+            ] if node.clip else []),
+            widgets.Boolean(name="Motion Blur", value=node.use_motion_blur),
+            *([
+                widgets.Value(name="Samples", value=node.motion_blur_samples),
+                widgets.Value(name="Shutter", value=node.motion_blur_shutter)
+            ] if node.use_motion_blur else [])
         ]
     },
     'CompositorNodeRotate': {
@@ -858,7 +898,11 @@ node_specifications = {
     'CompositorNodeStabilize': {
         'class': 'distor_node',
         'props': lambda node: [
-            widgets.Placeholder()
+            widgets.MovieClip(value="" if not node.clip else node.clip.name),
+            *([
+                dropdown(node, 'filter_type'),
+                widgets.Boolean(name="Invert", value=node.invert)
+            ] if node.clip else [])
         ]
     },
     'CompositorNodeTransform': {
@@ -1143,7 +1187,7 @@ node_specifications = {
     'FunctionNodeInputColor': {
         'class': 'input_node',
         'props': lambda node: [
-            widgets.ColorPicker(color=socketColorToSVGColor(node.outputs[0].default_value)),
+            widgets.ColorPicker(color=node.outputs[0].default_value),
             widgets.RGBA(color=socketColorToSVGColor(node.outputs[0].default_value))
         ]
     },
@@ -1159,7 +1203,7 @@ node_specifications = {
     'GeometryNodeInputMaterial': {
         'class': 'input_node',
         'props': lambda node: [
-            widgets.Material()
+            widgets.Material(value="" if not node.material else node.material.name)
         ]
     },
     'GeometryNodeObjectInfo': {
@@ -1174,7 +1218,7 @@ node_specifications = {
     'FunctionNodeInputString': {
         'class': 'input_node',
         'props': lambda node: [
-            widgets.Value(name="", value=node.outputs[0].default_value)
+            widgets.String(value=node.outputs[0].default_value)
         ]
     },
     # ShaderNodeValue    
@@ -1445,7 +1489,7 @@ node_specifications = {
     'GeometryNodeViewer': {
         'class': 'output_node',
         'props': lambda node: [
-            widgets.Placeholder()
+            dropdown(node, 'domain')
         ]
     },
 
