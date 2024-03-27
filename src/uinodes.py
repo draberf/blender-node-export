@@ -109,10 +109,7 @@ SOCKET_WIDGET_DEFS = {
         widgets.Label(text=socket.name),
         widgets.Label(text=getImageWidgetString(socket), alignment='R')
     ]),
-    'OBJECT': lambda socket: widgets.FortySixty(wids=[
-        widgets.Label(text=socket.name),
-        widgets.Label(text=getObjectName(socket), alignment='R')
-    ]),
+    'OBJECT': lambda socket: widgets.String(value="" if not socket.default_value else socket.default_value.name),
     'TEXTURE': lambda socket: widgets.FortySixty(wids=[
         widgets.Label(text=socket.name),
         widgets.Label(text=getObjectName(socket), alignment='R')
