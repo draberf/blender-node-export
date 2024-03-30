@@ -439,11 +439,69 @@ class Curves(Widget):
 
         return grp
 
-class Ramp(Placeholder):
-    ...
+class Ramp(Widget):
+    
+    def __init__(self, color_mode="RGB", interpolation="Ease", stops=[], evals=[[0.0,0.0,0.0]], use_gradient=False) -> None:
+        super().__init__()
+        self.stops=stops
+        self.evals=evals
+        self.use_gradient=use_gradient
+        self.color_mode=color_mode
+        self.interpolation=interpolation
 
-class Script(Placeholder):
-    ...
+    def height(self):
+        return 3*constants.LINKED_SOCKET_HEIGHT
+    
+    def svg(self, width=DEFAULT_WIDTH, attrib={}, x=0, resize=True) -> ET.Element:
+        grp = super().svg(width, attrib, x, resize)
+
+        grp.append(
+            Columns(wids=[
+                Empty(),
+                Empty(),
+                Dropdown(value=self.color_mode),
+                Dropdown(value=self.interpolation),
+            ], resize_override=False).svg(width=self.width, resize=False)
+        )
+
+        if self.use_gradient: ...
+
+        bar_width = self.width/(len(self.evals)-1)
+
+        for i, (start, _) in enumerate(zip(self.evals[:-1], self.evals[1:])):
+            x_start = i * bar_width
+
+            color_string = str(socketColorToSVGColor(start))
+            ET.SubElement(grp, 'rect', attrib={
+                'x':str(x_start),
+                'y':str(self.height()/3.0 + constants.SOCKET_GAP),
+                'width':str(bar_width),
+                'height':str(self.height()/3.0),
+                'style':f'fill:{color_string};stroke:{color_string};stroke-weight:0.1'
+            })
+
+        for x, color in self.stops:
+            g = ET.SubElement(grp, 'g', attrib={'transform': f'translate({x*self.width-5}, {2*self.height()/3 - 2})'})
+            ET.SubElement(g, 'polygon', attrib={
+                'points': ' '.join([str(n) for n in [
+                    5,  0,
+                    0,  5,
+                    0,  12,
+                    10, 12,
+                    10, 5
+                ]]),
+                'style':'fill:white;stroke:none'
+            })
+            ET.SubElement(g, 'rect', attrib={
+                'x': '1',
+                'y': '6',
+                'width': '8',
+                'height': '5',
+                'style':f'fill:{socketColorToSVGColor(color)};stroke:black;stroke-width:0.2'
+            })
+
+        return grp
+
 
 class Texture(Placeholder):
     ...
