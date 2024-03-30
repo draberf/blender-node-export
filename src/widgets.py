@@ -400,9 +400,10 @@ class FloatFac(Placeholder):
 
 class Curves(Widget):
     
-    def __init__(self, curves=[]) -> None:
+    def __init__(self, curves=[], hue_background=False) -> None:
         super().__init__()
         self.curves = curves
+        self.hue_background = hue_background
 
     def height(self) -> float:
         return 8 * constants.LINKED_SOCKET_HEIGHT
@@ -415,7 +416,7 @@ class Curves(Widget):
             'y':'0',
             'width':str(self.width),
             'height':str(self.height()),
-            'style':'fill:#545454'
+            'style':'fill:url(#hc_grad)' if self.hue_background else 'fill:#545454'
         })
 
         for color, point_pairs, infill in self.curves:
