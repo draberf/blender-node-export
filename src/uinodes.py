@@ -205,6 +205,13 @@ class Converter():
             color = methods.socketColorToSVGColor(hsv_to_rgb((0.75 + i/steps), 1.0, 1.0))
             ET.SubElement(grp, 'polygon', points=f"0 0 {point1_x} {point1_y} {point2_x} {point2_y}", style=f"fill:{color}; stroke:none")
 
+        ## hue correct gradient
+        grad = ET.SubElement(defs, 'linearGradient', id='hc_grad', x1='0', x2='1', y1='0', y2='0')
+        for i in range(7):
+            prog = i/6.0
+            ET.SubElement(grad, 'stop', attrib={'offset':  str(prog), 'stop-color':methods.socketColorToSVGColor(hsv_to_rgb(prog, 1.0, 1.0))})
+
+
         return defs
 
 
