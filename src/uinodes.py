@@ -249,7 +249,12 @@ class Converter():
                             style=f"stroke:{color1};stroke-width:2;fill:none")
 
         # add nodes to final SVG
-        svg.extend([node.svg() for node in self.nodes])
+        for node in self.nodes:
+            try:
+                svg.append(node.svg())
+            except Exception as e:
+                print(node.name)
+                raise e
 
         # add anchors to final SVG
         svg.extend([anchor.svg(x=str(x-constants.MARKER_BOX_HALF), y=str(y-constants.MARKER_BOX_HALF)) for x, y, anchor in self.anchor_refs.values()])
