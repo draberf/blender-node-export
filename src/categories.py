@@ -339,7 +339,7 @@ node_specifications = {
     'CompositorNodeHueCorrect': {
         'class': 'color_node',
         'props': lambda node: [
-            widgets.Mapping()
+            curve(node.mapping, 'CORRECT')
         ]
     },
     'CompositorNodeHueSat': {
@@ -412,7 +412,7 @@ node_specifications = {
     'CompositorNodeValToRGB': {
         'class': 'converter_node',
         'props': lambda node: [
-            widgets.Ramp()
+            ramp(node)
         ]
     },
     'CompositorNodeCombineColor': {
@@ -2215,7 +2215,7 @@ node_specifications = {
     'ShaderNodeValToRGB': {
         'class': 'converter_node',
         'props': lambda node: [
-            widgets.Ramp()
+            ramp(node)
         ]
     },
     'ShaderNodeCombineColor': {
@@ -2283,7 +2283,7 @@ node_specifications = {
         'class': 'script_node',
         'props': lambda node: [
             selectBar(node, 'mode'),
-            widgets.Script() if node.mode[0] == "I" else widgets.File()
+            widgets.Script(value="" if not node.script else node.script.name) if node.mode[0] == "I" else widgets.File(node.filepath)
         ]
     },
 
