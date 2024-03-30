@@ -3,7 +3,7 @@ from . import constants
 
 from math import pi
 
-from .methods import getFloatString, polarToCartesian
+from .methods import getFloatString, polarToCartesian, socketColorToSVGColor
 
 from colorsys import rgb_to_hsv
 
