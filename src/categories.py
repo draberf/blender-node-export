@@ -66,6 +66,16 @@ def curve(curving, type="VALUE", sampling=40) -> widgets.Widget:
             print(f"WARNING: Undefined curve type {type}.")
             return widgets.Curves(curves=[('black'), evaluate_curve_n(0), False])
 
+def ramp(node, n=50) -> widgets.Ramp:
+
+    color_mode = node.color_ramp.color_mode
+    interpolation = enumName(node.color_ramp, 'interpolation' if color_mode == 'RGB' else 'hue_interpolation') 
+
+    return widgets.Ramp(color_mode=color_mode,
+                        interpolation=interpolation,
+                        stops=[(element.position, element.color) for element in node.color_ramp.elements],
+                        evals=[node.color_ramp.evaluate(min(i/n, 1.0)) for i in range(n+1)])
+
 def generateCustomProps(node):
     
     wids = []
