@@ -320,29 +320,6 @@ class Dropdown(Widget):
 
         return grp
 
-class ColorPickerNew(Widget):
-
-    css_classname = 'color_picker'
-
-    def __init__(self, exp_width=0, color=[0,0,0], **kwargs) -> None:
-        kwargs.update({'exp_width':exp_width, 'color':color})
-        super().__init__(**kwargs)
-
-    def height(self):
-        return self.kwargs['exp_width']*0.8
-    
-    def svg(self, width=DEFAULT_WIDTH, **attrs):
-        grp = super().svg(width=width, **attrs)
-        
-        ET.SubElement(grp, 'use', href='#color_wheel')
-        ET.SubElement(grp, 'rect', attrib={
-            'x': str(0.81*self.kwargs['exp_width']),
-            'y': '0',
-            'width': str(0.18*self.kwargs['exp_width']),
-            'height': str(self.height())
-        })
-        ...
-
 class ColorPicker(Widget):
     
     def __init__(self, color=[1.0,0.0,0.0], **kwargs) -> None:
