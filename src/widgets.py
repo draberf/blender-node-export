@@ -40,7 +40,7 @@ class Empty(Widget):
     def height(self) -> float:
         return 0
     
-    def svg(self, width=DEFAULT_WIDTH, attrib={}) -> ET.Element:
+    def svg(self, width=DEFAULT_WIDTH, attrib={}, **_) -> ET.Element:
         return super().svg(width=width, attrib=attrib)
 
 class Placeholder(Widget):
