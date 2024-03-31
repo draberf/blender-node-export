@@ -1711,6 +1711,13 @@ node_specifications = {
 
     ### SHADER NODES ###
 
+    'ShaderNodeGroup': {
+        'class': 'group_node',
+        'props': lambda node: [
+            widgets.String(value=node.node_tree.name)
+        ]
+    },
+
     # Shader > Input
 
     'ShaderNodeAmbientOcclusion': {
