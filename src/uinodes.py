@@ -164,8 +164,7 @@ class Converter():
 
         for node in nodetree.nodes:
             
-            # create node rep
-            node_object = UINode(node, self.colors)
+            node_object = UIRedirectNode(node, self.colors) if node.bl_idname == 'NodeReroute' else UINode(node, self.colors)
 
             self.vb_min_x = min(self.vb_min_x, node_object.x)
             self.vb_min_y = min(self.vb_min_y, node_object.y)
@@ -255,17 +254,19 @@ class Converter():
                             style=f"stroke:{color1};stroke-width:2;fill:none;opacity:{opacity}")
 
         # add nodes to final SVG
-        node_arr = []
         for node in self.nodes:
             try:
-                node_arr.append(node.svg())
+                out = node.svg()
+                if out: svg.append(out)
             except Exception as e:
                 print(node.name)
                 raise e
-        svg.extend(node_arr)
 
         # add anchors to final SVG
-        svg.extend([anchor.svg(x=str(x-constants.MARKER_BOX_HALF), y=str(y-constants.MARKER_BOX_HALF)) for x, y, anchor in self.anchor_refs.values()])
+        for x, y, anchor in self.anchor_refs.values():
+            out = anchor.svg(x=str(x-constants.MARKER_BOX_HALF), y=str(y-constants.MARKER_BOX_HALF))
+            if not out: continue
+            svg.append(out)
 
         tree = ET.ElementTree(svg)
         ET.indent(tree)
@@ -350,13 +351,6 @@ class UINode():
         # adjust node height
         self.h = max(self.h, self.height+constants.BOTTOM_PADDING)
 
-    def get_socket_coords(self):
-        self.socket_coords = {}
-        for coord, uisocket in zip(self.output_coords + self.input_coords, self.uioutputs + self.uiinputs):
-            offset = 0 if not uisocket.socket.is_output else self.w
-            self.socket_coords[str(uisocket.socket.as_pointer())] = (self.x+offset,self.y+coord+(0.5)*constants.LINKED_SOCKET_HEIGHT,constants.SOCKET_COLORS[uisocket.socket.type])
-        return self.socket_coords
-
     def svg(self) -> ET.Element:
         group = ET.Element('svg', x=f"{self.x}", y=f"{self.y}", width=str(self.w), height=str(self.h), viewBox=f"0 0 {self.w} {self.h}")
         if self.muted: group.set('opacity', '50%')
@@ -382,6 +376,24 @@ class UINode():
         frame_items.append(bg)
 
         return frame_items
+
+class UIRedirectNode(UINode):
+
+    def __init__(self, node: bpy.types.Node, colors: str):
+        
+        self.name = "Redirect Node"
+
+        self.muted = False
+
+        self.w, self.h = 0, 0
+        self.x =  node.location[0]
+        self.y = -node.location[1]
+
+        self.anchors = {node.inputs[0].as_pointer(): (self.x, self.y, UIShape(node.inputs[0]))}
+        self.anchors.update({output.as_pointer(): (self.x, self.y, UIShape(output, render=False)) for output in node.outputs})
+    
+    def svg(self):
+        return None
 
 # class of SVG for a node header
 class UIHeader():
@@ -417,12 +429,14 @@ class UIShape():
         "S": "square"
     }
 
-    def __init__(self, socket):
+    def __init__(self, socket, render=True):
         self.shape = self.shapes[socket.display_shape[0]]
         self.has_dot = socket.display_shape[-1] == "T"
         self.color = constants.SOCKET_COLORS[socket.type]
+        self.render = render
 
     def svg(self, **kwargs):
+        if not self.render: return None
         group = ET.Element('svg', attrib=kwargs)
 
         ET.SubElement(group, 'use', href=f'#marker_{self.shape}', fill=self.color)
