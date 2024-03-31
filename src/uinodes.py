@@ -297,6 +297,9 @@ class UINode():
         self.outputs = [output for output in node.outputs.values() if all([not output.hide, output.enabled, not output.is_unavailable])]
         self.inputs = [input for input in node.inputs.values() if all([not input.hide, input.enabled, not input.is_unavailable])]
 
+        self.muted = node.mute
+        
+
         self.anchors = {}
 
 
@@ -356,6 +359,7 @@ class UINode():
 
     def svg(self) -> ET.Element:
         group = ET.Element('svg', x=f"{self.x}", y=f"{self.y}", width=str(self.w), height=str(self.h), viewBox=f"0 0 {self.w} {self.h}")
+        if self.muted: group.set('opacity', '50%')
         
         # frame
         rect = self.frame()
