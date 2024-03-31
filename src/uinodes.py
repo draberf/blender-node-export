@@ -396,15 +396,16 @@ class UIHeader():
 
     def svg(self) -> ET.Element:
         group = ET.Element('g', id=f"Header {self.name}")
-        rect = ET.Element('rect', width=f"{self.width}", height=f"{self.height}")
+        rect = ET.SubElement(group, 'rect', attrib={
+            'width':f'{self.width}',
+            'height':f'{self.height}',
+            'opacity':'60%',
+            'fill':self.color,
+            'stroke':'none'
+        })
         
-        rect.set("fill", self.color)
-        rect.set("stroke", "none")
-        group.append(rect)
-
-        label = ET.Element('text', x=f"{self.PADDING}", y=f"{self.height*3/4}")
+        label = ET.SubElement(group, 'text', x=f"{self.PADDING}", y=f"{self.height*3/4}")
         label.text = self.name
-        group.append(label)
 
         return group
     
