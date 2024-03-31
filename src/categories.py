@@ -2251,7 +2251,7 @@ node_specifications = {
     },
     'ShaderNodeMath': {
         'class': 'converter_node',
-        'name_behavior': lambda node: node.operation,
+        'name_behavior': lambda node: enumName(node, 'operation'),
         'props': lambda node: [
             dropdown(node, 'operation'),
             widgets.Boolean(name="Clamp", value=node.use_clamp)
