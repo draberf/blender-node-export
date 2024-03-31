@@ -242,14 +242,17 @@ class Converter():
             
             from_x, from_y, from_anchor_object = self.anchor_refs[link[0]]
             to_x, to_y, _ = self.anchor_refs[link[1]]
+            is_muted = link[2]
+
+            opacity = '100%' if not is_muted else '20%'
 
             color1 = from_anchor_object.color
 
             diff_x = abs(to_x - from_x)
             ET.SubElement(svg, 'path', d=f"M {from_x},{from_y} C {from_x + fac*diff_x},{from_y} {to_x - fac*diff_x},{to_y} {to_x},{to_y}",
-                            style=f"stroke:#000000;stroke-width:4;fill:none")
+                            style=f"stroke:#000000;stroke-width:4;fill:none;opacity:{opacity}")
             ET.SubElement(svg, 'path', d=f"M {from_x},{from_y} C {from_x + fac*diff_x},{from_y} {to_x - fac*diff_x},{to_y} {to_x},{to_y}",
-                            style=f"stroke:{color1};stroke-width:2;fill:none")
+                            style=f"stroke:{color1};stroke-width:2;fill:none;opacity:{opacity}")
 
         # add nodes to final SVG
         for node in self.nodes:
