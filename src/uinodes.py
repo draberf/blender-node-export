@@ -149,7 +149,7 @@ class Converter():
         self.nodes = []
 
         self.links = [
-            (link.from_socket.as_pointer(), link.to_socket.as_pointer()) for link in nodetree.links
+            (link.from_socket.as_pointer(), link.to_socket.as_pointer(), False) for link in nodetree.links
         ]
 
         self.curving = context.preferences.themes[0].node_editor.noodle_curving
@@ -174,7 +174,10 @@ class Converter():
 
             self.anchor_refs.update(node_object.anchors)
             self.nodes.append(node_object)
-        
+
+            if node.mute:
+                self.links.extend([(link.from_socket.as_pointer(), link.to_socket.as_pointer(), True) for link in node.internal_links])
+                
     def makeDefs(self) -> ET.Element:
 
         defs = ET.Element('defs')
