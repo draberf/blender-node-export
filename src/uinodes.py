@@ -135,7 +135,17 @@ def widgetFactory(socket) -> widgets.Widget:
         return widgets.Label(text=socket.name, alignment='R')
 
     return SOCKET_WIDGET_DEFS[socket.type](socket)
-    
+
+def nodeFactory(node, colors) -> 'UINode':
+
+    match node.bl_idname:
+        case 'NodeFrame':
+            return UIFrameNode(node)
+        case 'NodeReroute':
+            return UIRedirectNode(node, colors=colors)
+        case _:
+            return UINode(node, colors=colors)
+
 class Converter():
 
     def __init__(self, context) -> None:
@@ -147,6 +157,7 @@ class Converter():
         self.colors.update({'switch_node': 'gray'})
 
         self.nodes = []
+        self.node_frames = []
 
         self.links = [
             (link.from_socket.as_pointer(), link.to_socket.as_pointer(), False) for link in nodetree.links
@@ -164,7 +175,7 @@ class Converter():
 
         for node in nodetree.nodes:
             
-            node_object = UIRedirectNode(node, self.colors) if node.bl_idname == 'NodeReroute' else UINode(node, self.colors)
+            node_object = nodeFactory(node, self.colors)
 
             self.vb_min_x = min(self.vb_min_x, node_object.x)
             self.vb_min_y = min(self.vb_min_y, node_object.y)
@@ -172,7 +183,10 @@ class Converter():
             self.vb_max_y = max(self.vb_max_y, node_object.y+node_object.h)
 
             self.anchor_refs.update(node_object.anchors)
-            self.nodes.append(node_object)
+            if node.bl_idname == 'NodeFrame':
+                self.node_frames.append(node_object)
+            else:
+                self.nodes.append(node_object)
 
             if node.mute:
                 self.links.extend([(link.from_socket.as_pointer(), link.to_socket.as_pointer(), True) for link in node.internal_links])
@@ -233,6 +247,10 @@ class Converter():
 
         svg.append(self.makeDefs())
 
+
+        # add node frames to final SVG
+        for frame in self.node_frames:
+            svg.append(frame.svg())
         
 
         # add links to final SVG
@@ -295,6 +313,12 @@ class UINode():
         self.h *= constants.NODE_DIM_RATIO
         self.x =  node.location[0]
         self.y = -node.location[1]
+        if node.bl_idname == 'NodeFrame':
+            self.x -= self.w/2 - 70.0
+            self.y -= self.h/2 - 50.0
+        if node.parent:
+            self.x += node.parent.location[0]
+            self.y -= node.parent.location[1]
         self.outputs = [output for output in node.outputs.values() if all([not output.hide, output.enabled, not output.is_unavailable])]
         self.inputs = [input for input in node.inputs.values() if all([not input.hide, input.enabled, not input.is_unavailable])]
 
@@ -394,6 +418,45 @@ class UIRedirectNode(UINode):
     
     def svg(self):
         return None
+
+class UIFrameNode(UINode):
+
+    def __init__(self, node: bpy.types.Node):
+        
+        self.name = ""
+        if node.label:
+            self.name = node.label
+
+        self.w, self.h = node.dimensions
+        self.w *= constants.NODE_DIM_RATIO
+        self.h *= constants.NODE_DIM_RATIO
+        self.x =  node.location[0] - self.w/2 + 70.0
+        self.y = -node.location[1] - self.h/2 + 50.0
+
+        self.color = 'black' if not node.use_custom_color else methods.socketColorToSVGColor(node.color)
+
+        self.anchors = {}
+
+    def svg(self) -> ET.Element:
+        group = ET.Element('svg', x=f"{self.x}", y=f"{self.y}", width=str(self.w), height=str(self.h), viewBox=f"0 0 {self.w} {self.h}")
+        
+        ET.SubElement(group, 'rect', attrib={
+            'x': '0',
+            'y': '0',
+            'width': str(self.w),
+            'height': str(self.h),
+            'style':f'fill:{self.color};stroke:none'
+        })
+
+        if self.name:
+            text = ET.SubElement(group, 'text', attrib={
+                'x':str(self.w/2),
+                'y':str(constants.LINKED_SOCKET_HEIGHT),
+                'text-anchor':'middle'
+            })
+            text.text = self.name
+
+        return group
 
 # class of SVG for a node header
 class UIHeader():
