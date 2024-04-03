@@ -173,7 +173,12 @@ class Converter():
         self.vb_max_x =  nodetree.nodes[0].location[0]
         self.vb_max_y = -nodetree.nodes[0].location[1]
 
+
+        frame_ptrs = {}
+        frame_children = {}
         for node in nodetree.nodes:
+
+            print(node.bl_idname, node.as_pointer())
             
             node_object = nodeFactory(node, self.colors)
 
@@ -185,12 +190,30 @@ class Converter():
             self.anchor_refs.update(node_object.anchors)
             if node.bl_idname == 'NodeFrame':
                 self.node_frames.append(node_object)
+                frame_ptrs[node.as_pointer()] = node_object
             else:
                 self.nodes.append(node_object)
 
+            print(node.parent)
+            if node.parent:
+                ptr = node.parent.as_pointer()
+                if not ptr in frame_children:
+                    frame_children[ptr] = [node_object]
+                else:
+                    frame_children[ptr].append(node_object)
+                print(frame_children)
+
             if node.mute:
                 self.links.extend([(link.from_socket.as_pointer(), link.to_socket.as_pointer(), True) for link in node.internal_links])
-                
+
+        # process frame sizes
+        for ptr, frame in frame_ptrs.items():
+            if ptr in frame_children:
+                frame.children = frame_children[ptr]
+
+        for frame in frame_ptrs.values():
+            frame.updateDimensions()
+
     def makeDefs(self) -> ET.Element:
 
         defs = ET.Element('defs')
@@ -313,9 +336,6 @@ class UINode():
         self.h *= constants.NODE_DIM_RATIO
         self.x =  node.location[0]
         self.y = -node.location[1]
-        if node.bl_idname == 'NodeFrame':
-            self.x -= self.w/2 - 70.0
-            self.y -= self.h/2 - 50.0
         if node.parent:
             self.x += node.parent.location[0]
             self.y -= node.parent.location[1]
@@ -375,6 +395,10 @@ class UINode():
         # adjust node height
         self.h = max(self.h, self.height+constants.BOTTOM_PADDING)
 
+    def is_frame(self) -> bool:
+        return False
+
+
     def svg(self) -> ET.Element:
         group = ET.Element('svg', x=f"{self.x}", y=f"{self.y}", width=str(self.w), height=str(self.h), viewBox=f"0 0 {self.w} {self.h}")
         if self.muted: group.set('opacity', '50%')
@@ -412,6 +436,9 @@ class UIRedirectNode(UINode):
         self.w, self.h = 0, 0
         self.x =  node.location[0]
         self.y = -node.location[1]
+        if node.parent:
+            self.x += node.parent.location[0]
+            self.y -= node.parent.location[1]
 
         self.anchors = {node.inputs[0].as_pointer(): (self.x, self.y, UIShape(node.inputs[0]))}
         self.anchors.update({output.as_pointer(): (self.x, self.y, UIShape(output, render=False)) for output in node.outputs})
@@ -432,10 +459,34 @@ class UIFrameNode(UINode):
         self.h *= constants.NODE_DIM_RATIO
         self.x =  node.location[0] - self.w/2 + 70.0
         self.y = -node.location[1] - self.h/2 + 50.0
+        if node.parent:
+            self.x += node.parent.location[0]
+            self.y -= node.parent.location[1]
 
         self.color = 'black' if not node.use_custom_color else methods.socketColorToSVGColor(node.color)
 
+        self.children = []
+        self.boundaries_set = False
+
         self.anchors = {}
+
+    def is_frame(self) -> bool:
+        return True
+    
+    def updateDimensions(self) -> None:
+        
+        if self.boundaries_set: return
+        
+        for node in self.children:
+            if node.is_frame():
+                node.updateDimensions()
+            self.x = min(self.x, node.x-10)
+            self.y = min(self.y, node.y-10)
+            self.w = max(self.w, (node.x+node.w)-self.x+10)
+            self.h = max(self.h, (node.y+node.h)-self.y+10)
+
+        self.boundaries_set = True
+
 
     def svg(self) -> ET.Element:
         group = ET.Element('svg', x=f"{self.x}", y=f"{self.y}", width=str(self.w), height=str(self.h), viewBox=f"0 0 {self.w} {self.h}")
