@@ -266,7 +266,7 @@ class Vector(Widget):
 
         grp.append(Label(text=self.name).svg(width=self.width, resize=False))
         for i, value in enumerate(self.values):
-            grp.append(Value(value=value).svg(width=self.width, attrib={'y':str((i+1)*constants.LINKED_SOCKET_HEIGHT)}, resize=False))
+            grp.append(Float(value=value).svg(width=self.width, attrib={'y':str((i+1)*constants.LINKED_SOCKET_HEIGHT)}, resize=False))
         
         return grp
 
