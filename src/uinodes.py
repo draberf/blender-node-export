@@ -96,11 +96,12 @@ def value_socket(socket) -> widgets.Widget:
 # convert unconnected input socket to widget
 SOCKET_WIDGET_DEFS = {
     'VALUE': lambda socket: value_socket(socket),
+    'FLOAT': lambda socket: widgets.Float(name=socket.name, value=socket.default_value),
     'RGBA': lambda socket: widgets.FortySixty(wids=[
         widgets.Label(text=socket.name),
         widgets.RGBA(color="rgb("+",".join([str(round(x*255)) for x in socket.default_value[:3]])+")")
     ]),
-    'VECTOR': lambda socket: widgets.Vector(name=socket.name, values=[getFloatString(f) for f in socket.default_value]) if not socket.hide_value else widgets.Label(text=socket.name),
+    'VECTOR': lambda socket: widgets.Vector(name=socket.name, values=socket.default_value) if not socket.hide_value else widgets.Label(text=socket.name),
     'INT': lambda socket: widgets.FortySixty(wids=[
         widgets.Label(text=socket.name),
         widgets.Label(text=str(socket.default_value), alignment='R')
