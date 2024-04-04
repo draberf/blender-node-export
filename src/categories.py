@@ -1,7 +1,7 @@
 # node.name -- needs to remove .### in case of multiple nodes
 
 from . import widgets
-from .methods import socketColorToSVGColor, enumName
+from .methods import socketColorToSVGColor, enumName, getFloatString
 from .constants import IGNORE_PROPS
 
 CHANNEL_MATTE_OPTS = {
