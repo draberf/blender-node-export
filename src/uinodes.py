@@ -183,10 +183,6 @@ class Converter():
             
             node_object = nodeFactory(node, self.colors)
 
-            self.vb_min_x = min(self.vb_min_x, node_object.x)
-            self.vb_min_y = min(self.vb_min_y, node_object.y)
-            self.vb_max_x = max(self.vb_max_x, node_object.x+node_object.w)
-            self.vb_max_y = max(self.vb_max_y, node_object.y+node_object.h)
 
             self.anchor_refs.update(node_object.anchors)
             if node.bl_idname == 'NodeFrame':
@@ -258,16 +254,6 @@ class Converter():
     def convert(self) -> ET.ElementTree:
         
         svg = ET.Element('svg', version="1.1", xmlns="http://www.w3.org/2000/svg")
-        svg_w = self.vb_max_x-self.vb_min_x + 2*constants.VIEWBOX_PADDING
-        svg_h = self.vb_max_y-self.vb_min_y + 2*constants.VIEWBOX_PADDING
-        svg.set('width',  str(svg_w))
-        svg.set('height', str(svg_h))
-        svg.set('viewBox', ' '.join([str(f) for f in [
-            self.vb_min_x - constants.VIEWBOX_PADDING,
-            self.vb_min_y - constants.VIEWBOX_PADDING,
-            svg_w,
-            svg_h
-        ]]))
 
         svg.append(self.makeDefs())
 
@@ -275,7 +261,18 @@ class Converter():
         # add node frames to final SVG
         for frame in self.node_frames:
             svg.append(frame.svg())
-        
+
+        for node in self.nodes+self.node_frames:
+            
+            self.vb_min_x = min(self.vb_min_x, node.x)
+            self.vb_min_y = min(self.vb_min_y, node.y)
+            self.vb_max_x = max(self.vb_max_x, node.x+node.w)
+            self.vb_max_y = max(self.vb_max_y, node.y+node.h)
+
+
+        # update viewbox based on rendered links
+        svg_w = self.vb_max_x-self.vb_min_x
+        svg_h = self.vb_max_y-self.vb_min_y
 
         # add links to final SVG
         fac = self.curving/10.0
@@ -290,10 +287,30 @@ class Converter():
             color1 = from_anchor_object.color
 
             diff_x = abs(to_x - from_x)
-            ET.SubElement(svg, 'path', d=f"M {from_x},{from_y} C {from_x + fac*diff_x},{from_y} {to_x - fac*diff_x},{to_y} {to_x},{to_y}",
+            control_x1 = from_x + fac*diff_x
+            control_x2 = to_x - fac*diff_x
+
+            ET.SubElement(svg, 'path', d=f"M {from_x},{from_y} C {control_x1},{from_y} {control_x2},{to_y} {to_x},{to_y}",
                             style=f"stroke:#000000;stroke-width:4;fill:none;opacity:{opacity}")
-            ET.SubElement(svg, 'path', d=f"M {from_x},{from_y} C {from_x + fac*diff_x},{from_y} {to_x - fac*diff_x},{to_y} {to_x},{to_y}",
+            ET.SubElement(svg, 'path', d=f"M {from_x},{from_y} C {control_x1},{from_y} {control_x2},{to_y} {to_x},{to_y}",
                             style=f"stroke:{color1};stroke-width:2;fill:none;opacity:{opacity}")
+            
+            if self.curving > 0 and from_x > to_x:
+                x1, x2 = methods.getBezierExtrema(from_x, control_x1, control_x2, to_x)
+                print(x1, x2)
+                self.vb_min_x = min(self.vb_min_x, min(x1, x2))
+                svg_w = max(svg_w, max(x1-self.vb_min_x, x2-self.vb_min_x))
+
+
+
+        svg.set('width',  str(svg_w))
+        svg.set('height', str(svg_h))
+        svg.set('viewBox', ' '.join([str(f) for f in [
+            self.vb_min_x - constants.VIEWBOX_PADDING,
+            self.vb_min_y - constants.VIEWBOX_PADDING,
+            svg_w + 2*constants.VIEWBOX_PADDING,
+            svg_h + 2*constants.VIEWBOX_PADDING
+        ]]))        
 
         # add nodes to final SVG
         for node in self.nodes:
@@ -481,10 +498,10 @@ class UIFrameNode(UINode):
         for node in self.children:
             if node.is_frame():
                 node.updateDimensions()
-            self.x = min(self.x, node.x-10)
-            self.y = min(self.y, node.y-10)
-            self.w = max(self.w, (node.x+node.w)-self.x+10)
-            self.h = max(self.h, (node.y+node.h)-self.y+10)
+            self.x = min(self.x, node.x-40)
+            self.y = min(self.y, node.y-40)
+            self.w = max(self.w, (node.x+node.w)-self.x+40)
+            self.h = max(self.h, (node.y+node.h)-self.y+40)
 
         self.boundaries_set = True
 
