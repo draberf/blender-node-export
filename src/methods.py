@@ -1,5 +1,6 @@
 import mathutils
 import cmath
+from math import sqrt
 
 # in: mathutils.Color with r, g, b, methods
 # out: color representation in SVG-compliant format
@@ -25,3 +26,22 @@ def cartesianToPolar(x: float, y: float) -> tuple[float, float]:
 
 def polarToCartesian(rho: float, phi: float) -> tuple[float, float]:
     return (z := cmath.rect(rho, phi)).real, z.imag
+
+def solveQuadratic(a: float, b: float, c: float) -> tuple[float, float]:
+    sqrt_d = sqrt(b**2 - 4*a*c)
+    return ((-b+sqrt_d)/(2*a), (-b-sqrt_d)/(2*a))
+
+def getBezierExtrema(x0: float, x1: float, x2: float, x3: float) -> tuple[float, float]:
+    
+    bezier = lambda t: (1-t)**3*x0 + 3*(1-t)**2*t*x1 + 3*(1-t)*t**2*x2 + t**3*x3
+    
+    try:
+        t1, t2 = solveQuadratic((-3*x0 + 9*x1 - 9*x2 + 3*x3)/100.0, (6*x0 - 12*x1 + 6*x2)/100.0, (-3*x0 + 3*x1)/100.0)
+        print(t1, t2)
+    except Exception as e:
+        print(x0, x1, x2, x3)
+        raise e
+    return (
+        bezier(t1),
+        bezier(t2)
+    )
