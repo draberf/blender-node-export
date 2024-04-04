@@ -9,7 +9,7 @@ bl_info = {
     "blender": (3, 4, 0),
     "location": "Node Editor",
     "warning": "",
-    "support": "TESTING",
+    "support": "COMMUNITY",
     "doc_url": "",
     "tracker_url": "",
     "category": "Import-Export"
