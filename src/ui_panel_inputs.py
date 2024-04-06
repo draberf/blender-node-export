@@ -10,8 +10,14 @@ from .constants import IGNORE_PROPS
 
 TARGET = "D:\\skola_mit\\dp\\blender-node-export\\output.svg"
 
+
 class ExportPropertyGroup(bpy.types.PropertyGroup):
+
+    
+    export_selected_only: bpy.props.BoolProperty(name="Export Selected Only", default=False)
     output: bpy.props.StringProperty(name = "Output", subtype='FILE_PATH')
+
+
 
 class UIInspectOperator(bpy.types.Operator):
     bl_idname = "ui.inspector"
@@ -21,6 +27,9 @@ class UIInspectOperator(bpy.types.Operator):
         
         print("====")
 
+        props = context.scene.export_svg_props
+
+        props.export_selected_only = False
 
         if not (nodes := context.selected_nodes):
             print("No selected node")
@@ -60,15 +69,14 @@ class UIExportOperator(bpy.types.Operator):
         #    nodes += bpy.context.selected_nodes
         #    bpy.ops.node.select_all(action='INVERT')
 
-        nodetree = context.space_data.node_tree
-
+        props = context.scene.export_svg_props
 
         header = "<?xml version='1.0' encoding='utf-8'?>"
 
         doctype = "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">"
 
 
-        tree = Converter(context).convert()
+        tree = Converter(context, selected_only=props.export_selected_only).convert()
         
         with open(bpy.path.abspath(context.scene.export_svg_props.output), "w+") as f:
             f.write(header)
@@ -92,14 +100,16 @@ class UIInspectPanel(bpy.types.Panel):
     def draw(self, context):
 
         layout = self.layout
+        props = context.scene.export_svg_props
 
-        
+        row = layout.row()
+        row.prop(props, 'export_selected_only')
 
         row = layout.row()
         row.label(text="Export target")
 
         row = layout.row()
-        row.prop(context.scene.export_svg_props, 'output', text="")
+        row.prop(props, 'output', text="")
 
         layout.operator(
             operator='ui.exporter',

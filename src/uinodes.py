@@ -149,7 +149,7 @@ def nodeFactory(node, colors) -> 'UINode':
 
 class Converter():
 
-    def __init__(self, context) -> None:
+    def __init__(self, context, selected_only=False) -> None:
         
         nodetree = context.space_data.node_tree
         self.colors = {k:methods.blColorToSVGColor(v) for k, v in [
@@ -168,16 +168,20 @@ class Converter():
 
         self.anchor_refs = {}
 
+        filtered_nodes = nodetree.nodes if not selected_only else [node for node in nodetree.nodes if node.select]
 
-        self.vb_min_x =  nodetree.nodes[0].location[0]
-        self.vb_min_y = -nodetree.nodes[0].location[1]
-        self.vb_max_x =  nodetree.nodes[0].location[0]
-        self.vb_max_y = -nodetree.nodes[0].location[1]
+
+        self.vb_min_x =  filtered_nodes[0].location[0]
+        self.vb_min_y = -filtered_nodes[0].location[1]
+        self.vb_max_x =  filtered_nodes[0].location[0]
+        self.vb_max_y = -filtered_nodes[0].location[1]
 
 
         frame_ptrs = {}
         frame_children = {}
-        for node in nodetree.nodes:
+        for node in filtered_nodes:
+
+            if selected_only and not node.select: continue
 
             print(node.bl_idname, node.as_pointer())
             
@@ -278,6 +282,7 @@ class Converter():
         fac = self.curving/10.0
         for link in self.links:
             
+            if not link[0] in self.anchor_refs or not link[1] in self.anchor_refs: continue
             from_x, from_y, from_anchor_object = self.anchor_refs[link[0]]
             to_x, to_y, _ = self.anchor_refs[link[1]]
             is_muted = link[2]
