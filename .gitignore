@@ -168,4 +168,3 @@ src/*_old.py
 *.png
 *.pdf
 *.zip
-Makefile
