@@ -10,6 +10,7 @@ import xml.etree.ElementTree as ET
 
 from colorsys import rgb_to_hsv, hsv_to_rgb
 from math import sin, cos, pi
+from re import search
 
 MARKER_DEFS = {
     'circle': ('circle',{
@@ -169,6 +170,9 @@ class Converter():
         self.anchor_refs = {}
 
         filtered_nodes = nodetree.nodes if not selected_only else [node for node in nodetree.nodes if node.select]
+        if not filtered_nodes:
+            print(filtered_nodes)
+            filtered_nodes = nodetree.nodes
 
 
         self.vb_min_x =  filtered_nodes[0].location[0]
@@ -180,8 +184,6 @@ class Converter():
         frame_ptrs = {}
         frame_children = {}
         for node in filtered_nodes:
-
-            if selected_only and not node.select: continue
 
             print(node.bl_idname, node.as_pointer())
             
@@ -354,6 +356,7 @@ class UINode():
             self.name = node.label
         elif 'name_behavior' in specification:
             self.name = specification['name_behavior'](node)
+        elif search(r'.[0-9]{3}$', self.name): self.name = self.name[:-4]
         self.w, self.h = node.dimensions
         self.w *= constants.NODE_DIM_RATIO
         self.h *= constants.NODE_DIM_RATIO
