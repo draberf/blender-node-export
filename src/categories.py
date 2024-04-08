@@ -4,6 +4,26 @@ from . import widgets
 from .methods import socketColorToSVGColor, enumName, getFloatString
 from .constants import IGNORE_PROPS
 
+CATEGORY_NAMES = (
+    'input',
+    'output',
+    'shader',
+    'texture',
+    'color',
+    'vector',
+    'converter',
+    'script',
+    'filter',
+    'matte',
+    'distor',
+    'layout',
+    'attribute',
+    'geometry',
+    'group',
+    'layout'
+)
+
+
 CHANNEL_MATTE_OPTS = {
     'RGB': ['R', 'G', 'B'],
     'HSV': ['H', 'S', 'V'],
@@ -133,24 +153,7 @@ def generateCustomProps(node):
     
     return wids
 
-    
-CATEGORIES = [
-    'input_node',
-    'output_node',
-    'shader_node',
-    'texture_node',
-    'color_node',
-    'vector_node',
-    'converter_node',
-    'script_node',
-    'filter_node',
-    'matte_node',
-    'distor_node',
-    'layout_node',
-    'attribute_node',
-    'geometry_node',
-    'group_node'
-]
+CATEGORIES = [name+'_node' for name in CATEGORY_NAMES]
 
 node_specifications = {
 
