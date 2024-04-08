@@ -379,7 +379,7 @@ class UINode():
             self.color_class = specification['class'] if specification['class'] else specification['class_behavior'](node)
         else:
             print(f"WARNING: Node {node.bl_idname} does not have a default specification. Placeholder object will be used instead.")
-            self.color_class = 'switch_node'
+            self.color_class = 'layout_node'
 
         self.uiheader = UIHeader(self.name, self.w, color=colors[self.color_class])
 
