@@ -19,7 +19,7 @@ bl_info = {
 # https://blender.stackexchange.com/questions/28504/blender-ignores-changes-to-python-scripts/28505#28505
 if "bpy" in locals():
     files = [
-        'constants', 'node_to_svg', 'ui_panel_inputs', 'uinodes', 'categories', 'widgets', 'methods'
+        'methods', 'constants', 'widgets', 'categories', 'uinodes', 'ui_panel_inputs'
     ]
     import importlib
     for file in files:
@@ -42,9 +42,8 @@ def register():
     bpy.utils.register_class(ui_panel_inputs.ExportPropertyGroup)
     bpy.types.Scene.export_svg_props = bpy.props.PointerProperty(type=ui_panel_inputs.ExportPropertyGroup)
 
-    bpy.utils.register_class(ui_panel_inputs.UIInspectOperator)
-    bpy.utils.register_class(ui_panel_inputs.UIExportOperator)
-    bpy.utils.register_class(ui_panel_inputs.UIInspectPanel)
+    for cls in ui_panel_inputs.operators+ui_panel_inputs.panels:
+        bpy.utils.register_class(cls)
 
 def unregister():
 
@@ -52,6 +51,5 @@ def unregister():
     del bpy.types.Scene.export_svg_props
     bpy.utils.unregister_class(ui_panel_inputs.ExportPropertyGroup)
 
-    bpy.utils.unregister_class(ui_panel_inputs.UIInspectOperator)
-    bpy.utils.unregister_class(ui_panel_inputs.UIExportOperator)
-    bpy.utils.unregister_class(ui_panel_inputs.UIInspectPanel)
+    for cls in ui_panel_inputs.operators+ui_panel_inputs.panels:
+        bpy.utils.unregister_class(cls)
