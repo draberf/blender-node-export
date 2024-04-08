@@ -153,10 +153,13 @@ class Converter():
     def __init__(self, context, selected_only=False, use_default_colors=True, custom_colors={}) -> None:
         
         nodetree = context.space_data.node_tree
-        self.colors = {k:methods.blColorToSVGColor(v) for k, v in [
-            (k, getattr(context.preferences.themes[0].node_editor, k)) for k in categories.CATEGORIES
-        ]}
-        self.colors.update({'switch_node': 'gray'})
+        self.colors = {}
+        if use_default_colors:
+            self.colors = {k:methods.blColorToSVGColor(v) for k, v in [
+                (k, getattr(context.preferences.themes[0].node_editor, k)) for k in categories.CATEGORIES
+            ]}
+        else:
+            self.colors = {k:methods.blColorToSVGColor(v) for k, v in custom_colors.items()}
 
         self.nodes = []
         self.node_frames = []
