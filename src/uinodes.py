@@ -150,7 +150,7 @@ def nodeFactory(node, colors) -> 'UINode':
 
 class Converter():
 
-    def __init__(self, context, selected_only=False) -> None:
+    def __init__(self, context, selected_only=False, use_default_colors=True, custom_colors={}) -> None:
         
         nodetree = context.space_data.node_tree
         self.colors = {k:methods.blColorToSVGColor(v) for k, v in [
