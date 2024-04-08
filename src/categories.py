@@ -982,7 +982,7 @@ node_specifications = {
     # Compositor > Switch
 
     'CompositorNodeSwitch': {
-        'class': 'switch_node',
+        'class': 'layout_node',
         'props': lambda node: [
             widgets.Boolean(name="Switch", value=node.check)
         ]
