@@ -86,10 +86,52 @@ def generateCustomProps(node):
     wids = []
     
     for prop in node.bl_rna.properties:
+        if not prop.identifier: continue
         if prop.identifier in IGNORE_PROPS: continue
 
+        try:
+            match prop.type:
+                case 'BOOLEAN':
+                    wids.append(widgets.Boolean(name=prop.name, value=getattr(node, prop.identifier)))
+                case 'INT':
+                    wids.extend([
+                        widgets.Label(text=prop.name),
+                        widgets.Value(value=getattr(node, prop.identifier))
+                    ])
+                case 'FLOAT':
+                    wids.extend([
+                        widgets.Label(text=prop.name),
+                        widgets.Float(value=getattr(node, prop.identifier))
+                    ])
+                case 'STRING':
+                    wids.extend([
+                        widgets.Label(text=prop.name),
+                        widgets.String(value=getattr(node, prop.identifier))
+                    ])
+                case 'ENUM':
+                    print([item for item in node.bl_rna.properties.items()])
+                    print('>>>>>', prop.identifier)
+                    wids.extend([
+                        widgets.Label(text=prop.name),
+                        dropdown(node, prop.identifier)
+                    ])
+                case 'POINTER' | 'COLLECTION':
+                    obj = getattr(node, prop.identifier)
+                    obj_name = ""
+                    if obj:
+                        if 'name' in obj.bl_rna.properties:
+                            obj_name = obj.name
+                    wids.extend([
+                        widgets.Label(text=prop.name),
+                        widgets.String(value=obj_name)
+                    ])
+        except:
+            wids.extend([
+                widgets.Label(text=prop.name),
+                widgets.Placeholder()
+            ])
     
-    return [widgets.Placeholder()] if not wids else wids
+    return wids
 
     
 CATEGORIES = [
