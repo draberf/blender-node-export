@@ -13,8 +13,16 @@ TARGET = "D:\\skola_mit\\dp\\blender-node-export\\output.svg"
 
 class ExportPropertyGroup(bpy.types.PropertyGroup):
 
-    
+    # toggle whether export should only include selected nodes
     export_selected_only: bpy.props.BoolProperty(name="Export Selected Only", default=False)
+
+    # colors of node headers
+    node_color_converter: bpy.props.FloatVectorProperty(name="Converter", subtype='COLOR', default=[0.0,0.0,0.0]) 
+
+    # opacity of header -- ADD HOVER INFO TO THIS
+
+
+    # target file to export into
     output: bpy.props.StringProperty(name = "Output", subtype='FILE_PATH')
 
 
@@ -27,9 +35,6 @@ class UIInspectOperator(bpy.types.Operator):
         
         print("====")
 
-        props = context.scene.export_svg_props
-
-        props.export_selected_only = False
 
         if not (nodes := context.selected_nodes):
             print("No selected node")
@@ -85,6 +90,23 @@ class UIExportOperator(bpy.types.Operator):
 
         return {'FINISHED'}
 
+class UIColorPanel(bpy.types.Panel):
+    bl_parent_id = 'NODE_EDITOR_PT_exporter'
+    bl_label = "Colors"
+    bl_options = {'HIDE_DEFAULT'}
+
+    @classmethod
+    def poll(cls, context):
+        return (context.object is not None)
+    
+    def draw(self, context):
+        layout = self.layout
+        props = context.scene.export_svg_props
+
+        #row = layout.row()
+        #row.prop(props, 'node_color_converter')
+
+
 class UIInspectPanel(bpy.types.Panel):
     bl_space_type = 'NODE_EDITOR'
     bl_region_type = 'UI'
@@ -103,7 +125,7 @@ class UIInspectPanel(bpy.types.Panel):
         props = context.scene.export_svg_props
 
         row = layout.row()
-        row.prop(props, 'export_selected_only')
+        row.prop(props, 'node_color_converter')
 
         row = layout.row()
         row.label(text="Export target")
