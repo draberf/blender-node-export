@@ -19,7 +19,7 @@ bl_info = {
 # https://blender.stackexchange.com/questions/28504/blender-ignores-changes-to-python-scripts/28505#28505
 if "bpy" in locals():
     files = [
-        'methods', 'constants', 'widgets', 'categories', 'uinodes', 'ui_panel_inputs'
+        'constants', 'methods', 'widgets', 'categories', 'uinodes', 'ui_panel_inputs'
     ]
     import importlib
     for file in files:
