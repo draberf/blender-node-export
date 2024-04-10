@@ -20,34 +20,34 @@ class ExportPropertyGroup(bpy.types.PropertyGroup):
     use_theme_colors: bpy.props.BoolProperty(name="Use theme colors", default=False)
 
     # node element colors
-    color_base:             bpy.props.FloatVectorProperty(name="Base",          subtype='COLOR', min=0, max=1)
-    color_string_field:     bpy.props.FloatVectorProperty(name="String Field",  subtype='COLOR', min=0, max=1)
-    color_bool_false:       bpy.props.FloatVectorProperty(name="False",         subtype='COLOR', min=0, max=1)
-    color_bool_true:        bpy.props.FloatVectorProperty(name="True",          subtype='COLOR', min=0, max=1)
-    color_value_field:      bpy.props.FloatVectorProperty(name="Value",         subtype='COLOR', min=0, max=1)
-    color_value_progress:   bpy.props.FloatVectorProperty(name="Progress Bar",  subtype='COLOR', min=0, max=1)
-    color_axis_x:           bpy.props.FloatVectorProperty(name="Axis X",        subtype='COLOR', min=0, max=1)
-    color_axis_y:           bpy.props.FloatVectorProperty(name="Axis Y",        subtype='COLOR', min=0, max=1)
-    color_axiz_z:           bpy.props.FloatVectorProperty(name="Axis Z",        subtype='COLOR', min=0, max=1)
-    color_text:             bpy.props.FloatVectorProperty(name="Text",          subtype='COLOR', min=0, max=1)
+    color_base:             bpy.props.FloatVectorProperty(name="Base",          subtype='COLOR', min=0, max=1, size=4)
+    color_string_field:     bpy.props.FloatVectorProperty(name="String Field",  subtype='COLOR', min=0, max=1, size=4)
+    color_bool_false:       bpy.props.FloatVectorProperty(name="False",         subtype='COLOR', min=0, max=1, size=4)
+    color_bool_true:        bpy.props.FloatVectorProperty(name="True",          subtype='COLOR', min=0, max=1, size=4)
+    color_value_field:      bpy.props.FloatVectorProperty(name="Value",         subtype='COLOR', min=0, max=1, size=4)
+    color_value_progress:   bpy.props.FloatVectorProperty(name="Progress Bar",  subtype='COLOR', min=0, max=1, size=4)
+    color_axis_x:           bpy.props.FloatVectorProperty(name="Axis X",        subtype='COLOR', min=0, max=1, size=3)
+    color_axis_y:           bpy.props.FloatVectorProperty(name="Axis Y",        subtype='COLOR', min=0, max=1, size=3)
+    color_axiz_z:           bpy.props.FloatVectorProperty(name="Axis Z",        subtype='COLOR', min=0, max=1, size=3)
+    color_text:             bpy.props.FloatVectorProperty(name="Text",          subtype='COLOR', min=0, max=1, size=3)
 
     # colors of node headers
-    header_color_input:         bpy.props.FloatVectorProperty(name="Input",     subtype='COLOR', min=0, max=1) 
-    header_color_output:        bpy.props.FloatVectorProperty(name="Output",    subtype='COLOR', min=0, max=1) 
-    header_color_shader:        bpy.props.FloatVectorProperty(name="Shader",    subtype='COLOR', min=0, max=1) 
-    header_color_texture:       bpy.props.FloatVectorProperty(name="Texture",   subtype='COLOR', min=0, max=1) 
-    header_color_color:         bpy.props.FloatVectorProperty(name="Color",     subtype='COLOR', min=0, max=1) 
-    header_color_vector:        bpy.props.FloatVectorProperty(name="Vector",    subtype='COLOR', min=0, max=1) 
-    header_color_converter:     bpy.props.FloatVectorProperty(name="Converter", subtype='COLOR', min=0, max=1) 
-    header_color_script:        bpy.props.FloatVectorProperty(name="Script",    subtype='COLOR', min=0, max=1) 
-    header_color_filter:        bpy.props.FloatVectorProperty(name="Filter",    subtype='COLOR', min=0, max=1) 
-    header_color_matte:         bpy.props.FloatVectorProperty(name="Matte",     subtype='COLOR', min=0, max=1) 
-    header_color_distor:        bpy.props.FloatVectorProperty(name="Distort",   subtype='COLOR', min=0, max=1) 
-    header_color_layout:        bpy.props.FloatVectorProperty(name="Layout",    subtype='COLOR', min=0, max=1) 
-    header_color_attribute:     bpy.props.FloatVectorProperty(name="Attribute", subtype='COLOR', min=0, max=1) 
-    header_color_geometry:      bpy.props.FloatVectorProperty(name="Geometry",  subtype='COLOR', min=0, max=1) 
-    header_color_group:         bpy.props.FloatVectorProperty(name="Group",     subtype='COLOR', min=0, max=1) 
-    header_color_layout:        bpy.props.FloatVectorProperty(name="Layout",    subtype='COLOR', min=0, max=1)
+    header_color_input:         bpy.props.FloatVectorProperty(name="Input",     subtype='COLOR', min=0, max=1, size=3) 
+    header_color_output:        bpy.props.FloatVectorProperty(name="Output",    subtype='COLOR', min=0, max=1, size=3) 
+    header_color_shader:        bpy.props.FloatVectorProperty(name="Shader",    subtype='COLOR', min=0, max=1, size=3) 
+    header_color_texture:       bpy.props.FloatVectorProperty(name="Texture",   subtype='COLOR', min=0, max=1, size=3) 
+    header_color_color:         bpy.props.FloatVectorProperty(name="Color",     subtype='COLOR', min=0, max=1, size=3) 
+    header_color_vector:        bpy.props.FloatVectorProperty(name="Vector",    subtype='COLOR', min=0, max=1, size=3) 
+    header_color_converter:     bpy.props.FloatVectorProperty(name="Converter", subtype='COLOR', min=0, max=1, size=3) 
+    header_color_script:        bpy.props.FloatVectorProperty(name="Script",    subtype='COLOR', min=0, max=1, size=3) 
+    header_color_filter:        bpy.props.FloatVectorProperty(name="Filter",    subtype='COLOR', min=0, max=1, size=3) 
+    header_color_matte:         bpy.props.FloatVectorProperty(name="Matte",     subtype='COLOR', min=0, max=1, size=3) 
+    header_color_distor:        bpy.props.FloatVectorProperty(name="Distort",   subtype='COLOR', min=0, max=1, size=3) 
+    header_color_layout:        bpy.props.FloatVectorProperty(name="Layout",    subtype='COLOR', min=0, max=1, size=3) 
+    header_color_attribute:     bpy.props.FloatVectorProperty(name="Attribute", subtype='COLOR', min=0, max=1, size=3) 
+    header_color_geometry:      bpy.props.FloatVectorProperty(name="Geometry",  subtype='COLOR', min=0, max=1, size=3) 
+    header_color_group:         bpy.props.FloatVectorProperty(name="Group",     subtype='COLOR', min=0, max=1, size=3) 
+    header_color_layout:        bpy.props.FloatVectorProperty(name="Layout",    subtype='COLOR', min=0, max=1, size=3)
 
     # opacity of header -- ADD HOVER INFO TO THIS
     header_opacity: bpy.props.FloatProperty(name="Header Opacity", subtype='PERCENTAGE', min=0, max=100, default=HEADER_OPACITY)
@@ -55,8 +55,9 @@ class ExportPropertyGroup(bpy.types.PropertyGroup):
     # colors of nodes
     node_color: bpy.props.FloatVectorProperty(name="Base Color", subtype='COLOR', min=0, max=1)
 
-
-
+    # outline settings
+    outline_thickness: bpy.props.FloatProperty(name="Outline Thickness", min=0, max=10)
+    outline_color: bpy.props.FloatVectorProperty(name="Outline Color", subtype='COLOR', min=0, max=1)
 
     # target file to export into
     output: bpy.props.StringProperty(name = "Output", subtype='FILE_PATH')
@@ -69,7 +70,7 @@ def resetColors(prop_group, context):
     prop_group.color_base = theme.node_editor.node_backdrop
     prop_group.color_string_field = theme.user_interface.wcol_text.inner
     prop_group.color_bool_false = theme.user_interface.wcol_option.inner
-    prop_group.color_bool_true = theme.user_interface.wcol_option.selected
+    prop_group.color_bool_true = theme.user_interface.wcol_option.inner_sel
     prop_group.color_value_field = theme.user_interface.wcol_numslider.inner
     prop_group.color_value_progress = theme.user_interface.wcol_numslider.item
     prop_group.color_axis_x = theme.user_interface.axis_x
@@ -185,12 +186,10 @@ class UIColorPanel(UIPanel):
 
 
         # https://blender.stackexchange.com/questions/41387/how-to-deactivate-a-ui-element-in-an-add-on
-        for color_name in ['color_'+elem for elem in ELEMENTS]+['header_color_'+name for name in CATEGORY_NAMES]:
+        for color_name in ['color_'+elem for elem in ELEMENTS]+['header_color_'+name for name in CATEGORY_NAMES]+['header_opacity']:
             row = layout.row()
             row.prop(props, color_name)
             row.enabled = not props.use_theme_colors
-
-        layout.prop(props, 'header_opacity')
 
         layout.operator(
             operator='ui.color_reset',
@@ -211,6 +210,9 @@ class UIInspectPanel(UIPanel):
 
         row = layout.row()
         row.label(text="Export target")
+
+        row = layout.row()
+        row.prop(props, 'export_selected_only')
 
         row = layout.row()
         row.prop(props, 'output', text="")
