@@ -2,6 +2,8 @@ import mathutils
 import cmath
 from math import sqrt
 
+from constants import HEADER_OPACITY, CATEGORY_NAMES
+
 # in: mathutils.Color with r, g, b, methods
 # out: color representation in SVG-compliant format
 def blColorToSVGColor(color: mathutils.Color) -> str:
@@ -45,3 +47,26 @@ def getBezierExtrema(x0: float, x1: float, x2: float, x3: float) -> tuple[float,
         bezier(t1),
         bezier(t2)
     )
+
+def getColorsFromPreferences(context) -> dict[list[float]]:
+    
+    output = {}
+    
+    theme = context.preferences.themes[0]
+
+    output['color_base'] = theme.node_editor.node_backdrop
+    output['color_string_field'] = theme.user_interface.wcol_text.inner
+    output['color_bool_false'] = theme.user_interface.wcol_option.inner
+    output['color_bool_true'] = theme.user_interface.wcol_option.selected
+    output['color_value_field'] = theme.user_interface.wcol_numslider.inner
+    output['color_value_progress'] = theme.user_interface.wcol_numslider.item
+    output['color_axis_x'] = theme.user_interface.axis_x
+    output['color_axis_y'] = theme.user_interface.axis_y
+    output['color_axis_z'] = theme.user_interface.axis_z
+    output['color_text'] = theme.user_interface.wcol_regular.text
+
+    output['noodliness'] = theme.node_editor.noodle_curving
+    output['header_opacity'] = HEADER_OPACITY
+
+    for name in CATEGORY_NAMES:
+       output['header_color_'+name] = getattr(theme.node_editor, name+'_node')

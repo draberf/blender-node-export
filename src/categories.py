@@ -2,26 +2,7 @@
 
 from . import widgets
 from .methods import socketColorToSVGColor, enumName, getFloatString
-from .constants import IGNORE_PROPS
-
-CATEGORY_NAMES = (
-    'input',
-    'output',
-    'shader',
-    'texture',
-    'color',
-    'vector',
-    'converter',
-    'script',
-    'filter',
-    'matte',
-    'distor',
-    'layout',
-    'attribute',
-    'geometry',
-    'group',
-    'layout'
-)
+from .constants import IGNORE_PROPS, CATEGORY_NAMES
 
 
 CHANNEL_MATTE_OPTS = {
