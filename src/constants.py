@@ -13,7 +13,7 @@ SOCKET_TEXT_PADDING = 10
 SOCKET_TEXT_HEIGHT = 11
 
 # colors
-HEADER_COLOR = "red"
+HEADER_OPACITY = 38
 
 # properties to skip
 DEFAULT_PROPERTIES = 0
@@ -57,3 +57,30 @@ MARKER_DOT_RADIUS = 1
 
 # padding of the final tree viewbox
 VIEWBOX_PADDING = 10
+
+
+CATEGORY_NAMES = (
+    'input',
+    'output',
+    'shader',
+    'texture',
+    'color',
+    'vector',
+    'converter',
+    'script',
+    'filter',
+    'matte',
+    'distor',
+    'layout',
+    'attribute',
+    'geometry',
+    'group',
+    'layout'
+)
+
+ELEMENTS = (
+    'base', 'string_field',
+    'bool_false', 'bool_true',
+    'value_field', 'value_progress',
+    'axis_x', 'axis_y', 'axis_z'
+)

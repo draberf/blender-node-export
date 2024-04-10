@@ -150,9 +150,18 @@ def nodeFactory(node, colors) -> 'UINode':
 
 class Converter():
 
-    def __init__(self, context, selected_only=False, use_default_colors=True, custom_colors={}) -> None:
+    def __init__(
+            self,
+            context,
+            selected_only=False,
+            use_default_colors=True,
+            custom_colors={},
+            header_opacity=60) -> None:
         
+        # obtain node tree
         nodetree = context.space_data.node_tree
+
+        # obtain visual properties
         self.colors = {}
         if use_default_colors:
             self.colors = {k:methods.blColorToSVGColor(v) for k, v in [
@@ -160,6 +169,7 @@ class Converter():
             ]}
         else:
             self.colors = {k:methods.blColorToSVGColor(v) for k, v in custom_colors.items()}
+        self.header_opacity = header_opacity
 
         self.nodes = []
         self.node_frames = []
@@ -325,7 +335,7 @@ class Converter():
         # add nodes to final SVG
         for node in self.nodes:
             try:
-                out = node.svg()
+                out = node.svg(self.header_opacity)
                 if out: svg.append(out)
             except Exception as e:
                 print(node.name)
@@ -428,7 +438,7 @@ class UINode():
         return False
 
 
-    def svg(self) -> ET.Element:
+    def svg(self, header_opacity=60) -> ET.Element:
         group = ET.Element('svg', x=f"{self.x}", y=f"{self.y}", width=str(self.w), height=str(self.h), viewBox=f"0 0 {self.w} {self.h}")
         if self.muted: group.set('opacity', '50%')
         
@@ -437,7 +447,7 @@ class UINode():
         group.append(rect)
 
         # header
-        group.append(self.uiheader.svg())
+        group.append(self.uiheader.svg(opacity=header_opacity))
 
         # new widgets rendering
         group.extend([widget.svg(width=self.w, attrib={'y':str(height)}) for height, widget in self.height_widget_pairs])
@@ -549,12 +559,12 @@ class UIHeader():
         self.height = height
         self.color = color
 
-    def svg(self) -> ET.Element:
+    def svg(self, opacity=60) -> ET.Element:
         group = ET.Element('g', id=f"Header {self.name}")
         rect = ET.SubElement(group, 'rect', attrib={
             'width':f'{self.width}',
             'height':f'{self.height}',
-            'opacity':'60%',
+            'opacity':str(opacity)+'%',
             'fill':self.color,
             'stroke':'none'
         })

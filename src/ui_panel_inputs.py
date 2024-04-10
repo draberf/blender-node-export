@@ -1,10 +1,12 @@
 import bpy
 
 from .uinodes import Converter
-from .constants import IGNORE_PROPS
+from .constants import IGNORE_PROPS, HEADER_OPACITY, ELEMENTS
 from .categories import CATEGORY_NAMES
 
 TARGET = "D:\\skola_mit\\dp\\blender-node-export\\output.svg"
+
+
 
 operators = []
 panels = []
@@ -17,33 +19,67 @@ class ExportPropertyGroup(bpy.types.PropertyGroup):
     # use category defaults automatically
     use_theme_colors: bpy.props.BoolProperty(name="Use theme colors", default=False)
 
+    # node element colors
+    color_base:             bpy.props.FloatVectorProperty(name="Base",          subtype='COLOR', min=0, max=1)
+    color_string_field:     bpy.props.FloatVectorProperty(name="String Field",  subtype='COLOR', min=0, max=1)
+    color_bool_false:       bpy.props.FloatVectorProperty(name="False",         subtype='COLOR', min=0, max=1)
+    color_bool_true:        bpy.props.FloatVectorProperty(name="True",          subtype='COLOR', min=0, max=1)
+    color_value_field:      bpy.props.FloatVectorProperty(name="Value",         subtype='COLOR', min=0, max=1)
+    color_value_progress:   bpy.props.FloatVectorProperty(name="Progress Bar",  subtype='COLOR', min=0, max=1)
+    color_axis_x:           bpy.props.FloatVectorProperty(name="Axis X",        subtype='COLOR', min=0, max=1)
+    color_axis_y:           bpy.props.FloatVectorProperty(name="Axis Y",        subtype='COLOR', min=0, max=1)
+    color_axiz_z:           bpy.props.FloatVectorProperty(name="Axis Z",        subtype='COLOR', min=0, max=1)
+    color_text:             bpy.props.FloatVectorProperty(name="Text",          subtype='COLOR', min=0, max=1)
+
     # colors of node headers
-    node_colors_input: bpy.props.FloatVectorProperty(name="Input", subtype='COLOR', min=0, max=1) 
-    node_colors_output: bpy.props.FloatVectorProperty(name="Output", subtype='COLOR', min=0, max=1) 
-    node_colors_shader: bpy.props.FloatVectorProperty(name="Shader", subtype='COLOR', min=0, max=1) 
-    node_colors_texture: bpy.props.FloatVectorProperty(name="Texture", subtype='COLOR', min=0, max=1) 
-    node_colors_color: bpy.props.FloatVectorProperty(name="Color", subtype='COLOR', min=0, max=1) 
-    node_colors_vector: bpy.props.FloatVectorProperty(name="Vector", subtype='COLOR', min=0, max=1) 
-    node_colors_converter: bpy.props.FloatVectorProperty(name="Converter", subtype='COLOR', min=0, max=1) 
-    node_colors_script: bpy.props.FloatVectorProperty(name="Script", subtype='COLOR', min=0, max=1) 
-    node_colors_filter: bpy.props.FloatVectorProperty(name="Filter", subtype='COLOR', min=0, max=1) 
-    node_colors_matte: bpy.props.FloatVectorProperty(name="Matte", subtype='COLOR', min=0, max=1) 
-    node_colors_distor: bpy.props.FloatVectorProperty(name="Distort", subtype='COLOR', min=0, max=1) 
-    node_colors_layout: bpy.props.FloatVectorProperty(name="Layout", subtype='COLOR', min=0, max=1) 
-    node_colors_attribute: bpy.props.FloatVectorProperty(name="Attribute", subtype='COLOR', min=0, max=1) 
-    node_colors_geometry: bpy.props.FloatVectorProperty(name="Geometry", subtype='COLOR', min=0, max=1) 
-    node_colors_group: bpy.props.FloatVectorProperty(name="Group", subtype='COLOR', min=0, max=1) 
-    node_colors_layout: bpy.props.FloatVectorProperty(name="Layout", subtype='COLOR', min=0, max=1) 
+    header_color_input:         bpy.props.FloatVectorProperty(name="Input",     subtype='COLOR', min=0, max=1) 
+    header_color_output:        bpy.props.FloatVectorProperty(name="Output",    subtype='COLOR', min=0, max=1) 
+    header_color_shader:        bpy.props.FloatVectorProperty(name="Shader",    subtype='COLOR', min=0, max=1) 
+    header_color_texture:       bpy.props.FloatVectorProperty(name="Texture",   subtype='COLOR', min=0, max=1) 
+    header_color_color:         bpy.props.FloatVectorProperty(name="Color",     subtype='COLOR', min=0, max=1) 
+    header_color_vector:        bpy.props.FloatVectorProperty(name="Vector",    subtype='COLOR', min=0, max=1) 
+    header_color_converter:     bpy.props.FloatVectorProperty(name="Converter", subtype='COLOR', min=0, max=1) 
+    header_color_script:        bpy.props.FloatVectorProperty(name="Script",    subtype='COLOR', min=0, max=1) 
+    header_color_filter:        bpy.props.FloatVectorProperty(name="Filter",    subtype='COLOR', min=0, max=1) 
+    header_color_matte:         bpy.props.FloatVectorProperty(name="Matte",     subtype='COLOR', min=0, max=1) 
+    header_color_distor:        bpy.props.FloatVectorProperty(name="Distort",   subtype='COLOR', min=0, max=1) 
+    header_color_layout:        bpy.props.FloatVectorProperty(name="Layout",    subtype='COLOR', min=0, max=1) 
+    header_color_attribute:     bpy.props.FloatVectorProperty(name="Attribute", subtype='COLOR', min=0, max=1) 
+    header_color_geometry:      bpy.props.FloatVectorProperty(name="Geometry",  subtype='COLOR', min=0, max=1) 
+    header_color_group:         bpy.props.FloatVectorProperty(name="Group",     subtype='COLOR', min=0, max=1) 
+    header_color_layout:        bpy.props.FloatVectorProperty(name="Layout",    subtype='COLOR', min=0, max=1)
 
     # opacity of header -- ADD HOVER INFO TO THIS
+    header_opacity: bpy.props.FloatProperty(name="Header Opacity", subtype='PERCENTAGE', min=0, max=100, default=HEADER_OPACITY)
+
+    # colors of nodes
+    node_color: bpy.props.FloatVectorProperty(name="Base Color", subtype='COLOR', min=0, max=1)
+
+
 
 
     # target file to export into
     output: bpy.props.StringProperty(name = "Output", subtype='FILE_PATH')
 
 def resetColors(prop_group, context):
+
+    theme = context.preferences.themes[0]
+
+    # theme.user_interace
+    prop_group.color_base = theme.node_editor.node_backdrop
+    prop_group.color_string_field = theme.user_interface.wcol_text.inner
+    prop_group.color_bool_false = theme.user_interface.wcol_option.inner
+    prop_group.color_bool_true = theme.user_interface.wcol_option.selected
+    prop_group.color_value_field = theme.user_interface.wcol_numslider.inner
+    prop_group.color_value_progress = theme.user_interface.wcol_numslider.item
+    prop_group.color_axis_x = theme.user_interface.axis_x
+    prop_group.color_axis_y = theme.user_interface.axis_y
+    prop_group.color_axis_z = theme.user_interface.axis_z
+    prop_group.color_text = theme.user_interface.wcol_regular.text
+
+    prop_group.header_opacity = HEADER_OPACITY
     for name in CATEGORY_NAMES:
-        setattr(prop_group, 'node_colors_'+name, getattr(context.preferences.themes[0].node_editor, name+'_node'))
+        setattr(prop_group, 'header_color_'+name, getattr(theme.node_editor, name+'_node'))
 
 class UIInspectOperator(bpy.types.Operator):
     bl_idname = "ui.inspector"
@@ -83,14 +119,6 @@ class UIExportOperator(bpy.types.Operator):
     
     def execute(self, context):
 
-        #SELECT_ALL = True
-
-        #nodes = bpy.context.selected_nodes
-
-        #if SELECT_ALL:
-        #    bpy.ops.node.select_all(action='INVERT')
-        #    nodes += bpy.context.selected_nodes
-        #    bpy.ops.node.select_all(action='INVERT')
 
         props = context.scene.export_svg_props
 
@@ -103,8 +131,9 @@ class UIExportOperator(bpy.types.Operator):
                          selected_only=props.export_selected_only,
                          use_default_colors=props.use_theme_colors,
                          custom_colors={
-                             name+'_node':getattr(props, 'node_colors_'+name) for name in CATEGORY_NAMES
-                         }
+                             name+'_node':getattr(props, 'header_color_'+name) for name in CATEGORY_NAMES
+                         },
+                         header_opacity=props.header_opacity
                          ).convert()
         
         with open(bpy.path.abspath(context.scene.export_svg_props.output), "w+") as f:
@@ -154,12 +183,14 @@ class UIColorPanel(UIPanel):
 
         layout.prop(props, 'use_theme_colors')
 
+
         # https://blender.stackexchange.com/questions/41387/how-to-deactivate-a-ui-element-in-an-add-on
-        for name in CATEGORY_NAMES:
+        for color_name in ['color_'+elem for elem in ELEMENTS]+['header_color_'+name for name in CATEGORY_NAMES]:
             row = layout.row()
-            row.prop(props, 'node_colors_'+name)
+            row.prop(props, color_name)
             row.enabled = not props.use_theme_colors
 
+        layout.prop(props, 'header_opacity')
 
         layout.operator(
             operator='ui.color_reset',
