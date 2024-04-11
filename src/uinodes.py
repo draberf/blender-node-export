@@ -133,8 +133,11 @@ SOCKET_WIDGET_DEFS = {
 
 def widgetFactory(socket) -> widgets.Widget:
     
-    if socket.is_output or socket.is_linked:
+    if socket.is_output:
         return widgets.Label(text=socket.name, alignment='R')
+
+    if socket.is_linked:
+        return widgets.Label(text=socket.name)
 
     return SOCKET_WIDGET_DEFS[socket.type](socket)
 
