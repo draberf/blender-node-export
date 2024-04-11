@@ -428,8 +428,6 @@ class UINode():
                 for widget in specification['props'](node):
                     if not widget: continue
                     register_widget(widget)
-        else:
-            register_widget(widgets.Placeholder())
 
         for in_socket in self.inputs:
             make_socket_widget(in_socket, False)
