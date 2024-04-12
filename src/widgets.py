@@ -30,10 +30,10 @@ class Widget():
             self.width = width
             attrib['x'] = str(x)
             
-        attrib['width'] = str(self.width)
-        attrib['height'] = str(self.height())
-        attrib['viewBox'] = f"0 0 {self.width} {self.height()}"
-        return ET.Element('svg', attrib=attrib)
+        #attrib['width'] = str(self.width)
+        #attrib['height'] = str(self.height())
+        attrib['transform'] = 'translate('+attrib['x']+','+('0' if not 'y' in attrib else attrib['y'])+')'
+        return ET.Element('g', attrib=attrib)
 
 class Empty(Widget):
 
