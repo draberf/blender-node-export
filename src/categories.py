@@ -2172,6 +2172,14 @@ node_specifications = {
         ],
         'name_behavior': lambda node: "Mix" if node.data_type != 'RGBA' else enumName(node, 'blend_type')
     },
+    'ShaderNodeMixRGB': {
+        'class': 'color_node',
+        'props': lambda node: [
+            dropdown(node, 'blend_type'),
+            widgets.Boolean(name="Clamp", value=node.use_clamp)
+        ],
+        'name_behavior': lambda node: enumName(node, 'blend_type')        
+    },
     'ShaderNodeRGBCurve': {
         'class': 'color_node',
         'props': lambda node: [
