@@ -374,8 +374,8 @@ class UINode():
             self.name = specification['name_behavior'](node)
         elif search(r'.[0-9]{3}$', self.name): self.name = self.name[:-4]
         self.w, self.h = node.dimensions
-        self.w *= constants.NODE_DIM_RATIO
-        self.h *= constants.NODE_DIM_RATIO
+        #self.w *= constants.NODE_DIM_RATIO
+        #self.h *= constants.NODE_DIM_RATIO
         self.x =  node.location[0]
         self.y = -node.location[1]
         if node.parent:
@@ -495,8 +495,8 @@ class UIFrameNode(UINode):
             self.name = node.label
 
         self.w, self.h = node.dimensions
-        self.w *= constants.NODE_DIM_RATIO
-        self.h *= constants.NODE_DIM_RATIO
+        #self.w *= constants.NODE_DIM_RATIO
+        #self.h *= constants.NODE_DIM_RATIO
         self.x =  node.location[0] - self.w/2 + 70.0
         self.y = -node.location[1] - self.h/2 + 50.0
         if node.parent:
