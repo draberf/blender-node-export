@@ -28,7 +28,7 @@ class ExportPropertyGroup(bpy.types.PropertyGroup):
     color_value_progress:   bpy.props.FloatVectorProperty(name="Progress Bar",  subtype='COLOR', min=0, max=1, size=4)
     color_axis_x:           bpy.props.FloatVectorProperty(name="Axis X",        subtype='COLOR', min=0, max=1, size=3)
     color_axis_y:           bpy.props.FloatVectorProperty(name="Axis Y",        subtype='COLOR', min=0, max=1, size=3)
-    color_axiz_z:           bpy.props.FloatVectorProperty(name="Axis Z",        subtype='COLOR', min=0, max=1, size=3)
+    color_axis_z:           bpy.props.FloatVectorProperty(name="Axis Z",        subtype='COLOR', min=0, max=1, size=3)
     color_text:             bpy.props.FloatVectorProperty(name="Text",          subtype='COLOR', min=0, max=1, size=3)
 
     # colors of node headers
