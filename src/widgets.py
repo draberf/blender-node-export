@@ -15,7 +15,7 @@ class Widget():
     css_classname = 'widget'
     
     def __init__(self, id_prefix='') -> None:
-        self.id = __class__.css_classname
+        self.id = self.css_classname
 
     def prepend_id(self, prefix) -> 'Widget':
         self.id = prefix + '_' + self.id
@@ -33,8 +33,16 @@ class Widget():
         elem = ET.Element('g', id=self.id)
         clip_id = self.id+'_clip'
         g_id = self.id+'_g'
-        ET.SubElement(elem, 'clipPath', id=clip_id)
-        g = ET.SubElement(elem, 'g', id=g_id, attrib={'clip-path', f'url(#{clip_id})'})
+        clip = ET.SubElement(elem, 'clipPath', id=clip_id)
+        ET.SubElement(clip, 'rect', attrib={
+            'x':'0',
+            'y':'0',
+            'width':str(width),
+            'height':str(self.height())
+        })
+        g = ET.SubElement(elem, 'g', id=g_id, attrib={
+            'clip-path': f'url(#{clip_id})'
+            })
         self.fill_svg(g, width=width)
         elem.set('transform',f'translate({x},{y})')
         return elem
@@ -125,7 +133,7 @@ class Boolean(Widget):
             rect.set('fill', '#222222')
 
         # add nameplate (svg offset by button width)
-        elem.append(Label(text=self.name).prepend_id(self.id).svg(width=self.width-constants.LINKED_SOCKET_HEIGHT, x=constants.LINKED_SOCKET_HEIGHT))
+        elem.append(Label(text=self.name).prepend_id(self.id).svg(width=width-constants.LINKED_SOCKET_HEIGHT, x=constants.LINKED_SOCKET_HEIGHT))
 
 class Columns(Widget):
     
@@ -199,17 +207,17 @@ class Value(Widget):
                 ET.SubElement(elem, 'rect', attrib={
                     'x': '0',
                     'y': '0',
-                    'width': str(self.width*proportion),
+                    'width': str(width*proportion),
                     'height': str(self.height()),
                     'class': 'progress_bar'
                 })
 
         # label
         if not self.name:
-            elem.append(Label(str(self.value), alignment='C').prepend_id(self.id).svg(width=self.width-2*PADDING, x=PADDING, resize=False))
+            elem.append(Label(str(self.value), alignment='C').prepend_id(self.id).svg(width=width-2*PADDING, x=PADDING, resize=False))
         else:
-            elem.append(Label(self.name).prepend_id(self.id).svg(width=(self.width/2.0)-PADDING, x=PADDING, resize=False))
-            elem.append(Label(str(self.value), alignment='R').prepend_id(self.id).svg(width=(self.width/2.0)-PADDING, x=self.width/2.0, resize=False))
+            elem.append(Label(self.name).prepend_id(self.id).svg(width=(width/2.0)-PADDING, x=PADDING, resize=False))
+            elem.append(Label(str(self.value), alignment='R').prepend_id(self.id).svg(width=(width/2.0)-PADDING, x=width/2.0, resize=False))
 
 class Float(Value):
 
@@ -253,7 +261,7 @@ class Vector(Widget):
 
         elem.append(Label(text=self.name).prepend_id(self.id).svg(width=width, resize=False))
         for i, value in enumerate(self.values):
-            elem.append(Float(value=value).prepend_id(self.id).svg(width=width, attrib={'y':str((i+1)*constants.LINKED_SOCKET_HEIGHT)}, resize=False))
+            elem.append(Float(value=value).prepend_id(self.id).svg(width=width, y=(i+1)*constants.LINKED_SOCKET_HEIGHT, resize=False))
         
 class LabeledDropdown(Widget):
 
@@ -272,7 +280,7 @@ class LabeledDropdown(Widget):
     
     def fill_svg(self, elem, width=DEFAULT_WIDTH):
 
-        widths = [max(0.25*self.width, self.MIN_LABEL_WIDTH), min(0.75*width, width-self.MIN_LABEL_WIDTH)]
+        widths = [max(0.25*width, self.MIN_LABEL_WIDTH), min(0.75*width, width-self.MIN_LABEL_WIDTH)]
 
         elem.append(Label(self.name).prepend_id(self.id).svg(width=widths[0], resize=False))
         elem.append(Dropdown(self.value).prepend_id(self.id).svg(width=widths[1], x=widths[0], resize=False))
@@ -350,7 +358,7 @@ class SelectBar(Widget):
     
     def fill_svg(self, elem, width=DEFAULT_WIDTH):
         
-        w = self.width/len(self.options)
+        w = width/len(self.options)
         for i, opt in enumerate(self.options):
             color = '#545454' if i != self.select_index else '#7777dd'
             rect = ET.SubElement(elem, 'rect')
@@ -415,27 +423,26 @@ class Ramp(Widget):
     def height(self):
         return 3*constants.LINKED_SOCKET_HEIGHT
     
-    def svg(self, width=DEFAULT_WIDTH, attrib={}, x=0, resize=True) -> ET.Element:
-        grp = super().svg(width, attrib, x, resize)
+    def fill_svg(self, elem, width=DEFAULT_WIDTH) -> ET.Element:
 
-        grp.append(
+        elem.append(
             Columns(wids=[
                 Empty(),
                 Empty(),
                 Dropdown(value=self.color_mode),
                 Dropdown(value=self.interpolation),
-            ], resize_override=False).svg(width=self.width, resize=False)
+            ], resize_override=False).prepend_id(self.id).svg(width=width, resize=False)
         )
 
         if self.use_gradient: ...
 
-        bar_width = self.width/(len(self.evals)-1)
+        bar_width =width/(len(self.evals)-1)
 
         for i, (start, _) in enumerate(zip(self.evals[:-1], self.evals[1:])):
             x_start = i * bar_width
 
             color_string = str(socketColorToSVGColor(start))
-            ET.SubElement(grp, 'rect', attrib={
+            ET.SubElement(elem, 'rect', attrib={
                 'x':str(x_start),
                 'y':str(self.height()/3.0 + constants.SOCKET_GAP),
                 'width':str(bar_width),
@@ -444,7 +451,7 @@ class Ramp(Widget):
             })
 
         for x, color in self.stops:
-            g = ET.SubElement(grp, 'g', attrib={'transform': f'translate({x*self.width-5}, {2*self.height()/3 - 2})'})
+            g = ET.SubElement(elem, 'g', attrib={'transform': f'translate({x*width-5}, {2*self.height()/3 - 2})'})
             ET.SubElement(g, 'polygon', attrib={
                 'points': ' '.join([str(n) for n in [
                     5,  0,
@@ -462,8 +469,6 @@ class Ramp(Widget):
                 'height': '5',
                 'style':f'fill:{socketColorToSVGColor(color)};stroke:black;stroke-width:0.2'
             })
-
-        return grp
 
 
 class Texture(Placeholder):
@@ -486,26 +491,24 @@ class String(Widget):
     def height(self):
         return constants.LINKED_SOCKET_HEIGHT
     
-    def svg(self, width=DEFAULT_WIDTH, attrib={}, x=0, resize=True) -> ET.Element:
-        grp = super().svg(width, attrib, x, resize)
+    def fill_svg(self, elem, width=DEFAULT_WIDTH) -> ET.Element:
 
         if self.name:
-            grp.append(FortySixty(wids=[
+            elem.append(FortySixty(wids=[
                 Label(text=self.name),
                 String(self.value)
-            ], resize_override=False).svg(width=self.width, resize=False))
+            ], resize_override=False).prepend_id(self.id).svg(width=width, resize=False))
         else:
-            rect = ET.SubElement(grp, 'rect', attrib={
+            rect = ET.SubElement(elem, 'rect', attrib={
                 'x': '0',
                 'y': '0',
-                'width': str(self.width),
+                'width': str(width),
                 'height': str(self.height()),
                 'style': 'fill:black'
             })
             
-            grp.append(Label(text=self.value).svg(width=self.width))
+            elem.append(Label(text=self.value).prepend_id(self.id).svg(width=width))
 
-        return grp
 
 class IES(String):
     ...
