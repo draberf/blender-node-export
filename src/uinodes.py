@@ -253,7 +253,7 @@ class Converter():
 
         ## color wheel
         color_wheel = ET.SubElement(defs, 'symbol', id='color_wheel')
-        grp = ET.SubElement(color_wheel, 'svg', viewBox='-50 -50 100 100', width='90', height='90')
+        grp = ET.SubElement(color_wheel, 'g', transform='scale(0.6,0.6)')
         steps=24
         def angleToCoords(angle, radius):
             return radius*cos(angle), radius*sin(angle)
@@ -386,6 +386,9 @@ class UINode():
 
         self.muted = node.mute
         
+        # for identifying widgets
+        self.id = node.name
+
 
         self.anchors = {}
 
@@ -440,7 +443,7 @@ class UINode():
 
 
     def svg(self, header_opacity=60) -> ET.Element:
-        group = ET.Element('svg', x=f"{self.x}", y=f"{self.y}", width=str(self.w), height=str(self.h), viewBox=f"0 0 {self.w} {self.h}")
+        group = ET.Element('g', transform=f'translate({self.x},{self.y})', id=f'{self.id}')
         if self.muted: group.set('opacity', '50%')
         
         # frame
@@ -451,12 +454,12 @@ class UINode():
         group.append(self.uiheader.svg(opacity=header_opacity))
 
         # new widgets rendering
-        group.extend([widget.svg(width=self.w, attrib={'y':str(height)}) for height, widget in self.height_widget_pairs])
+        group.extend([widget.prepend_id(f'{self.id}_{str(i)}').svg(width=self.w, y=height) for i, (height, widget) in enumerate(self.height_widget_pairs)])
 
         return group
 
     def frame(self) -> ET.Element:
-        frame_items = ET.Element('svg')
+        frame_items = ET.Element('g')
 
         bg = ET.Element('rect', width=f"{self.w}", height=f"{self.h}")
         bg.set('class', 'nodeframe')
@@ -529,7 +532,7 @@ class UIFrameNode(UINode):
 
 
     def svg(self) -> ET.Element:
-        group = ET.Element('svg', x=f"{self.x}", y=f"{self.y}", width=str(self.w), height=str(self.h), viewBox=f"0 0 {self.w} {self.h}")
+        group = ET.Element('g', transform=f'translate({self.x},{self.y})')
         
         ET.SubElement(group, 'rect', attrib={
             'x': '0',
@@ -589,9 +592,9 @@ class UIShape():
         self.color = constants.SOCKET_COLORS[socket.type]
         self.render = render
 
-    def svg(self, **kwargs):
+    def svg(self, x=0, y=0):
         if not self.render: return None
-        group = ET.Element('svg', attrib=kwargs)
+        group = ET.Element('g', transform=f'translate({x},{y})')
 
         ET.SubElement(group, 'use', href=f'#marker_{self.shape}', fill=self.color)
         if self.has_dot: ET.SubElement(group, 'use', href='#marker_dot', fill='black', stroke='none')
