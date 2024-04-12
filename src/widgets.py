@@ -14,56 +14,52 @@ class Widget():
     
     css_classname = 'widget'
     
-    def __init__(self) -> None:
-        ...
+    def __init__(self, id_prefix='') -> None:
+        self.id = __class__.css_classname
+
+    def prepend_id(self, prefix) -> 'Widget':
+        self.id = prefix + '_' + self.id
+        return self
     
     def height(self) -> float:
         return 0.0
 
-    def svg(self, width=DEFAULT_WIDTH, attrib={}, x=0, resize=True) -> ET.Element:
-        attrib['class'] = self.__class__.css_classname
-        self.width = width*(1-2*DEFAULT_PADDING) if resize else width
+    def fill_svg(self, elem, width=0) -> None:
+        return
+
+    def svg(self, x=0, y=0, width=0, resize=True) -> ET.Element:
         if resize:
-            self.width = width*(1-2*DEFAULT_PADDING)
-            attrib['x'] = str(x+width*DEFAULT_PADDING)
-        else:
-            self.width = width
-            attrib['x'] = str(x)
-            
-        #attrib['width'] = str(self.width)
-        #attrib['height'] = str(self.height())
-        attrib['transform'] = 'translate('+attrib['x']+','+('0' if not 'y' in attrib else attrib['y'])+')'
-        return ET.Element('g', attrib=attrib)
+            return self.svg(x=x+DEFAULT_PADDING*width, y=y, width=(1-2*DEFAULT_PADDING)*width, resize=False)
+        elem = ET.Element('g', id=self.id)
+        clip_id = self.id+'_clip'
+        g_id = self.id+'_g'
+        ET.SubElement(elem, 'clipPath', id=clip_id)
+        g = ET.SubElement(elem, 'g', id=g_id, attrib={'clip-path', f'url(#{clip_id})'})
+        self.fill_svg(g, width=width)
+        elem.set('transform',f'translate({x},{y})')
+        return elem
 
 class Empty(Widget):
-
-    def height(self) -> float:
-        return 0
-    
-    def svg(self, width=DEFAULT_WIDTH, attrib={}, **_) -> ET.Element:
-        return super().svg(width=width, attrib=attrib)
+    ...    
 
 class Placeholder(Widget):
     
     css_classname = 'placeholder'
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **_) -> None:
         super().__init__()
 
     def height(self) -> float:
         return 4*constants.LINKED_SOCKET_HEIGHT
     
-    def svg(self, width=DEFAULT_WIDTH, attrib={}, **kwargs) -> ET.Element:
-        grp = super().svg(width=width, attrib=attrib, **kwargs)
-        rect = ET.SubElement(grp, 'rect', x='0',   y ='0', width=str(self.width), height=str(self.height()))
-        line1 = ET.SubElement(grp, 'line', x1='0', y1='0', x2=str(self.width), y2=str(self.height()))
-        line2 = ET.SubElement(grp, 'line', x1='0', y1=str(self.height()), x2=str(self.width), y2='0')
+    def fill_svg(self, elem, width=0) -> ET.Element:
+        rect = ET.SubElement(elem, 'rect', x='0',   y ='0', width=str(width), height=str(self.height()))
+        line1 = ET.SubElement(elem, 'line', x1='0', y1='0', x2=str(width), y2=str(self.height()))
+        line2 = ET.SubElement(elem, 'line', x1='0', y1=str(self.height()), x2=str(width), y2='0')
         for elem in [rect, line1, line2]:        
             elem.set('fill', 'none')
             elem.set('stroke', '#cccccc')
             elem.set('stroke-width', '0.5')
-        return grp
-
 
 class Label(Widget):
 
@@ -80,20 +76,18 @@ class Label(Widget):
     def height(self) -> float:
         return constants.LINKED_SOCKET_HEIGHT
 
-    def svg(self, width=DEFAULT_WIDTH, attrib={}, **kwargs) -> ET.Element:
-        grp = super().svg(width=width, attrib=attrib, **kwargs)
-        label = ET.SubElement(grp, 'text', y=str(constants.SOCKET_TEXT_HEIGHT))
+    def fill_svg(self, elem, width=0) -> ET.Element:        
+        label = ET.SubElement(elem, 'text', y=str(constants.SOCKET_TEXT_HEIGHT))
         label.text = self.text
         match self.alignment:
             case 'L':
                 label.set('x', '0')
             case 'C' | 'M':
                 label.set('text-anchor', 'middle')
-                label.set('x', str(self.width/2.0))
+                label.set('x', str(width/2.0))
             case 'R':
                 label.set('text-anchor', 'end')
-                label.set('x', str(self.width))
-        return grp
+                label.set('x', str(width))
     
 class Boolean(Widget):
 
@@ -108,21 +102,21 @@ class Boolean(Widget):
     def height(self) -> ET.Element:
         return constants.LINKED_SOCKET_HEIGHT
 
-    def svg(self, width=DEFAULT_WIDTH, attrib={}, **kwargs) -> ET.Element:
-        grp = super().svg(width, attrib, **kwargs)
+    def fill_svg(self, elem, width=0) -> ET.Element:
 
         # add rectangle for checkbox
-        rect = ET.SubElement(grp, 'rect')
-        rect.set('x', str(constants.LINKED_SOCKET_HEIGHT*0.2))
-        rect.set('y', str(constants.LINKED_SOCKET_HEIGHT*0.2))
-        rect.set('width',  str(constants.LINKED_SOCKET_HEIGHT*0.6))
-        rect.set('height', str(constants.LINKED_SOCKET_HEIGHT*0.6))
-        rect.set('stroke', 'none')
+        rect = ET.SubElement(elem, 'rect', attrib={
+            'x':        str(constants.LINKED_SOCKET_HEIGHT*0.2),
+            'y':        str(constants.LINKED_SOCKET_HEIGHT*0.2),
+            'width':    str(constants.LINKED_SOCKET_HEIGHT*0.6),
+            'height':   str(constants.LINKED_SOCKET_HEIGHT*0.6),
+            'stroke':   'none'
+        })
 
         # add value to rectangle, draw checkmark
         if self.value:
             rect.set('fill', '#7777dd')
-            check = ET.SubElement(grp,'polyline', fill='none', stroke='white')
+            check = ET.SubElement(elem,'polyline', fill='none', stroke='white')
             check.set('stroke-width', "1")
             check.set('points', f"{constants.LINKED_SOCKET_HEIGHT*0.4}, {constants.LINKED_SOCKET_HEIGHT*0.5},\
                       {constants.LINKED_SOCKET_HEIGHT*0.5}, {constants.LINKED_SOCKET_HEIGHT*0.6},\
@@ -131,34 +125,37 @@ class Boolean(Widget):
             rect.set('fill', '#222222')
 
         # add nameplate (svg offset by button width)
-        grp.append(Label(text=self.name).svg(width=self.width-constants.LINKED_SOCKET_HEIGHT, x=constants.LINKED_SOCKET_HEIGHT))
-        return grp
+        elem.append(Label(text=self.name).prepend_id(self.id).svg(width=self.width-constants.LINKED_SOCKET_HEIGHT, x=constants.LINKED_SOCKET_HEIGHT))
 
 class Columns(Widget):
     
     css_classname = 'columns'
     
     def __init__(self, wids=[], ratios=[], resize_override=True) -> None:
-        self.elems = wids
-        self.resize_override = resize_override
         super().__init__()
+        self.wids = wids
+        self.resize_override = resize_override
 
         self.ratio_sum = sum(ratios)
         self.ratios = ratios
 
+    def prepend_id(self, prefix) -> Widget:
+        self.id = prefix + '_' + self.id
+        for i, wid in enumerate(self.wids):
+            wid.prepend_id(self.id+'_col'+str(i))
+        return self
+
     def height(self) -> float:
-        return max([elem.height() for elem in self.elems])
+        return max([elem.height() for elem in self.wids])
 
-    def svg(self, width=DEFAULT_WIDTH, attrib={}, **kwargs) -> ET.Element:
+    def fill_svg(self, elem, width=DEFAULT_WIDTH) -> ET.Element:
 
-        grp = super().svg(width=width, attrib=attrib, **kwargs)
-        col_width = self.width/len(self.elems)
+        col_width = width/len(self.wids)
         offset=0.0
-        for i, elem in enumerate(self.elems):
-            elem_width = col_width if not self.ratios else self.width*self.ratios[i]/self.ratio_sum
-            grp.append(elem.svg(width=elem_width, x=offset, resize=self.resize_override))
-            offset += elem_width
-        return grp
+        for i, wid in enumerate(self.wids):
+            widget_width = col_width if not self.ratios else width*self.ratios[i]/self.ratio_sum
+            elem.append(wid.svg(width=widget_width, x=offset, resize=self.resize_override))
+            offset += widget_width
 
 class FortySixty(Columns):
 
@@ -181,45 +178,38 @@ class Value(Widget):
     def height(self):
         return constants.LINKED_SOCKET_HEIGHT
 
-    def svg(self, width=DEFAULT_WIDTH, attrib={}, **kwargs):
-        grp = super().svg(width=width, attrib=attrib, **kwargs)
+    def fill_svg(self, elem, width=DEFAULT_WIDTH):
 
         PADDING = 15.0
 
-        rect = ET.SubElement(grp, 'rect', attrib={
+        rect = ET.SubElement(elem, 'rect', attrib={
             'x': '0',
             'y': '0',
-            'width': str(self.width),
+            'width': str(width),
             'height': str(self.height()),
-            'style': 'fill:#545454'
+            'class': 'value_bar'
         })
 
         # progressive paint in
         if self.minmax:
             lo, hi = self.minmax
             proportion = (float(self.value)-lo)/(hi-lo)
-            if proportion >= 1.0: rect.set('style', 'fill:#7777dd')
+            if proportion >= 1.0: rect.set('class', 'progress_bar')
             elif proportion >= 0.0:
-                ET.SubElement(grp, 'rect', attrib={
+                ET.SubElement(elem, 'rect', attrib={
                     'x': '0',
                     'y': '0',
                     'width': str(self.width*proportion),
                     'height': str(self.height()),
-                    'style': 'fill:#7777dd'
+                    'class': 'progress_bar'
                 })
 
         # label
         if not self.name:
-            grp.append(Label(str(self.value), alignment='C').svg(width=self.width-2*PADDING, x=PADDING, resize=False))
+            elem.append(Label(str(self.value), alignment='C').prepend_id(self.id).svg(width=self.width-2*PADDING, x=PADDING, resize=False))
         else:
-            grp.append(Label(self.name).svg(width=(self.width/2.0)-PADDING, x=PADDING, resize=False))
-            grp.append(Label(str(self.value), alignment='R').svg(width=(self.width/2.0)-PADDING, x=self.width/2.0, resize=False))
-
-        # arrows
-        #ET.SubElement(grp, 'use', href='#left_arrow',  x='3', y=str(self.height()/2.0-5.0))
-        #ET.SubElement(grp, 'use', href='#right_arrow', x=str(self.width-13.0), y=str(self.height()/2.0-5.0))
-
-        return grp
+            elem.append(Label(self.name).prepend_id(self.id).svg(width=(self.width/2.0)-PADDING, x=PADDING, resize=False))
+            elem.append(Label(str(self.value), alignment='R').prepend_id(self.id).svg(width=(self.width/2.0)-PADDING, x=self.width/2.0, resize=False))
 
 class Float(Value):
 
@@ -238,16 +228,14 @@ class RGBA(Widget):
     def height(self):
         return constants.LINKED_SOCKET_HEIGHT
 
-    def svg(self, width=DEFAULT_WIDTH, attrib={}, **kwargs) -> ET.Element:
-        grp = super().svg(width, attrib=attrib, **kwargs)
-        color_rect = ET.SubElement(grp, 'rect')
+    def fill_svg(self, elem, width=DEFAULT_WIDTH) -> ET.Element:
+        color_rect = ET.SubElement(elem, 'rect')
         color_rect.set('x', '0')
         color_rect.set('y', '0')
         color_rect.set('width', str(width))
         color_rect.set('height', str(self.height()))
         color_rect.set('style', 'stroke-width: 0')
         color_rect.set('fill', self.color)
-        return grp
     
 class Vector(Widget):
 
@@ -261,15 +249,12 @@ class Vector(Widget):
     def height(self):
         return 4*constants.LINKED_SOCKET_HEIGHT
     
-    def svg(self, width=DEFAULT_WIDTH, attrib={}, **kwargs) -> ET.Element:
-        grp = super().svg(width=width, attrib=attrib, **kwargs)
+    def fill_svg(self, elem, width=DEFAULT_WIDTH) -> ET.Element:
 
-        grp.append(Label(text=self.name).svg(width=self.width, resize=False))
+        elem.append(Label(text=self.name).prepend_id(self.id).svg(width=width, resize=False))
         for i, value in enumerate(self.values):
-            grp.append(Float(value=value).svg(width=self.width, attrib={'y':str((i+1)*constants.LINKED_SOCKET_HEIGHT)}, resize=False))
+            elem.append(Float(value=value).prepend_id(self.id).svg(width=width, attrib={'y':str((i+1)*constants.LINKED_SOCKET_HEIGHT)}, resize=False))
         
-        return grp
-
 class LabeledDropdown(Widget):
 
     css_classname = 'columns'
@@ -285,15 +270,12 @@ class LabeledDropdown(Widget):
     def height(self):
         return constants.LINKED_SOCKET_HEIGHT
     
-    def svg(self, width=DEFAULT_WIDTH, attrib={}, **kwargs):
-        grp = super().svg(width=width, attrib=attrib, **kwargs)
+    def fill_svg(self, elem, width=DEFAULT_WIDTH):
 
-        widths = [max(0.25*self.width, self.MIN_LABEL_WIDTH), min(0.75*self.width, self.width-self.MIN_LABEL_WIDTH)]
+        widths = [max(0.25*self.width, self.MIN_LABEL_WIDTH), min(0.75*width, width-self.MIN_LABEL_WIDTH)]
 
-        grp.append(Label(self.name).svg(width=widths[0], resize=False))
-        grp.append(Dropdown(self.value).svg(width=widths[1], x=widths[0], resize=False))
-
-        return grp
+        elem.append(Label(self.name).prepend_id(self.id).svg(width=widths[0], resize=False))
+        elem.append(Dropdown(self.value).prepend_id(self.id).svg(width=widths[1], x=widths[0], resize=False))
 
 class Dropdown(Widget):
 
@@ -307,18 +289,15 @@ class Dropdown(Widget):
     def height(self):
         return constants.LINKED_SOCKET_HEIGHT
     
-    def svg(self, width=DEFAULT_WIDTH, attrib={}, **kwargs):
-        grp = super().svg(width=width, attrib=attrib, **kwargs)
+    def fill_svg(self, elem, width=DEFAULT_WIDTH):
 
-        rect = ET.SubElement(grp, 'rect',
+        ET.SubElement(elem, 'rect',
                       x='0', y='0',
-                      width=str(self.width), height=str(self.height()))
+                      width=str(width), height=str(self.height()))
 
-        vee = ET.SubElement(grp, 'use', href='#down_arrow', x=str(self.width-20.0), y=str(self.height()/2.0-6.0))
+        ET.SubElement(elem, 'use', href='#down_arrow', x=str(width-20.0), y=str(self.height()/2.0-6.0))
         
-        grp.append(Label(text=self.value).svg(width=self.width))
-
-        return grp
+        elem.append(Label(text=self.value).prepend_id(self.id).svg(width=width))
 
 class ColorPicker(Widget):
     
@@ -329,19 +308,18 @@ class ColorPicker(Widget):
     def height(self) -> float:
         return 90.0
     
-    def svg(self, width=DEFAULT_WIDTH, attrib={}, **kwargs) -> ET.Element:
-        grp = super().svg(width, attrib, **kwargs)
+    def fill_svg(self, elem, width=DEFAULT_WIDTH) -> ET.Element:
 
-        defs = ET.SubElement(grp, 'defs')
+        defs = ET.SubElement(elem, 'defs')
         grad = ET.SubElement(defs, 'linearGradient', id='vertical_grad', x1='0', x2='0', y1='0', y2='1')
         ET.SubElement(grad, 'stop', attrib={'offset':  '0%', 'stop-color':'white'})
         ET.SubElement(grad, 'stop', attrib={'offset':'100%', 'stop-color':'black'})
 
-        wheel_offset = (self.width-10.0)/2.0-45.0
-        bar_offset = self.width-10.0
+        wheel_offset = (width-10.0)/2.0-45.0
+        bar_offset = width-10.0
 
-        ET.SubElement(grp, 'use', href='#color_wheel', x=str(wheel_offset), y='0')
-        ET.SubElement(grp, 'rect', x=str(bar_offset), y='0', width='10.0', height=str(self.height()), style='fill:url(#vertical_grad)')
+        ET.SubElement(elem, 'use', href='#color_wheel', x=str(wheel_offset), y='0')
+        ET.SubElement(elem, 'rect', x=str(bar_offset), y='0', width='10.0', height=str(self.height()), style='fill:url(#vertical_grad)')
 
         r, g, b = self.color[:3]
         h, s, v = rgb_to_hsv(r, g, b)
@@ -350,17 +328,12 @@ class ColorPicker(Widget):
         polar = polarToCartesian(s, (h-0.75)*2*pi)
         x = wheel_offset + 45.0 + polar[0]*45.0
         y = 45.0 + polar[1]*45.0
-        ET.SubElement(grp, 'circle', cx=str(x), cy=str(y), r='2', style='fill:white; stroke:black; stroke-width:0.5')
+        ET.SubElement(elem, 'circle', cx=str(x), cy=str(y), r='2', style='fill:white; stroke:black; stroke-width:0.5')
 
         # marker on bar
         x = bar_offset + 5.0
         y = 90.0*(1.0-v)
-        ET.SubElement(grp, 'circle', cx=str(x), cy=str(y), r='2', style='fill:white; stroke:black; stroke-width:0.5')
-
-        # marker on bar
-
-
-        return grp
+        ET.SubElement(elem, 'circle', cx=str(x), cy=str(y), r='2', style='fill:white; stroke:black; stroke-width:0.5')
 
 
 class SelectBar(Widget):
@@ -375,28 +348,20 @@ class SelectBar(Widget):
     def height(self):
         return constants.LINKED_SOCKET_HEIGHT
     
-    def svg(self, width=DEFAULT_WIDTH, attrib={}, **kwargs):
-        grp = super().svg(width=width, attrib=attrib, **kwargs)
+    def fill_svg(self, elem, width=DEFAULT_WIDTH):
         
         w = self.width/len(self.options)
         for i, opt in enumerate(self.options):
             color = '#545454' if i != self.select_index else '#7777dd'
-            rect = ET.SubElement(grp, 'rect')
+            rect = ET.SubElement(elem, 'rect')
             rect.set('x', str(i*w))
             rect.set('y', '0')
             rect.set('width', str(w))
             rect.set('height', str(self.height()))
             rect.set('style', f"fill:{color}")
             
-            grp.append(Label(opt, alignment='C').svg(width=w, x=i*w))
+            elem.append(Label(opt, alignment='C').prepend_id(self.id+'_'+str(i)).svg(width=w, x=i*w))
         
-        return grp
-
-
-class FloatFac(Placeholder):
-    ...
-
-
 
 class Curves(Widget):
     
@@ -408,37 +373,34 @@ class Curves(Widget):
     def height(self) -> float:
         return 8 * constants.LINKED_SOCKET_HEIGHT
     
-    def svg(self, width=DEFAULT_WIDTH, attrib={}, x=0, resize=True) -> ET.Element:
-        grp = super().svg(width, attrib, x, resize)
+    def fill_svg(self, elem, width=DEFAULT_WIDTH) -> ET.Element:
 
-        rect = ET.SubElement(grp, 'rect', attrib={
+        ET.SubElement(elem, 'rect', attrib={
             'x':'0',
             'y':'0',
-            'width':str(self.width),
+            'width':str(width),
             'height':str(self.height()),
             'style':'fill:url(#hc_grad)' if self.hue_background else 'fill:#545454'
         })
 
         for color, point_pairs, infill in self.curves:
             max_y = max(y for _, y in point_pairs)
-            points = [(x*self.width, (max_y-y)*self.height()) for x, y in point_pairs]
+            points = [(x*width, (max_y-y)*self.height()) for x, y in point_pairs]
             stroke = 'none' if infill else color
             fill =   color if infill else 'none'
-            if infill: points.extend([(self.width,self.height()),(0, self.height())])
-            line = ET.SubElement(grp, 'polyline' if not infill else 'polygon', attrib={
+            if infill: points.extend([(width, self.height()),(0, self.height())])
+            ET.SubElement(elem, 'polyline' if not infill else 'polygon', attrib={
                 'points':(' '.join([f'{x} {y}' for x, y in points])),
                 'style':f'stroke-width:1; stroke:{stroke}; fill:{fill}'
             })
         
-        frame = ET.SubElement(grp, 'rect', attrib={
+        ET.SubElement(elem, 'rect', attrib={
             'x':'0',
             'y':'0',
-            'width':str(self.width),
+            'width':str(width),
             'height':str(self.height()),
             'style':'fill:none; stroke:white; stroke-width:1'
         })
-
-        return grp
 
 class Ramp(Widget):
     
