@@ -1,5 +1,6 @@
 import mathutils
 import cmath
+import bpy
 from math import sqrt
 
 from .constants import HEADER_OPACITY, CATEGORY_NAMES
@@ -11,8 +12,24 @@ def blColorToSVGColor(color: mathutils.Color) -> str:
     # compliant with specification at p85
     return "rgb("+",".join([str(round(x*255)) for x in [r,g,b]])+")"
 
-def socketColorToSVGColor(color: list[float]) -> str:
-    return "rgb("+",".join([str(round(x*255)) for x in color[:3]])+")"
+# from https://github.com/blender/blender/blob/594f47ecd2d5367ca936cf6fc6ec8168c2b360d0/source/blender/blenlib/intern/math_color.c
+def colorCorrect(value: float) -> float:
+    if bpy.data.scenes[0].display_settings.display_device == 'sRGB': return linearRGBtoSRGB(value)
+    return value
+
+def linearRGBtoSRGB(value: float) -> float:
+  if value < 0.0031308:
+    return 0.0 if value < 0.0 else value * 12.92
+
+  return 1.055 * value**(1.0 / 2.4) - 0.055
+
+
+def socketColorToSVGColor(color: list[float], corrected=True) -> str:
+    if corrected:
+        return "rgb("+",".join([str(round(x*255)) for x in color[:3]])+")"
+    
+    return "rgb("+",".join([str(round(colorCorrect(x)*255)) for x in color[:3]])+")"
+    
 
 def enumName(node, enum_name):
     return node.bl_rna.properties[enum_name].enum_items[getattr(node, enum_name)].name
