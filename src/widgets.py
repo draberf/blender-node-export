@@ -265,7 +265,7 @@ class Vector(Widget):
         
 class LabeledDropdown(Widget):
 
-    css_classname = 'columns'
+    css_classname = 'labeled_dropdown'
 
     MIN_LABEL_WIDTH = 40
 
