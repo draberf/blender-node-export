@@ -1,7 +1,7 @@
 # node.name -- needs to remove .### in case of multiple nodes
 
 from . import widgets
-from .methods import socketColorToSVGColor, enumName, getFloatString
+from .methods import socketColorToSVGColor, enumName, getFloatString, colorCorrect
 from .constants import IGNORE_PROPS, CATEGORY_NAMES
 
 
@@ -195,8 +195,8 @@ node_specifications = {
     'CompositorNodeRGB': {
         'class': 'input_node',
         'props': lambda node: [
-            widgets.ColorPicker(color=node.outputs[0].default_value),
-            widgets.RGBA(color=socketColorToSVGColor(node.outputs[0].default_value))
+            widgets.ColorPicker(color=[colorCorrect(x) for x in node.outputs[0].default_value]),
+            widgets.RGBA(color=socketColorToSVGColor(node.outputs[0].default_value, corrected=False))
         ]
     },
     'CompositorNodeSceneTime': {
@@ -1228,8 +1228,8 @@ node_specifications = {
     'FunctionNodeInputColor': {
         'class': 'input_node',
         'props': lambda node: [
-            widgets.ColorPicker(color=node.outputs[0].default_value),
-            widgets.RGBA(color=socketColorToSVGColor(node.outputs[0].default_value))
+            widgets.ColorPicker(color=[colorCorrect(x) for x in node.outputs[0].default_value]),
+            widgets.RGBA(color=socketColorToSVGColor(node.outputs[0].default_value, corrected=False))
         ]
     },
     'FunctionNodeInputInt': {
@@ -1803,8 +1803,8 @@ node_specifications = {
     'ShaderNodeRGB': {
         'class': 'input_node',
         'props': lambda node: [
-            widgets.ColorPicker(color=node.outputs[0].default_value),
-            widgets.RGBA(color=socketColorToSVGColor(node.outputs[0].default_value))
+            widgets.ColorPicker(color=[colorCorrect(x) for x in node.outputs[0].default_value]),
+            widgets.RGBA(color=socketColorToSVGColor(node.outputs[0].default_value, corrected=False))
         ]
     },
     'ShaderNodeTangent': {
