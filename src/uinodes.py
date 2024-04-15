@@ -381,7 +381,7 @@ class UINode():
         self.muted = node.mute
         
         # for identifying widgets
-        self.id = node.name
+        self.id = node.name.replace(' ', '_')
 
 
         self.anchors = {}
