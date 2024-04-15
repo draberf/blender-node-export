@@ -98,9 +98,21 @@ class UIInspectOperator(bpy.types.Operator):
         for node in nodes:
 
             print(">>>", node.bl_idname, node.name)
-            #print("Sockets:")
+            print("Inputs:")
+            for input in node.outputs:
+                print(">", input.name)
+                if input.type == 'RGBA':
+                    for prop in input.bl_rna.properties:
+                        print(">>>", prop, prop.type, prop.subtype, "name", prop.name)
+                        
             for input in node.inputs:
                 print(">", input.name)
+                if input.type == 'RGBA':
+                    for prop in input.bl_rna.properties:
+                        print(">>>", prop, prop.type, prop.subtype, "name", prop.name)
+
+
+
             print("Props:")
             for prop in node.bl_rna.properties:
                 if prop.identifier in IGNORE_PROPS: continue
