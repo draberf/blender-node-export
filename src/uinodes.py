@@ -100,7 +100,7 @@ SOCKET_WIDGET_DEFS = {
     'FLOAT': lambda socket: widgets.Float(name=socket.name, value=socket.default_value),
     'RGBA': lambda socket: widgets.FortySixty(wids=[
         widgets.Label(text=socket.name),
-        widgets.RGBA(color="rgb("+",".join([str(round(x*255)) for x in socket.default_value[:3]])+")")
+        widgets.RGBA(color=methods.socketColorToSVGColor(socket.default_value[:3], corrected=socket.bl_rna.properties['default_value'].subtype == 'COLOR_GAMMA'))
     ]),
     'VECTOR': lambda socket: widgets.Vector(name=socket.name, values=socket.default_value) if not socket.hide_value else widgets.Label(text=socket.name),
     'INT': lambda socket: widgets.FortySixty(wids=[
@@ -248,13 +248,14 @@ class Converter():
 
         ## color wheel
         color_wheel = ET.SubElement(defs, 'symbol', id='color_wheel')
-        grp = ET.SubElement(color_wheel, 'g', transform='scale(0.6,0.6)')
+        radius=50
+        grp = ET.SubElement(color_wheel, 'g', transform=f'translate({radius},{radius})')
         steps=24
-        def angleToCoords(angle, radius):
+        def angleToCoords(angle):
             return radius*cos(angle), radius*sin(angle)
         for i in range(24):
-            point1_x, point1_y = angleToCoords(i*2*pi/steps, 50)
-            point2_x, point2_y = angleToCoords((i+1)*2*pi/steps, 50)
+            point1_x, point1_y = angleToCoords(i*2*pi/steps)
+            point2_x, point2_y = angleToCoords((i+1)*2*pi/steps)
             color = methods.socketColorToSVGColor(hsv_to_rgb((0.75 + i/steps), 1.0, 1.0))
             ET.SubElement(grp, 'polygon', points=f"0 0 {point1_x} {point1_y} {point2_x} {point2_y}", style=f"fill:{color}; stroke:none")
 
