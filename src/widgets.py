@@ -323,24 +323,31 @@ class ColorPicker(Widget):
         ET.SubElement(grad, 'stop', attrib={'offset':  '0%', 'stop-color':'white'})
         ET.SubElement(grad, 'stop', attrib={'offset':'100%', 'stop-color':'black'})
 
-        wheel_offset = (width-10.0)/2.0-45.0
-        bar_offset = width-10.0
+        bar_width = 10.0
+        wheel_space = width-bar_width-2.0
+        wheel_center_x = wheel_space/2.0
+        wheel_center_y = self.height()/2.0
+        wheel_width = min(wheel_space, self.height())
+        scale_factor = wheel_width/100.0
 
-        ET.SubElement(elem, 'use', href='#color_wheel', x=str(wheel_offset), y='0')
-        ET.SubElement(elem, 'rect', x=str(bar_offset), y='0', width='10.0', height=str(self.height()), style='fill:url(#vertical_grad)')
+        ET.SubElement(elem, 'rect', x=str(width-bar_width), y='0', width=str(bar_width), height=str(self.height()), style='fill:url(#vertical_grad)')
+
+        ET.SubElement(elem, 'use', href='#color_wheel',transform=f'translate({wheel_center_x-wheel_width/2.0},{wheel_center_y-wheel_width/2.0}) scale({scale_factor})')
 
         r, g, b = self.color[:3]
+        print(r, g, b)
         h, s, v = rgb_to_hsv(r, g, b)
+        print(h, s, v)
         
         # marker on wheel
         polar = polarToCartesian(s, (h-0.75)*2*pi)
-        x = wheel_offset + 45.0 + polar[0]*45.0
-        y = 45.0 + polar[1]*45.0
+        x = wheel_center_x + polar[0]*(wheel_width/2)
+        y = wheel_center_y + polar[1]*(wheel_width/2)
         ET.SubElement(elem, 'circle', cx=str(x), cy=str(y), r='2', style='fill:white; stroke:black; stroke-width:0.5')
 
         # marker on bar
-        x = bar_offset + 5.0
-        y = 90.0*(1.0-v)
+        x = wheel_space + 2.0 + bar_width/2.0
+        y = self.height()*(1.0-v)
         ET.SubElement(elem, 'circle', cx=str(x), cy=str(y), r='2', style='fill:white; stroke:black; stroke-width:0.5')
 
 
