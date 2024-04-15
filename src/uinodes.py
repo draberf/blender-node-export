@@ -187,7 +187,6 @@ class Converter():
 
         filtered_nodes = nodetree.nodes if not selected_only else [node for node in nodetree.nodes if node.select]
         if not filtered_nodes:
-            print(filtered_nodes)
             filtered_nodes = nodetree.nodes
 
 
@@ -201,8 +200,6 @@ class Converter():
         frame_children = {}
         for node in filtered_nodes:
 
-            print(node.bl_idname, node.as_pointer())
-            
             node_object = nodeFactory(node, self.colors)
 
 
@@ -213,14 +210,12 @@ class Converter():
             else:
                 self.nodes.append(node_object)
 
-            print(node.parent)
             if node.parent:
                 ptr = node.parent.as_pointer()
                 if not ptr in frame_children:
                     frame_children[ptr] = [node_object]
                 else:
                     frame_children[ptr].append(node_object)
-                print(frame_children)
 
             if node.mute:
                 self.links.extend([(link.from_socket.as_pointer(), link.to_socket.as_pointer(), True) for link in node.internal_links])
@@ -320,7 +315,6 @@ class Converter():
             
             if self.curving > 0 and from_x > to_x:
                 x1, x2 = methods.getBezierExtrema(from_x, control_x1, control_x2, to_x)
-                print(x1, x2)
                 self.vb_min_x = min(self.vb_min_x, min(x1, x2))
                 svg_w = max(svg_w, max(x1-self.vb_min_x, x2-self.vb_min_x))
 
