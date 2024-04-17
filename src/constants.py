@@ -74,8 +74,7 @@ CATEGORY_NAMES = (
     'layout',
     'attribute',
     'geometry',
-    'group',
-    'layout'
+    'group'
 )
 
 ELEMENTS = (
