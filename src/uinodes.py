@@ -160,6 +160,7 @@ def nodeFactory(node, colors, args) -> 'UINode':
         case 'NodeReroute':
             return UIRedirectNode(node, colors=colors)
         case _:
+            if node.hide: return UIHiddenNode(node, colors=colors, args=args)
             return UINode(node, colors=colors, args=args)
 
 class Converter():
@@ -521,7 +522,7 @@ class UIRedirectNode(UINode):
         self.anchors = {node.inputs[0].as_pointer(): (self.x, self.y, UIShape(node.inputs[0]))}
         self.anchors.update({output.as_pointer(): (self.x, self.y, UIShape(output, render=False)) for output in node.outputs})
     
-    def svg(self):
+    def svg(self, *args, **kwargs):
         return None
 
 class UIFrameNode(UINode):
@@ -584,6 +585,104 @@ class UIFrameNode(UINode):
                 'text-anchor':'middle'
             })
             text.text = self.name
+
+        return group
+
+class UIHiddenNode(UINode):
+    
+    def __init__(self, node: bpy.types.Node, colors: str, args={}):
+        # name
+        specification = {}
+        self.is_placeholder = False
+        if not node.bl_idname in categories.node_specifications:
+            specification = categories.node_specifications['PlaceholderNode']
+            self.is_placeholder = True
+        else:
+            specification = categories.node_specifications[node.bl_idname]
+
+        self.name = node.name
+        if node.label:
+            self.name = node.label
+        elif 'name_behavior' in specification:
+            self.name = specification['name_behavior'](node)
+
+        # color
+        if not self.is_placeholder:
+            self.color_class = specification['class'] if specification['class'] else specification['class_behavior'](node)
+        else:
+            print(f"WARNING: Node {node.bl_idname} does not have a default specification. Placeholder object will be used instead.")
+            self.color_class = 'layout_node'
+        self.color=colors[self.color_class]
+
+        # position & size
+        self.w, self.h = node.dimensions
+        self.w *= constants.NODE_DIM_RATIO
+        self.h *= constants.NODE_DIM_RATIO
+        self.x =  node.location[0]
+        self.y = -node.location[1]
+
+        if node.parent:
+            self.x += node.parent.location[0]
+            self.y -= node.parent.location[1]
+        self.outputs = [output for output in node.outputs.values() if all([not output.hide, output.enabled, not output.is_unavailable])]
+        self.inputs = [input for input in node.inputs.values() if all([not input.hide, input.enabled, not input.is_unavailable])]
+
+        self.muted = node.mute
+        
+        # for identifying widgets
+        self.id = node.name.replace(' ', '_')
+
+
+        # markers
+        self.anchors = {}
+
+        for i, (t, socket) in [*enumerate(zip(len(self.inputs)*['input'], self.inputs))]+[*enumerate(zip(len(self.outputs)*['output'], self.outputs))]:
+
+            # calculate angle
+            step = (pi/(len(self.inputs)+1)) if t == 'input' else -pi/(len(self.outputs)+1)
+            angle = pi/2 + (i+1)*step
+
+            # calculate position
+            x, y = methods.polarToCartesian(self.h/2, -angle)
+
+            print(t, x, y, step, angle)
+
+            x += (self.h/2) if t == 'input' else (self.w-self.h/2)
+            y += self.h/2
+
+            # add to anchor
+            self.anchors[socket.as_pointer()] = (self.x + x, self.y + y, UIShape(socket))
+
+    def svg(self, header_opacity, use_gradient=False):
+
+        # create group
+        group = ET.Element('g', transform=f'translate({self.x},{self.y})', id=f'{self.id}')
+        if self.muted: group.set('opacity', '50%')
+        
+        # add round rectangle base
+        ET.SubElement(group, 'rect', attrib={
+            'width':str(self.w),
+            'height':str(self.h),
+            'rx':str(self.h/2),
+            'ry':str(self.h/2),
+            'class': 'nodeframe'
+        })
+
+        # add round rectangle opacity overlay
+        ET.SubElement(group, 'rect', attrib={
+            'width':str(self.w),
+            'height':str(self.h),
+            'rx':str(self.h/2),
+            'ry':str(self.h/2),
+            'opacity':str(header_opacity)+'%',
+            'fill':self.color,
+            'stroke':'none'
+        })
+
+
+        # add name
+        label = ET.SubElement(group, 'text', x=f"{6}", y=f"{self.h/2+3}")
+        label.text = self.name
 
         return group
 
