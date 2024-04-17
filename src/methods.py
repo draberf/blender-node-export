@@ -65,6 +65,7 @@ def getBezierExtrema(x0: float, x1: float, x2: float, x3: float) -> tuple[float,
         bezier(t2)
     )
 
+
 def getColorsFromPreferences(context) -> dict[list[float]]:
     
     output = {}
@@ -74,7 +75,7 @@ def getColorsFromPreferences(context) -> dict[list[float]]:
     output['color_base'] = theme.node_editor.node_backdrop
     output['color_string_field'] = theme.user_interface.wcol_text.inner
     output['color_bool_false'] = theme.user_interface.wcol_option.inner
-    output['color_bool_true'] = theme.user_interface.wcol_option.selected
+    output['color_bool_true'] = theme.user_interface.wcol_option.inner_sel
     output['color_value_field'] = theme.user_interface.wcol_numslider.inner
     output['color_value_progress'] = theme.user_interface.wcol_numslider.item
     output['color_axis_x'] = theme.user_interface.axis_x
@@ -87,3 +88,13 @@ def getColorsFromPreferences(context) -> dict[list[float]]:
 
     for name in CATEGORY_NAMES:
        output['header_color_'+name] = getattr(theme.node_editor, name+'_node')
+
+    return output
+
+
+def findProporiton(value: float, bound_1: float, bound_2: float, bound_3: float) -> float:
+    
+    minimum = min(bound_1, bound_2, bound_3)
+    maximum = max(bound_1, bound_2, bound_3)
+
+    return (value - minimum) / (maximum - minimum)
