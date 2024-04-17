@@ -64,15 +64,26 @@ def getFloatString(value: float, spaces: int = 5) -> str:
     s += (5-len(s))*"0"
     return s
 
-def style() -> ET.Element:
+def style(colors, outline) -> ET.Element:
     
     style_elem = ET.Element('style')
 
     style_elem.text = '\n'.join([
-        ".nodeframe { fill: #333333 } ",
-        "text { font-family: Sans, Arial; font-size: 0.6em; fill: white }",
+        "text { font-family: Sans, Arial; font-size: 0.6em; fill: "+colors['color_text']+" }",
+        "rect { stroke-width:"+str(outline['thickness'])+";stroke:"+methods.socketColorToSVGColor(outline['color'])+" }"
+        ".checkmark { stroke:"+colors['color_text']+" } ",
+        ".nodeframe { fill:"+colors['color_base']+" } ",
         ".marker { stroke-width: "+str(constants.MARKER_LINE)+"px; stroke: black}",
-        ".arrow { stroke-width: 1; stroke: white; fill:none}"
+        ".arrow { stroke-width: 1; stroke: white; fill:none}",
+        ".string { fill:"+colors['color_string_field']+"}",
+        ".bool_false {fill:"+colors['color_bool_false']+"}",
+        ".bool_true  {fill:"+colors['color_bool_true'] +"}",
+        ".value_bar {fill:"+colors['color_value_field']+"}",
+        ".progress_bar {fill:"+colors['color_value_progress']+"}",
+        ".axis_x {stroke:"+colors['color_axis_x']+"}",
+        ".axis_y {stroke:"+colors['color_axis_y']+"}",
+        ".axis_z {stroke:"+colors['color_axis_z']+"}",
+        ".axis_w {"+"stroke:black"+"}",
     ])
 
     return style_elem
@@ -141,7 +152,7 @@ def widgetFactory(socket) -> widgets.Widget:
 
     return SOCKET_WIDGET_DEFS[socket.type](socket)
 
-def nodeFactory(node, colors) -> 'UINode':
+def nodeFactory(node, colors, args) -> 'UINode':
 
     match node.bl_idname:
         case 'NodeFrame':
@@ -149,30 +160,44 @@ def nodeFactory(node, colors) -> 'UINode':
         case 'NodeReroute':
             return UIRedirectNode(node, colors=colors)
         case _:
-            return UINode(node, colors=colors)
+            return UINode(node, colors=colors, args=args)
 
 class Converter():
 
-    def __init__(
-            self,
-            context,
-            selected_only=False,
-            use_default_colors=True,
-            custom_colors={},
-            header_opacity=60) -> None:
+    def __init__(self, context) -> None:
         
         # obtain node tree
         nodetree = context.space_data.node_tree
 
-        # obtain visual properties
+        # obtain properties
+        props = context.scene.export_svg_props
+
         self.colors = {}
-        if use_default_colors:
-            self.colors = {k:methods.blColorToSVGColor(v) for k, v in [
-                (k, getattr(context.preferences.themes[0].node_editor, k)) for k in categories.CATEGORIES
-            ]}
+        if props.use_theme_colors:
+            prefs = methods.getColorsFromPreferences(context)
+            self.colors = {name+'_node':methods.socketColorToSVGColor(prefs['header_color_'+name]) for name in constants.CATEGORY_NAMES}
+            self.colors.update({'color_'+name:methods.socketColorToSVGColor(prefs['color_'+name]) for name in constants.ELEMENTS})
+            self.colors['noodliness'] = prefs['noodliness']
+            self.colors['header_opacity'] = prefs['header_opacity']
         else:
-            self.colors = {k:methods.blColorToSVGColor(v) for k, v in custom_colors.items()}
-        self.header_opacity = header_opacity
+            self.colors = {name+'_node':methods.socketColorToSVGColor(getattr(props, 'header_color_'+name)) for name in constants.CATEGORY_NAMES}
+            self.colors.update({'color_'+name:methods.socketColorToSVGColor(getattr(props, 'color_'+name)) for name in constants.ELEMENTS})
+            self.colors['noodliness'] = context.preferences.themes[0].node_editor.noodle_curving
+            self.colors['header_opacity'] = props.header_opacity
+        
+        self.outline = {
+            'thickness':props.rect_outline if props.rect_outline > 0.005 else 0,
+            'color':props.rect_outline_color
+        }
+        self.header_opacity = self.colors['header_opacity']
+
+        self.quality = props.fidelity
+        self.use_gradient = props.use_gradients
+
+        widget_args = {
+            'quality': self.quality,
+            'use_gradient': self.use_gradient
+        }
 
         self.nodes = []
         self.node_frames = []
@@ -185,7 +210,7 @@ class Converter():
 
         self.anchor_refs = {}
 
-        filtered_nodes = nodetree.nodes if not selected_only else [node for node in nodetree.nodes if node.select]
+        filtered_nodes = nodetree.nodes if not props.export_selected_only else [node for node in nodetree.nodes if node.select]
         if not filtered_nodes:
             filtered_nodes = nodetree.nodes
 
@@ -200,7 +225,7 @@ class Converter():
         frame_children = {}
         for node in filtered_nodes:
 
-            node_object = nodeFactory(node, self.colors)
+            node_object = nodeFactory(node, self.colors, args=widget_args)
 
 
             self.anchor_refs.update(node_object.anchors)
@@ -232,7 +257,7 @@ class Converter():
 
         defs = ET.Element('defs')
 
-        defs.append(style())
+        defs.append(style(self.colors, self.outline))
 
         # add symbols
 
@@ -248,16 +273,31 @@ class Converter():
 
         ## color wheel
         color_wheel = ET.SubElement(defs, 'symbol', id='color_wheel')
+        ### add 'cloud' over gradient
+        cloud = ET.SubElement(color_wheel, 'radialGradient', id='cloud_gradient')
+        ET.SubElement(cloud, 'stop', attrib={'offset':  '0%', 'stop-opacity':'1'  , 'stop-color':'white'})
+        ET.SubElement(cloud, 'stop', attrib={'offset': '60%', 'stop-opacity':'0.5', 'stop-color':'white'})
+        ET.SubElement(cloud, 'stop', attrib={'offset':'100%', 'stop-opacity':'0'  , 'stop-color':'white'})
         radius=50
         grp = ET.SubElement(color_wheel, 'g', transform=f'translate({radius},{radius})')
-        steps=24
+        steps=2*self.quality
         def angleToCoords(angle):
             return radius*cos(angle), radius*sin(angle)
-        for i in range(24):
-            point1_x, point1_y = angleToCoords(i*2*pi/steps)
-            point2_x, point2_y = angleToCoords((i+1)*2*pi/steps)
+        for i in range(steps):
+            angle_start = i*2*pi/steps
+            angle_end = (i+1)*2*pi/steps
+            point1_x, point1_y = angleToCoords(angle_start)
+            point2_x, point2_y = angleToCoords(angle_end)
             color = methods.socketColorToSVGColor(hsv_to_rgb((0.75 + i/steps), 1.0, 1.0))
-            ET.SubElement(grp, 'polygon', points=f"0 0 {point1_x} {point1_y} {point2_x} {point2_y}", style=f"fill:{color}; stroke:none")
+            fill = color
+            if self.use_gradient:
+                next_color = methods.socketColorToSVGColor(hsv_to_rgb((0.75 + (i+1)/steps), 1.0, 1.0))
+                grad = ET.SubElement(grp, 'linearGradient', id=f'color_wheel_grad_{i}', gradientUnits='userSpaceOnUse', x1=str(point1_x), x2=str(point2_x), y1=str(point1_y), y2=str(point2_y))
+                ET.SubElement(grad, 'stop', attrib={'offset':'0%', 'stop-color':color})
+                ET.SubElement(grad, 'stop', attrib={'offset':'100%', 'stop-color':next_color})
+                fill = f'url(#color_wheel_grad_{i})'
+            ET.SubElement(grp, 'polygon', points=f"0 0 {point1_x} {point1_y} {point2_x} {point2_y}", style=f"fill:{fill}; stroke:none")
+        ET.SubElement(grp, 'circle', cx='0', cy='0', r=str(radius), fill='url(#cloud_gradient)')
 
         ## hue correct gradient
         grad = ET.SubElement(defs, 'linearGradient', id='hc_grad', x1='0', x2='1', y1='0', y2='0')
@@ -333,7 +373,7 @@ class Converter():
         # add nodes to final SVG
         for node in self.nodes:
             try:
-                out = node.svg(self.header_opacity)
+                out = node.svg(self.header_opacity, use_gradient=self.use_gradient)
                 if out: svg.append(out)
             except Exception as e:
                 print(node.name)
@@ -353,7 +393,7 @@ class Converter():
 # class wrapper for a single node
 class UINode():
 
-    def __init__(self, node: bpy.types.Node, colors: {str}):
+    def __init__(self, node: bpy.types.Node, colors: {str}, args = {}):
         specification = {}
         self.is_placeholder = False
         if not node.bl_idname in categories.node_specifications:
@@ -369,8 +409,8 @@ class UINode():
             self.name = specification['name_behavior'](node)
         elif search(r'.[0-9]{3}$', self.name): self.name = self.name[:-4]
         self.w, self.h = node.dimensions
-        #self.w *= constants.NODE_DIM_RATIO
-        #self.h *= constants.NODE_DIM_RATIO
+        self.w *= constants.NODE_DIM_RATIO
+        self.h *= constants.NODE_DIM_RATIO
         self.x =  node.location[0]
         self.y = -node.location[1]
         if node.parent:
@@ -423,7 +463,7 @@ class UINode():
         
         if specification:
             if 'props' in specification:
-                for widget in specification['props'](node):
+                for widget in specification['props'](node, args):
                     if not widget: continue
                     register_widget(widget)
 
@@ -437,7 +477,7 @@ class UINode():
         return False
 
 
-    def svg(self, header_opacity=60) -> ET.Element:
+    def svg(self, header_opacity=60, use_gradient=False) -> ET.Element:
         group = ET.Element('g', transform=f'translate({self.x},{self.y})', id=f'{self.id}')
         if self.muted: group.set('opacity', '50%')
         
@@ -449,7 +489,7 @@ class UINode():
         group.append(self.uiheader.svg(opacity=header_opacity))
 
         # new widgets rendering
-        group.extend([widget.prepend_id(f'{self.id}_{str(i)}').svg(width=self.w, y=height) for i, (height, widget) in enumerate(self.height_widget_pairs)])
+        group.extend([widget.prepend_id(f'{self.id}_{str(i)}').svg(width=self.w, y=height, use_gradient=use_gradient) for i, (height, widget) in enumerate(self.height_widget_pairs)])
 
         return group
 
@@ -493,8 +533,8 @@ class UIFrameNode(UINode):
             self.name = node.label
 
         self.w, self.h = node.dimensions
-        #self.w *= constants.NODE_DIM_RATIO
-        #self.h *= constants.NODE_DIM_RATIO
+        self.w *= constants.NODE_DIM_RATIO
+        self.h *= constants.NODE_DIM_RATIO
         self.x =  node.location[0] - self.w/2 + 70.0
         self.y = -node.location[1] - self.h/2 + 50.0
         if node.parent:
