@@ -197,6 +197,23 @@ class UIParentPanel(UIPanel):
 
 panels.append(UIParentPanel)
 
+
+class UIQualityPanel(UIPanel):
+    bl_parent_id = 'NODE_EDITOR_PT_export_parent'
+    bl_label = "Element Quality"
+
+    def draw(self, context):
+        
+        layout = self.layout
+        props = context.scene.export_svg_props
+
+        layout.prop(props, 'fidelity')
+        layout.prop(props, 'use_gradients')
+
+
+panels.append(UIQualityPanel)
+
+
 class UIColorPanel(UIPanel):
     bl_parent_id = 'NODE_EDITOR_PT_export_parent'
     bl_label = "Colors"
@@ -209,8 +226,10 @@ class UIColorPanel(UIPanel):
         layout = self.layout
         props = context.scene.export_svg_props
 
-        layout.prop(props, 'use_theme_colors')
+        layout.prop(props, 'rect_outline')
+        layout.prop(props, 'rect_outline_color')
 
+        layout.prop(props, 'use_theme_colors')
 
         # https://blender.stackexchange.com/questions/41387/how-to-deactivate-a-ui-element-in-an-add-on
         for color_name in ['color_'+elem for elem in ELEMENTS]+['header_color_'+name for name in CATEGORY_NAMES]+['header_opacity']:
@@ -224,7 +243,6 @@ class UIColorPanel(UIPanel):
         )
 
 panels.append(UIColorPanel)
-
 
 class UIInspectPanel(UIPanel):
     bl_parent_id = 'NODE_EDITOR_PT_export_parent'
