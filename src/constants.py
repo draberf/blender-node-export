@@ -83,3 +83,5 @@ ELEMENTS = (
     'value_field', 'value_progress',
     'axis_x', 'axis_y', 'axis_z'
 )
+
+ROUND_CORNER = 5
