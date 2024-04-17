@@ -199,6 +199,7 @@ panels.append(UIParentPanel)
 
 class UIQualityPanel(UIPanel):
     bl_parent_id = 'NODE_EDITOR_PT_export_parent'
+    bl_idname = "NODE_EDITOR_PT_quality"
     bl_label = "Element Quality"
 
     def draw(self, context):
@@ -215,6 +216,7 @@ panels.append(UIQualityPanel)
 
 class UIColorPanel(UIPanel):
     bl_parent_id = 'NODE_EDITOR_PT_export_parent'
+    bl_idname = "NODE_EDITOR_PT_color"
     bl_label = "Colors"
 
     @classmethod
