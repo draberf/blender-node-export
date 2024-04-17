@@ -192,10 +192,12 @@ class Converter():
         }
         self.header_opacity = self.colors['header_opacity']
 
+        self.rounded_corners = props.rounded_corners
         self.quality = props.fidelity
         self.use_gradient = props.use_gradients
 
         widget_args = {
+            'rounded_corners': self.rounded_corners,
             'quality': self.quality,
             'use_gradient': self.use_gradient
         }
@@ -438,6 +440,10 @@ class UINode():
 
         self.uiheader = UIHeader(self.name, self.w, color=colors[self.color_class])
 
+        self.rounded_corners = False
+        if 'rounded_corners' in args:
+            if args['rounded_corners']:
+                self.rounded_corners = True
 
         # new Widget stack method + coords
         self.height_widget_pairs = []
@@ -479,8 +485,20 @@ class UINode():
 
 
     def svg(self, header_opacity=60, use_gradient=False) -> ET.Element:
-        group = ET.Element('g', transform=f'translate({self.x},{self.y})', id=f'{self.id}')
-        if self.muted: group.set('opacity', '50%')
+        supergroup = ET.Element('g', transform=f'translate({self.x},{self.y})', id=f'{self.id}')
+        clip_rect = ET.Element('rect', attrib={
+            'width':str(self.w),
+            'height':str(self.h),
+            'rx':str(constants.ROUND_CORNER if self.rounded_corners else 0),
+            'ry':str(constants.ROUND_CORNER if self.rounded_corners else 0),
+            'style':'fill:none'
+        })
+        clip_id = f'{self.id}_super_clip'
+        clip = ET.SubElement(supergroup, 'clipPath', id=clip_id)
+        clip.append(clip_rect)
+        group = ET.SubElement(supergroup, 'g', attrib={'clip-path':f'url(#{clip_id}'})
+        supergroup.append(clip_rect)
+        if self.muted: supergroup.set('opacity', '50%')
         
         # frame
         rect = self.frame()
@@ -490,9 +508,9 @@ class UINode():
         group.append(self.uiheader.svg(opacity=header_opacity))
 
         # new widgets rendering
-        group.extend([widget.prepend_id(f'{self.id}_{str(i)}').svg(width=self.w, y=height, use_gradient=use_gradient) for i, (height, widget) in enumerate(self.height_widget_pairs)])
+        group.extend([widget.prepend_id(f'{self.id}_{str(i)}').svg(width=self.w, y=height, use_gradient=use_gradient, rounded_corners=self.rounded_corners) for i, (height, widget) in enumerate(self.height_widget_pairs)])
 
-        return group
+        return supergroup
 
     def frame(self) -> ET.Element:
         frame_items = ET.Element('g')
