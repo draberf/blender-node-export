@@ -242,7 +242,6 @@ class RGBA(Widget):
         color_rect.set('y', '0')
         color_rect.set('width', str(width))
         color_rect.set('height', str(self.height()))
-        color_rect.set('style', 'stroke-width: 0')
         color_rect.set('fill', self.color)
     
 class Vector(Widget):
@@ -299,9 +298,14 @@ class Dropdown(Widget):
     
     def fill_svg(self, elem, width=DEFAULT_WIDTH):
 
-        ET.SubElement(elem, 'rect',
-                      x='0', y='0',
-                      width=str(width), height=str(self.height()))
+        ET.SubElement(elem, 'rect', attrib={
+                      'x':'0',
+                      'y':'0',
+                      'width':str(width),
+                      'height':str(self.height()),
+                      'class':'string'
+        })
+        
 
         ET.SubElement(elem, 'use', href='#down_arrow', x=str(width-20.0), y=str(self.height()/2.0-6.0))
         
@@ -367,13 +371,13 @@ class SelectBar(Widget):
         
         w = width/len(self.options)
         for i, opt in enumerate(self.options):
-            color = '#545454' if i != self.select_index else '#7777dd'
+            color_class = 'value_bar' if i != self.select_index else 'progress_bar'
             rect = ET.SubElement(elem, 'rect')
             rect.set('x', str(i*w))
             rect.set('y', '0')
             rect.set('width', str(w))
             rect.set('height', str(self.height()))
-            rect.set('style', f"fill:{color}")
+            rect.set('style', f"fill:{color_class}")
             
             elem.append(Label(opt, alignment='C').prepend_id(self.id+'_'+str(i)).svg(width=w, x=i*w))
         
@@ -395,18 +399,20 @@ class Curves(Widget):
             'y':'0',
             'width':str(width),
             'height':str(self.height()),
-            'style':'fill:url(#hc_grad)' if self.hue_background else 'fill:#545454'
+            'class':'value_bar',
+            'style':'fill:url(#hc_grad)' if self.hue_background else ''
         })
 
         for color, point_pairs, infill in self.curves:
             max_y = max(y for _, y in point_pairs)
             points = [(x*width, (max_y-y)*self.height()) for x, y in point_pairs]
-            stroke = 'none' if infill else color
+            style_color = '' if infill else color
             fill =   color if infill else 'none'
             if infill: points.extend([(width, self.height()),(0, self.height())])
             ET.SubElement(elem, 'polyline' if not infill else 'polygon', attrib={
                 'points':(' '.join([f'{x} {y}' for x, y in points])),
-                'style':f'stroke-width:1; stroke:{stroke}; fill:{fill}'
+                'class':style_color,
+                'style':f'stroke-width:1; fill:{fill}'
             })
         
         ET.SubElement(elem, 'rect', attrib={
@@ -511,7 +517,7 @@ class String(Widget):
                 'y': '0',
                 'width': str(width),
                 'height': str(self.height()),
-                'style': 'fill:black'
+                'class': 'string'
             })
             
             elem.append(Label(text=self.value).prepend_id(self.id).svg(width=width))
