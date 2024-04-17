@@ -458,21 +458,40 @@ class Ramp(Widget):
             ], resize_override=False).prepend_id(self.id).svg(width=width, resize=False)
         )
 
-        if self.use_gradient: ...
-
-        bar_width =width/(len(self.evals)-1)
-
-        for i, (start, _) in enumerate(zip(self.evals[:-1], self.evals[1:])):
-            x_start = i * bar_width
-
-            color_string = str(socketColorToSVGColor(start))
-            ET.SubElement(elem, 'rect', attrib={
-                'x':str(x_start),
-                'y':str(self.height()/3.0 + constants.SOCKET_GAP),
-                'width':str(bar_width),
-                'height':str(self.height()/3.0),
-                'style':f'fill:{color_string};stroke:{color_string};stroke-weight:0.1'
+        if self.kwargs['use_gradient']:
+            
+            grad = ET.SubElement(elem, 'linearGradient', id='ramp_grad')
+            for i, (start, _) in enumerate(zip(self.evals[:-1], self.evals[1:])):
+                ET.SubElement(grad, 'stop', attrib={
+                    'offset':str(i/len(self.evals)),
+                    'stop-color':socketColorToSVGColor(start)
+                })
+            ET.SubElement(grad, 'stop', attrib={
+                'offset':'1',
+                'stop-color':socketColorToSVGColor(self.evals[-1])
             })
+            ET.SubElement(elem, 'rect', attrib={
+                'x':'0',
+                'y':str(self.height()/3.0 + constants.SOCKET_GAP),
+                'width':str(width),
+                'height':str(self.height()/3.0),
+                'style':f'fill:url(#ramp_grad);stroke-width:0'
+            })
+
+        else:
+            bar_width = width/(len(self.evals)-1)
+
+            for i, (start, _) in enumerate(zip(self.evals[:-1], self.evals[1:])):
+                x_start = i * bar_width
+        
+                color_string = str(socketColorToSVGColor(start))
+                ET.SubElement(elem, 'rect', attrib={
+                    'x':str(x_start),
+                    'y':str(self.height()/3.0 + constants.SOCKET_GAP),
+                    'width':str(bar_width),
+                    'height':str(self.height()/3.0),
+                    'style':f'fill:{color_string};stroke:{color_string};stroke-weight:0.1'
+                })
 
         for x, color in self.stops:
             g = ET.SubElement(elem, 'g', attrib={'transform': f'translate({x*width-5}, {2*self.height()/3 - 2})'})
