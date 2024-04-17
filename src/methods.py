@@ -90,3 +90,23 @@ def getColorsFromPreferences(context) -> dict[list[float]]:
        output['header_color_'+name] = getattr(theme.node_editor, name+'_node')
 
     return output
+
+def insertIntoSortedByKey(e, arr, key) -> list:
+    
+    if not arr: return [e]
+
+    if len(arr) == 1:
+        if key(e) > key(arr[0]): return arr + [e]
+        else: return [e] + arr
+    
+    midpoint = len(arr) // 2
+
+    if key(e) > key(arr[midpoint-1]):
+        if key(e) < key(arr[midpoint]):
+            return arr[:midpoint] + [e] + arr[midpoint:]
+        else:
+            return arr[:midpoint+1] + insertIntoSortedByKey(e, arr[midpoint+1:], key)
+    else:
+        return insertIntoSortedByKey(e, arr[:midpoint-1], key) + arr[midpoint-1:]
+    
+
