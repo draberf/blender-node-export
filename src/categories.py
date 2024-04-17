@@ -144,7 +144,7 @@ node_specifications = {
 
     'CompositorNodeBokehImage': {
         'class': 'input_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Placeholder(),
             widgets.Value(name="Flaps", value=node.flaps),
             widgets.Angle(name="Angle", value=node.angle),
@@ -155,7 +155,7 @@ node_specifications = {
     },
     'CompositorNodeImage': {
         'class': 'input_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Placeholder() if node.image else None,
             image(node.image),
             *([
@@ -167,7 +167,7 @@ node_specifications = {
     },
     'CompositorNodeMask': {
         'class': 'input_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.String(value="" if not node.mask else node.mask.name),
             widgets.Boolean(name="Feather", value=node.use_feather),
             dropdown(node, 'size_source'),
@@ -180,21 +180,21 @@ node_specifications = {
     },
     'CompositorNodeMovieClip': {
         'class': 'input_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Placeholder(),
             widgets.String(value="" if not node.clip else node.clip.name)
         ]
     },
     'CompositorNodeRLayers': {
         'class': 'input_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.String(value="" if not node.scene else node.scene.name),
             widgets.Dropdown(value=node.layer) if node.scene else None
         ]
     },
     'CompositorNodeRGB': {
         'class': 'input_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.ColorPicker(color=[colorCorrect(x) for x in node.outputs[0].default_value]),
             widgets.RGBA(color=socketColorToSVGColor(node.outputs[0].default_value, corrected=False))
         ]
@@ -204,22 +204,22 @@ node_specifications = {
     },
     'CompositorNodeTexture': {
         'class': 'input_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Placeholder(),
             widgets.String(value="" if not node.texture else node.texture.name),
         ]
     },
     'CompositorNodeTime': {
         'class': 'input_node',
-        'props': lambda node: [
-            curve(node.curve, type='VALUE'),
+        'props': lambda node, args: [
+            curve(node.curve, type='VALUE', sampling=args['quality']),
             widgets.Value(name="Start", value=node.frame_start),
             widgets.Value(name="End", value=node.frame_end)
         ]
     },
     'CompositorNodeTrackPos': {
         'class': 'input_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.String(value="" if not node.clip else node.clip.name),
             *([
                 widgets.String(value=node.tracking_object),
@@ -231,7 +231,7 @@ node_specifications = {
     },
     'CompositorNodeValue': {
         'class': 'input_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Float(name="", value=node.outputs[0].default_value)
         ]
     },
@@ -240,33 +240,33 @@ node_specifications = {
 
     'CompositorNodeComposite': {
         'class': 'output_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Boolean(name="Use Alpha", value=node.use_alpha)
         ]
     },
     'CompositorNodeOutputFile': {
         'class': 'output_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Label(text="Base Path:"),
             widgets.File()
         ]
     },
     'CompositorNodeLevels': {
         'class': 'output_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'channel')
         ]
     },
     'CompositorNodeSplitViewer': {
         'class': 'output_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             selectBar(node, 'axis'), # axis
             widgets.Value(name="Factor", value=node.factor)
         ]
     },
     'CompositorNodeViewer': {
         'class': 'output_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Boolean(name="Use Alpha", value=node.use_alpha)
         ]
     },
@@ -275,20 +275,20 @@ node_specifications = {
 
     'CompositorNodeAlphaOver': {
         'class': 'color_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Boolean(name="Convert Premultiplied", value=node.use_premultiply),
             widgets.Float(name="Premultiplied", value=node.premul, minmax=(0.0,1.0))
         ]
     },
     'CompositorNodeBrightContrast': {
         'class': 'color_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Boolean(name="Convert Premultiplied", value=node.use_premultiply)
         ]
     },
     'CompositorNodeColorBalance': {
         'class': 'color_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'correction_method', label="Correction Formula:"),
             widgets.Columns(wids=[
                 widgets.ColorPicker(color=node.lift),
@@ -304,7 +304,7 @@ node_specifications = {
     },
     'CompositorNodeColorCorrection': {
         'class': 'color_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Columns(wids=[
                 widgets.Boolean(name="Red", value=node.red),
                 widgets.Boolean(name="Green", value=node.green),
@@ -364,8 +364,8 @@ node_specifications = {
     },
     'CompositorNodeHueCorrect': {
         'class': 'color_node',
-        'props': lambda node: [
-            curve(node.mapping, 'CORRECT')
+        'props': lambda node, args: [
+            curve(node.mapping, 'CORRECT', sampling=args['quality'])
         ]
     },
     'CompositorNodeHueSat': {
@@ -373,14 +373,14 @@ node_specifications = {
     },
     'CompositorNodeInvert': {
         'class': 'color_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Boolean(name="RGB", value=node.invert_rgb),
             widgets.Boolean(name="Alpha", value=node.invert_alpha)
         ]
     },
     'CompositorNodeMixRGB': {
         'class': 'color_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'blend_type'),
             widgets.Boolean(name="Alpha", value=node.use_alpha),
             widgets.Boolean(name="Clamp", value=node.use_clamp)
@@ -391,13 +391,13 @@ node_specifications = {
     },
     'CompositorNodeCurveRGB': {
         'class': 'color_node',
-        'props': lambda node: [
-            curve(node.mapping, type='CRGB')
+        'props': lambda node, args: [
+            curve(node.mapping, type='CRGB', sampling=args['quality'])
         ]
     },
     'CompositorNodeTonemap': {
         'class': 'color_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'tonemap_type'),
             *([
                 widgets.Float(name="Intensity", value=node.intensity),
@@ -414,7 +414,7 @@ node_specifications = {
     },
     'CompositorNodeZcombine': {
         'class': 'color_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Boolean(name="Use Alpha", value=node.use_alpha),
             widgets.Boolean(name="Anti-Alias Z", value=node.use_antialias_z)
         ]
@@ -424,26 +424,26 @@ node_specifications = {
 
     'CompositorNodePremulKey': {
         'class': 'converter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'mapping'),
         ]
     },
     'CompositorNodeConvertColorSpace': {
         'class': 'converter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'from_color_space', "From:"),
             dropdown(node, 'to_color_space', "To:")
         ]
     },
     'CompositorNodeValToRGB': {
         'class': 'converter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             ramp(node)
         ]
     },
     'CompositorNodeCombineColor': {
         'class': 'converter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'mode'),
             dropdown(node, 'ycc_mode') if node.mode == "YCC" else None
         ]
@@ -453,14 +453,14 @@ node_specifications = {
     },
     'CompositorNodeIDMask': {
         'class': 'converter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Value(name="Index", value=node.index),
             widgets.Boolean(name="Anti-Aliasing", value=node.use_antialiasing)
         ]
     },
     'CompositorNodeMath': {
         'class': 'converter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'operation'),
             widgets.Boolean(name="Clamp", value=node.use_clamp)
         ],
@@ -471,7 +471,7 @@ node_specifications = {
     },
     'CompositorNodeSeparateColor': {
         'class': 'converter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'mode'),
             dropdown(node, 'ycc_mode') if node.mode == 'YCC' else None
         ]
@@ -481,7 +481,7 @@ node_specifications = {
     },
     'CompositorNodeSetAlpha': {
         'class': 'converter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'mode', label="Mode:")
         ]
     },
@@ -493,7 +493,7 @@ node_specifications = {
 
     'CompositorNodeAntiAliasing': {
         'class': 'filter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Float(name="Threshold", value=node.threshold, minmax=(0.0,1.0)),
             widgets.Float(name="Contrast Limit", value=node.contrast_limit, minmax=(0.0,1.0)),
             widgets.Float(name="Corner Rounding", value=node.corner_rounding, minmax=(0.0,1.0))
@@ -501,7 +501,7 @@ node_specifications = {
     },
     'CompositorNodeBilateralblur': {
         'class': 'filter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Value(name="Iterations", value=node.iterations),
             widgets.Float(name="Color Sigma", value=node.iterations),
             widgets.Float(name="Space Sigma", value=node.iterations),
@@ -509,7 +509,7 @@ node_specifications = {
     },
     'CompositorNodeBlur': {
         'class': 'filter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'filter_type'),
             *([
                 widgets.Boolean(name="Variable Size", value=node.use_variable_size),
@@ -532,7 +532,7 @@ node_specifications = {
     },
     'CompositorNodeBokehBlur': {
         'class': 'filter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Boolean(name="Variable Size", value=node.use_variable_size),
             widgets.Value(name="Max Blur", value=node.blur_max),
             widgets.Boolean(name="Extend Bounds", value=node.use_extended_bounds)
@@ -540,7 +540,7 @@ node_specifications = {
     },
     'CompositorNodeDefocus': {
         'class': 'filter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Label(text="Bokeh Type:"),
             dropdown(node, 'bokeh'),
             widgets.Angle(name="Angle", value=node.angle),
@@ -556,7 +556,7 @@ node_specifications = {
     },
     'CompositorNodeDenoise': {
         'class': 'filter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Label(text="Prefilter"),
             dropdown(node, 'prefilter'),
             widgets.Boolean(name="HDR", value=node.use_hdr)
@@ -564,7 +564,7 @@ node_specifications = {
     },
     'CompositorNodeDilateErode': {
         'class': 'filter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'mode', label="Mode:"),
             widgets.Value(name="Distance", value=node.distance),
             widgets.Float(name="Edge", value=node.edge) if node.mode == 'THRESHOLD' else None,
@@ -573,7 +573,7 @@ node_specifications = {
     },
     'CompositorNodeDBlur': {
         'class': 'filter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Value(name="Iterations", value=node.iterations),
             #widgets.Boolean(name="Wrap", value=node.use_wrap),
             widgets.Label(text="Center:"),
@@ -587,14 +587,14 @@ node_specifications = {
     },
     'CompositorNodeFilter': {
         'class': 'filter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'filter_type')
         ],
         'name_behavior': lambda node: enumName(node, 'filter_type')
     },
     'CompositorNodeGlare': {
         'class': 'filter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'glare_type'),
             dropdown(node, 'quality'),
             widgets.Value(name="Iterations", value=node.iterations) if node.glare_type != 'FOG_GLOW' else None,
@@ -613,7 +613,7 @@ node_specifications = {
     },
     'CompositorNodeInpaint': {
         'class': 'filter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Value(name="Distance", value=node.distance)
         ]
     },
@@ -622,7 +622,7 @@ node_specifications = {
     },
     'CompositorNodeSunBeams': {
         'class': 'filter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Columns(wids=[
                 widgets.Float(value=node.source[0]),
                 widgets.Float(value=node.source[1])
@@ -632,7 +632,7 @@ node_specifications = {
     },
     'CompositorNodeVecBlur': {
         'class': 'filter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Value(name="Samples", value=node.samples),
             widgets.Value(name="Blur", value=getFloatString(node.factor, decimal_points=2)),
             widgets.Label(text="Speed:"),
@@ -646,13 +646,13 @@ node_specifications = {
 
     'CompositorNodeMapRange': {
         'class': 'vector_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Boolean(name="Clamp", value=node.use_clamp)
         ]
     },
     'CompositorNodeMapValue': {
         'class': 'vector_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Label(text="Offset:"),
             widgets.Float(name="", value=node.offset),
             widgets.Label(text="Size:"),
@@ -665,7 +665,7 @@ node_specifications = {
     },
     'CompositorNodeNormal': {
         'class': 'vector_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Placeholder()
         ]
     },
@@ -674,8 +674,8 @@ node_specifications = {
     },
     'CompositorNodeCurveVec': {
         'class': 'vector_node',
-        'props': lambda node: [
-            curve(node.mapping, type='XYZ')
+        'props': lambda node, args: [
+            curve(node.mapping, type='XYZ', sampling=args['quality'])
         ]
     },
 
@@ -683,7 +683,7 @@ node_specifications = {
 
     'CompositorNodeBoxMask': {
         'class': 'matte_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Columns(wids=[
                 widgets.Float(name="", value=node.x),
                 widgets.Float(name="", value=node.y)
@@ -698,7 +698,7 @@ node_specifications = {
     },
     'CompositorNodeChannelMatte': {
         'class': 'matte_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Label(text="Color Space:"),
             selectBar(node, 'color_space'),
             widgets.Label(text="Key Channel:"),
@@ -712,7 +712,7 @@ node_specifications = {
     },
     'CompositorNodeChromaMatte': {
         'class': 'matte_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Angle(name="Aceptance", value=node.tolerance),
             widgets.Angle(name="Cutoff", value=node.threshold),
             widgets.Float(name="Falloff", value=node.gain, minmax=(0.0,1.0))
@@ -722,7 +722,7 @@ node_specifications = {
     
     'CompositorNodeColorMatte': {
         'class': 'matte_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Float(name="H", value=node.color_hue, minmax=(0.0,1.0)),
             widgets.Float(name="S", value=node.color_saturation, minmax=(0.0,1.0)),
             widgets.Float(name="V", value=node.color_value, minmax=(0.0,1.0))
@@ -730,7 +730,7 @@ node_specifications = {
     },
     'CompositorNodeColorSpill': {
         'class': 'matte_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Label(text="Despill Channel"),
             selectBar(node, 'channel'),
             dropdown(node, 'limit_method', label="Algorithm:"),
@@ -749,7 +749,7 @@ node_specifications = {
     },
     'CompositorNodeCryptomatteV2': {
         'class': 'matte_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             selectBar(node, 'source'),
             widgets.Scene(value="" if not node.scene else node.scene.name) if node.source == 'SCENE' else None,
             widgets.Image(value="" if not node.image else node.image.name) if node.source == 'IMAGE' else None,
@@ -770,21 +770,21 @@ node_specifications = {
     },
     'CompositorNodeCryptomatte': {
         'class': 'matte_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Label(text="Matte Objects:"),
             widgets.String(value=node.matte_id)
         ]
     },
     'CompositorNodeDiffMatte': {
         'class': 'matte_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Float(name="Tolerance", value=node.tolerance, minmax=(0.0,1.0)),
             widgets.Float(name="Falloff", value=node.tolerance, minmax=(0.0,1.0))
         ]
     },
     'CompositorNodeDistanceMatte': {
         'class': 'matte_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Float(name="Tolerance", value=node.tolerance, minmax=(0.0,1.0)),
             widgets.Float(name="Falloff", value=node.tolerance, minmax=(0.0,1.0)),
             widgets.Label(text="Color Space:"),
@@ -793,7 +793,7 @@ node_specifications = {
     },
     'CompositorNodeDoubleEdgeMask': {
         'class': 'matte_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Label(text="Inner Edge:"),
             widgets.Dropdown(value=enumName(node, 'inner_mode')),
             widgets.Label(text="Buffer Edge:"),
@@ -802,7 +802,7 @@ node_specifications = {
     },
     'CompositorNodeEllipseMask': {
         'class': 'matte_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Columns(wids=[
                 widgets.Float(name="X", value=node.x),
                 widgets.Float(name="Y", value=node.y)
@@ -817,7 +817,7 @@ node_specifications = {
     },
     'CompositorNodeKeying': {
         'class': 'matte_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Value(name="Pre Blur", value=node.blur_pre),
             widgets.Float(name="Screen Balance", value=node.screen_balance, minmax=(0.0,1.0)), #screen_balance
             widgets.Float(name="Despill Factor", value=node.despill_factor, minmax=(0.0,1.0)), #despill_factor
@@ -834,14 +834,14 @@ node_specifications = {
     },
     'CompositorNodeKeyingScreen': {
         'class': 'matte_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Tracking(value="" if not node.clip else node.clip.name),
             widgets.Object(value=node.tracking_object) if node.clip else None
         ]
     },
     'CompositorNodeLumaMatte': {
         'class': 'matte_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Float(name="High", value=node.limit_max, minmax=(0.0,1.0)), #limit_max
             widgets.Float(name="Low", value=node.limit_min, minmax=(0.0,1.0)) #limit_min
         ]
@@ -854,7 +854,7 @@ node_specifications = {
     },
     'CompositorNodeCrop': {
         'class': 'distor_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Boolean(name="Crop Image Size", value=node.use_crop_size),
             widgets.Boolean(name="Relative", value=node.relative),
             *([
@@ -876,13 +876,13 @@ node_specifications = {
     },
     'CompositorNodeFlip': {
         'class': 'distor_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'axis')
         ]
     },
     'CompositorNodeLensdist': {
         'class': 'distor_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Boolean(name="Projector", value=node.use_projector),
             widgets.Boolean(name="Jitter", value=node.use_jitter),
             widgets.Boolean(name="Fit", value=node.use_fit),
@@ -890,13 +890,13 @@ node_specifications = {
     },
     'CompositorNodeMapUV': {
         'class': 'distor_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Value(name="Alpha", value=node.alpha, minmax=(0,100))
         ]
     },
     'CompositorNodeMovieDistortion': {
         'class': 'distor_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.MovieClip(value="" if not node.clip else node.clip.name),
             dropdown(node, 'distortion_type'),
         ],
@@ -904,7 +904,7 @@ node_specifications = {
     },
     'CompositorNodePlaneTrackDeform': {
         'class': 'distor_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.MovieClip(value="" if not node.clip else node.clip.name),
             *([
                 widgets.Object(value=node.tracking_object),
@@ -919,13 +919,13 @@ node_specifications = {
     },
     'CompositorNodeRotate': {
         'class': 'distor_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'filter_type')
         ]
     },
     'CompositorNodeScale': {
         'class': 'distor_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'space'),
             *([
                 selectBar(node, 'frame_method'),
@@ -938,7 +938,7 @@ node_specifications = {
     },
     'CompositorNodeStabilize': {
         'class': 'distor_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.MovieClip(value="" if not node.clip else node.clip.name),
             *([
                 dropdown(node, 'filter_type'),
@@ -948,13 +948,13 @@ node_specifications = {
     },
     'CompositorNodeTransform': {
         'class': 'distor_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'filter_type'),
         ]
     },
     'CompositorNodeTranslate': {
         'class': 'distor_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Boolean(name="Relative", value=node.use_relative),
             dropdown(node, 'wrap_axis', label="Wrapping:")
         ]
@@ -964,7 +964,7 @@ node_specifications = {
 
     'CompositorNodeSwitch': {
         'class': 'layout_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Boolean(name="Switch", value=node.check)
         ]
     },
@@ -977,21 +977,21 @@ node_specifications = {
 
     'GeometryNodeAttributeStatistic': {
         'class': 'attribute_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'data_type'),
             dropdown(node, 'domain')
         ]
     },
     'GeometryNodeCaptureAttribute': {
         'class': 'attribute_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'data_type'),
             dropdown(node, 'domain')
         ]
     },
     'GeometryNodeAttributeDomainSize': {
         'class': 'attribute_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'component')
         ]
     },
@@ -1000,7 +1000,7 @@ node_specifications = {
     },
     'GeometryNodeStoreNamedAttribute': {
         'class': 'attribute_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'data_type'),
             dropdown(node, 'domain')
         ]
@@ -1012,7 +1012,7 @@ node_specifications = {
     # ShaderNodeValToRGB
     'FunctionNodeCombineColor': {
         'class': 'converter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'mode')
         ]
     },
@@ -1020,7 +1020,7 @@ node_specifications = {
     # ShaderNodeRGBCurve
     'FunctionNodeSeparateColor': {
         'class': 'converter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'mode')
         ]
     },
@@ -1035,7 +1035,7 @@ node_specifications = {
     },
     'GeometryNodeCurveToPoints': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'mode')
         ]
     },
@@ -1044,19 +1044,19 @@ node_specifications = {
     },
     'GeometryNodeFillCurve': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'mode')
         ]
     },
     'GeometryNodeFilletCurve': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'mode')
         ]
     },
     'GeometryNodeResampleCurve': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'mode')
         ]
     },
@@ -1065,7 +1065,7 @@ node_specifications = {
     },
     'GeometryNodeSampleCurve': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'data_type'),
             selectBar(node, 'mode'), #mode
             widgets.Boolean(name="All Curves", value=node.use_all_curves)
@@ -1076,7 +1076,7 @@ node_specifications = {
     },
     'GeometryNodeTrimCurve': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             selectBar(node, 'mode')
         ]
     },
@@ -1085,25 +1085,25 @@ node_specifications = {
 
     'GeometryNodeCurveArc': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             selectBar(node, 'mode')
         ]
     },
     'GeometryNodeCurvePrimitiveBezierSegment': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             selectBar(node, 'mode')
         ]
     },
     'GeometryNodeCurvePrimitiveCircle': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             selectBar(node, 'mode')
         ]
     },
     'GeometryNodeCurvePrimitiveLine': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             selectBar(node, 'mode')
         ]
     },
@@ -1115,7 +1115,7 @@ node_specifications = {
     },
     'GeometryNodeCurvePrimitiveQuadrilateral': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'mode')
         ]
     },
@@ -1145,20 +1145,20 @@ node_specifications = {
     },
     'GeometryNodeDeleteGeometry': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'mode'),
             dropdown(node, 'domain')
         ]
     },
     'GeometryNodeDuplicateElements': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'domain')
         ]
     },
     'GeometryNodeProximity': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'target_element')
         ]
     },
@@ -1170,20 +1170,20 @@ node_specifications = {
     },
     'GeometryNodeMergeByDistance': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'mode')
         ]
     },
     'GeometryNodeRaycast': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'data_type'),
             dropdown(node, 'mapping')
         ]
     },
     'GeometryNodeSampleIndex': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'data_type'),
             dropdown(node, 'domain'),
             widgets.Boolean(name="Clamp", value=node.clamp)
@@ -1191,7 +1191,7 @@ node_specifications = {
     },
     'GeometryNodeSampleNearest': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'domain')
         ]
     },
@@ -1200,7 +1200,7 @@ node_specifications = {
     },
     'GeometryNodeSeparateGeometry': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'domain')
         ]
     },
@@ -1221,20 +1221,20 @@ node_specifications = {
     },
     'GeometryNodeCollectionInfo': {
         'class': 'input_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             selectBar(node, 'transform_space')
         ]
     },
     'FunctionNodeInputColor': {
         'class': 'input_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.ColorPicker(color=[colorCorrect(x) for x in node.outputs[0].default_value]),
             widgets.RGBA(color=socketColorToSVGColor(node.outputs[0].default_value, corrected=False))
         ]
     },
     'FunctionNodeInputInt': {
         'class': 'input_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Value(name="", value=node.outputs[0].default_value)
         ]
     },
@@ -1243,13 +1243,13 @@ node_specifications = {
     },
     'GeometryNodeInputMaterial': {
         'class': 'input_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Material(value="" if not node.material else node.material.name)
         ]
     },
     'GeometryNodeObjectInfo': {
         'class': 'input_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             selectBar(node, 'transform_space')
         ]
     },
@@ -1258,14 +1258,14 @@ node_specifications = {
     },
     'FunctionNodeInputString': {
         'class': 'input_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.String(value=node.outputs[0].default_value)
         ]
     },
     # ShaderNodeValue    
     'FunctionNodeInputVector': {
         'class': 'input_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Float(name="X", value=node.outputs[0].default_value[0]),
             widgets.Float(name="Y", value=node.outputs[0].default_value[1]),
             widgets.Float(name="Z", value=node.outputs[0].default_value[2]),
@@ -1279,7 +1279,7 @@ node_specifications = {
     },
     'GeometryNodeInputNamedAttribute': {
         'class': 'input_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'data_type')
         ]
     },
@@ -1354,7 +1354,7 @@ node_specifications = {
     },
     'GeometryNodeExtrudeMesh': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'mode')
         ]
     },
@@ -1363,7 +1363,7 @@ node_specifications = {
     },
     'GeometryNodeMeshBoolean': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'operation')
         ]
     },
@@ -1372,13 +1372,13 @@ node_specifications = {
     },
     'GeometryNodeMeshToPoints': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Dropdown(value=enumName(node, 'mode'))
         ]
     },
     'GeometryNodeMeshToVolume': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Columns(wids=[
                 widgets.Label(text="Resolution", alignment='R'),
                 widgets.Dropdown(value=enumName(node, 'resolution_mode'))
@@ -1387,19 +1387,19 @@ node_specifications = {
     },
     'GeometryNodeSampleNearestSurface': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'data_type')
         ]
     },
     'GeometryNodeSampleUVSurface': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'data_type')
         ]
     },
     'GeometryNodeScaleElements': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'domain'),
             dropdown(node, 'scale_mode')
         ]
@@ -1412,14 +1412,14 @@ node_specifications = {
     },
     'GeometryNodeSubdivisionSurface': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'uv_smooth'),
             dropdown(node, 'boundary_smooth'),
         ]
     },
     'GeometryNodeTriangulate': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'quad_method'),
             dropdown(node, 'ngon_method')
         ]
@@ -1465,7 +1465,7 @@ node_specifications = {
 
     'GeometryNodeMeshCone': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'fill_type', label="Fill Type:")
         ]
     },
@@ -1474,7 +1474,7 @@ node_specifications = {
     },
     'GeometryNodeMeshCylinder': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'fill_type', label="Fill Type:")
         ]
     },
@@ -1486,13 +1486,13 @@ node_specifications = {
     },
     'GeometryNodeMeshCircle': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'fill_type', label="Fill Type:")
         ]
     },
     'GeometryNodeMeshLine': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'mode'),
             dropdown(node, 'count_mode') if node.mode == 'END_POINTS' else None
         ]
@@ -1529,7 +1529,7 @@ node_specifications = {
 
     'GeometryNodeViewer': {
         'class': 'output_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'domain')
         ]
     },
@@ -1538,13 +1538,13 @@ node_specifications = {
 
     'GeometryNodeDistributePointsInVolume': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'mode')
         ]
     },
     'GeometryNodeDistributePointsOnFaces': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'distribute_method')
         ]
     },
@@ -1556,7 +1556,7 @@ node_specifications = {
     },
     'GeometryNodePointsToVolume': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'resolution_mode', label="Resolution:")
         ]
     },
@@ -1580,7 +1580,7 @@ node_specifications = {
     },
     'GeometryNodeStringToCurves': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Font(),
             dropdown(node, 'overflow'),
             dropdown(node, 'align_x'),
@@ -1602,7 +1602,7 @@ node_specifications = {
     # ShaderNodeTexGradient
     'GeometryNodeImageTexture': {
         'class': 'texture_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'interpolation'),
             dropdown(node, 'extension')
         ]
@@ -1618,21 +1618,21 @@ node_specifications = {
 
     'GeometryNodeAccumulateField': {
         'class': 'converter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'data_type'),
             dropdown(node, 'domain')
         ]
     },
     'FunctionNodeAlignEulerToVector': {
         'class': 'converter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             selectBar(node, 'axis'),
             dropdown(node, 'pivot_axis', label="Pivot")
         ]
     },
     'FunctionNodeBooleanMath': {
         'class': 'converter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'operation')
         ],
         'name_behavior': lambda node: enumName(node, 'operation')
@@ -1640,7 +1640,7 @@ node_specifications = {
     # ShaderNodeClamp
     'FunctionNodeCompare': {
         'class': 'converter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'data_type'),
             dropdown(node, 'mode') if node.data_type == 'VECTOR' else None,
             dropdown(node, 'operation'),
@@ -1649,7 +1649,7 @@ node_specifications = {
     },
     'GeometryNodeFieldAtIndex': {
         'class': 'converter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'data_type'),
             dropdown(node, 'domain'),
         ]
@@ -1657,14 +1657,14 @@ node_specifications = {
     # ShaderNodeFloatCurve
     'FunctionNodeFloatToInt': {
         'class': 'converter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Dropdown(value=enumName(node, 'rounding_mode'))
         ],
         'name_behavior': lambda node: enumName(node, 'rounding_mode')
     },
     'GeometryNodeFieldOnDomain': {
         'class': 'converter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'data_type'),
             dropdown(node, 'domain'),
         ]
@@ -1674,20 +1674,20 @@ node_specifications = {
     # ShaderNodeMix
     'FunctionNodeRandomValue': {
         'class': 'converter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'data_type')
         ]
     },
     'FunctionNodeRotateEuler': {
         'class': 'converter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.SelectBar(["Axis Angle", "Euler"], 0 if node.type == 'AXIS_ANGLE' else 1), ## needs to be specified due to override
             selectBar(node, 'space')
         ]
     },
     'GeometryNodeSwitch': {
         'class': 'converter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'input_type')
         ]
     },
@@ -1699,7 +1699,7 @@ node_specifications = {
     },
     'GeometryNodeUVUnwrap': {
         'class': 'converter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'method')
         ]
     },
@@ -1719,7 +1719,7 @@ node_specifications = {
     },
     'GeometryNodeVolumeToMesh': {
         'class': 'geometry_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'resolution_mode', "Resolution:")
         ]
     },
@@ -1739,7 +1739,7 @@ node_specifications = {
 
     'ShaderNodeGroup': {
         'class': 'group_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.String(value=node.node_tree.name)
         ]
     },
@@ -1763,7 +1763,7 @@ node_specifications = {
     },
     'ShaderNodeBevel': {
         'class': 'input_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Value(name="Samples", value=str(node.samples))
         ]
     },
@@ -1772,7 +1772,7 @@ node_specifications = {
     },
     'ShaderNodeVertexColor': {
         'class': 'input_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.String(value=node.layer_name)
         ]
     },
@@ -1802,14 +1802,14 @@ node_specifications = {
     },
     'ShaderNodeRGB': {
         'class': 'input_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.ColorPicker(color=[colorCorrect(x) for x in node.outputs[0].default_value]),
             widgets.RGBA(color=socketColorToSVGColor(node.outputs[0].default_value, corrected=False))
         ]
     },
     'ShaderNodeTangent': {
         'class': 'input_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Columns(wids=[
                 dropdown(node, 'direction_type'),
                 selectBar(node, 'axis')
@@ -1818,21 +1818,21 @@ node_specifications = {
     },
     'ShaderNodeTexCoord': {
         'class': 'input_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             object(node.object),
             widgets.Boolean(name="From Instancer", value=node.from_instancer)
         ]
     },
     'ShaderNodeUVMap': {
         'class': 'input_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Boolean(name="From Instancer", value=node.from_instancer),
             widgets.UVMap(value=node.uv_map)
         ]
     },
     'ShaderNodeValue': {
         'class': 'input_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Float(name="", value=node.outputs[0].default_value)
         ]
     },
@@ -1841,14 +1841,14 @@ node_specifications = {
     },
     'ShaderNodeWireframe': {
         'class': 'input_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Boolean(name="Pixel Size", value=node.use_pixel_size)
         ]
     },
 
     'ShaderNodeUVAlongStroke': {
         'class': 'input_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Boolean(name="Use Tips", value=node.use_tips)
         ]
     },
@@ -1857,7 +1857,7 @@ node_specifications = {
 
     'ShaderNodeOutputAOV': {
         'class': 'output_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.String(name="Name:", value=node.name)
         ],
         'name_behavior': lambda _: 'AOV Output'
@@ -1865,28 +1865,28 @@ node_specifications = {
 
     'ShaderNodeOutputLight': {
         'class': 'output_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'target')
         ]
     },
 
     'ShaderNodeOutputMaterial': {
         'class': 'output_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'target')
         ]
     },
 
     'ShaderNodeOutputWorld': {
         'class': 'output_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'target')
         ]
     },
 
     'ShaderNodeOutputLineStyle': {
         'class': 'output_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'blend_type'),
             widgets.Boolean(name="Clamp", value=node.use_clamp)
         ]
@@ -1900,7 +1900,7 @@ node_specifications = {
 
     'ShaderNodeBsdfAnisotropic': {
         'class': 'shader_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'distribution')
         ]
     },
@@ -1913,20 +1913,20 @@ node_specifications = {
     },
     'ShaderNodeBsdfGlass': {
         'class': 'shader_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'distribution')
         ]
     },
     'ShaderNodeBsdfGlossy': {
         'class': 'shader_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'distribution')
         ]
     },
 
     'ShaderNodeBsdfHair': {
         'class': 'shader_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'component')
         ]
     },
@@ -1939,7 +1939,7 @@ node_specifications = {
     },
     'ShaderNodeBsdfPrincipled': {
         'class': 'shader_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'distribution'),
             dropdown(node, 'subsurface_method')
         ]
@@ -1947,7 +1947,7 @@ node_specifications = {
 
     'ShaderNodeBsdfHairPrincipled': {
         'class': 'shader_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'parametrization')
         ]
     },
@@ -1957,7 +1957,7 @@ node_specifications = {
     },
     'ShaderNodeBsdfRefraction': {
         'class': 'shader_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'distribution')
         ]
     },
@@ -1966,7 +1966,7 @@ node_specifications = {
     },
     'ShaderNodeSubsurfaceScattering': {
         'class': 'shader_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'falloff')
         ]
     },
@@ -2001,7 +2001,7 @@ node_specifications = {
 
     'ShaderNodeTexBrick': {
         'class': 'texture_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Float(name="Offset", value=node.offset, minmax=(0.0, 1.0)),
             widgets.Value(name="Frequency", value=node.offset_frequency),
             widgets.Float(name="Squash", value=node.squash),
@@ -2013,7 +2013,7 @@ node_specifications = {
     },    
     'ShaderNodeTexEnvironment': {
         'class': 'texture_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             image(node.image),
             dropdown(node, 'interpolation'),
             dropdown(node, 'projection'),
@@ -2027,20 +2027,20 @@ node_specifications = {
     },
     'ShaderNodeTexGradient': {
         'class': 'texture_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'gradient_type')
         ]
     },
     'ShaderNodeTexIES': {
         'class': 'texture_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             selectBar(node, 'mode'),
             widgets.IES(value="" if not node.ies else node.ies.name) if node.mode == 'INTERNAL' else widgets.File(value=node.filepath)
         ]
     },
     'ShaderNodeTexImage': {
         'class': 'texture_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             image(node.image),
             dropdown(node, 'interpolation'),
             dropdown(node, 'projection'),
@@ -2055,26 +2055,26 @@ node_specifications = {
     },
     'ShaderNodeTexMagic': {
         'class': 'texture_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Value(name="Depth", value=node.turbulence_depth)
         ]
     },
     'ShaderNodeTexMusgrave': {
         'class': 'texture_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'musgrave_dimensions'),
             dropdown(node, 'musgrave_type')
         ]
     },
     'ShaderNodeTexNoise': {
         'class': 'texture_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'noise_dimensions')
         ]
     },
     'ShaderNodeTexPointDensity': {
         'class': 'texture_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             selectBar(node, 'point_source'),
             widgets.String(value="" if not node.object else node.object.name, name="Object:"),
             widgets.String(value="" if not node.particle_system else node.particle_system.name, name="Particle System:"),
@@ -2087,7 +2087,7 @@ node_specifications = {
     },
     'ShaderNodeTexSky': {
         'class': 'texture_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'sky_type'),
             *([
                 widgets.Sphere(values=node.sun_direction),
@@ -2115,7 +2115,7 @@ node_specifications = {
     },
     'ShaderNodeTexVoronoi': {
         'class': 'texture_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'voronoi_dimensions'),
             dropdown(node, 'feature'),
             dropdown(node, 'distance') if node.voronoi_dimensions != '1D' and node.feature not in ['DISTANCE_TO_EDGE', 'N_SPHERE_RADIUS'] else None
@@ -2123,7 +2123,7 @@ node_specifications = {
     },
     'ShaderNodeTexWave': {
         'class': 'texture_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'wave_type'),
             dropdown(node, 'rings_direction') if node.wave_type[0] == "R" else dropdown(node, 'bands_direction'),
             dropdown(node, 'wave_profile')
@@ -2131,7 +2131,7 @@ node_specifications = {
     },
     'ShaderNodeTexWhiteNoise': {
         'class': 'texture_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'noise_dimensions')
         ]
     },
@@ -2161,7 +2161,7 @@ node_specifications = {
             'RGBA': 'color_node',
             'ROTATION': 'vector_node'
         }[node.data_type],
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'data_type'),
             dropdown(node, 'factor_mode') if node.data_type == 'VECTOR' else None,
             *([
@@ -2174,7 +2174,7 @@ node_specifications = {
     },
     'ShaderNodeMixRGB': {
         'class': 'color_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'blend_type'),
             widgets.Boolean(name="Clamp", value=node.use_clamp)
         ],
@@ -2182,8 +2182,8 @@ node_specifications = {
     },
     'ShaderNodeRGBCurve': {
         'class': 'color_node',
-        'props': lambda node: [
-            curve(node.mapping, type="CRGB")
+        'props': lambda node, args: [
+            curve(node.mapping, type='CRGB', sampling=args['quality'])
         ]
     },
 
@@ -2191,51 +2191,51 @@ node_specifications = {
 
     'ShaderNodeBump': {
         'class': 'vector_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             widgets.Boolean(name="Invert", value=node.invert)
         ]
     },
     'ShaderNodeDisplacement': {
         'class': 'vector_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'space')
         ]
     },
     'ShaderNodeMapping': {
         'class': 'vector_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'vector_type', "Type:")
         ]
     },
     'ShaderNodeNormalMap': {
         'class': 'vector_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'space'),
             widgets.UVMap() if node.space ==  'TANGENT' else None
         ]
     },
     'ShaderNodeVectorCurve': {
         'class': 'vector_node',
-        'props': lambda node: [
-            curve(node.mapping, type='XYZ')
+        'props': lambda node, args: [
+            curve(node.mapping, type='XYZ', sampling=args['quality'])
         ]
     },
     'ShaderNodeVectorDisplacement': {
         'class': 'vector_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'space')
         ]
     },
     'ShaderNodeVectorRotate': {
         'class': 'vector_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'rotation_type', "Type:"),
             widgets.Boolean(name="Invert", value=node.invert)
         ]
     },
     'ShaderNodeVectorTransform': {
         'class': 'vector_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             selectBar(node, 'vector_type'),
             dropdown(node, 'convert_from'),
             dropdown(node, 'convert_to')
@@ -2249,19 +2249,19 @@ node_specifications = {
     },
     'ShaderNodeClamp': {
         'class': 'converter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'clamp_type')
         ]
     },
     'ShaderNodeValToRGB': {
         'class': 'converter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             ramp(node)
         ]
     },
     'ShaderNodeCombineColor': {
         'class': 'converter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'mode')
         ]
     },
@@ -2270,14 +2270,14 @@ node_specifications = {
     },
     'ShaderNodeFloatCurve': {
         'class': 'converter_node',
-        'props': lambda node: [
-            curve(node.mapping)
+        'props': lambda node, args: [
+            curve(node.mapping, sampling=args['quality'])
         ]
     },
     'ShaderNodeMapRange': {
         'class': None,
         'class_behavior': lambda node: 'converter_node' if node.data_type[0] == "F" else 'vector_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'data_type'),
             dropdown(node, 'interpolation_type'),
             widgets.Boolean(name="Clamp", value=node.clamp) if node.data_type[-1] == "R" else None
@@ -2286,7 +2286,7 @@ node_specifications = {
     'ShaderNodeMath': {
         'class': 'converter_node',
         'name_behavior': lambda node: enumName(node, 'operation'),
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'operation'),
             widgets.Boolean(name="Clamp", value=node.use_clamp)
         ]
@@ -2297,7 +2297,7 @@ node_specifications = {
     },
     'ShaderNodeSeparateColor': {
         'class': 'converter_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'mode')
         ]
     },
@@ -2309,7 +2309,7 @@ node_specifications = {
     },
     'ShaderNodeVectorMath': {
         'class': 'vector_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             dropdown(node, 'operation')
         ],
         'name_behavior': lambda node: node.operation
@@ -2322,7 +2322,7 @@ node_specifications = {
 
     'ShaderNodeScript': {
         'class': 'script_node',
-        'props': lambda node: [
+        'props': lambda node, _: [
             selectBar(node, 'mode'),
             widgets.Script(value="" if not node.script else node.script.name) if node.mode[0] == "I" else widgets.File(node.filepath)
         ]
@@ -2333,7 +2333,7 @@ node_specifications = {
 
     'PlaceholderNode': {
         'class': 'script_node',
-        'props': lambda node: generateCustomProps(node)
+        'props': lambda node, _: generateCustomProps(node)
     }
 
 }
