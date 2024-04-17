@@ -312,15 +312,33 @@ node_specifications = {
         'class': 'color_node',
         'props': lambda node, _: [
             dropdown(node, 'correction_method', label="Correction Formula:"),
-            widgets.Columns(wids=[
-                widgets.ColorPicker(color=node.lift),
-                widgets.ColorPicker(color=node.gamma),
-                widgets.ColorPicker(color=node.gain),
-            ]),
-            widgets.Columns(wids=[
-                widgets.Label(text="Lift:"), widgets.RGBA(color=socketColorToSVGColor(node.lift)),
-                widgets.Label(text="Gamma:"), widgets.RGBA(color=socketColorToSVGColor(node.gamma)),
-                widgets.Label(text="Gain:"), widgets.RGBA(color=socketColorToSVGColor(node.gain)),
+            *([
+                widgets.Columns(wids=[
+                    widgets.ColorPicker(color=node.lift),
+                    widgets.ColorPicker(color=node.gamma),
+                    widgets.ColorPicker(color=node.gain),
+                ]),
+                widgets.Columns(wids=[
+                    widgets.Label(text="Lift:"), widgets.RGBA(color=socketColorToSVGColor(node.lift)),
+                    widgets.Label(text="Gamma:"), widgets.RGBA(color=socketColorToSVGColor(node.gamma)),
+                    widgets.Label(text="Gain:"), widgets.RGBA(color=socketColorToSVGColor(node.gain)),
+                ])
+            ] if node.correction_method == 'LIFT_GAMMA_GAIN' else [
+                widgets.Columns(wids=[
+                    widgets.ColorPicker(color=node.offset),
+                    widgets.ColorPicker(color=node.power),
+                    widgets.ColorPicker(color=node.slope),
+                ]),
+                widgets.Columns(wids=[
+                    widgets.Label(text="Offset:"), widgets.RGBA(color=socketColorToSVGColor(node.offset)),
+                    widgets.Label(text="Power:"), widgets.RGBA(color=socketColorToSVGColor(node.power)),
+                    widgets.Label(text="Slope:"), widgets.RGBA(color=socketColorToSVGColor(node.slope)),
+                ]),
+                widgets.Columns(wids=[
+                    widgets.Float(name="Basis", value=node.offset_basis),
+                    widgets.Empty(),
+                    widgets.Empty()
+                ], resize_override=False)
             ])
         ]
     },
