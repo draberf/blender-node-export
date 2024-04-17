@@ -1,7 +1,7 @@
 # node.name -- needs to remove .### in case of multiple nodes
 
 from . import widgets
-from .methods import socketColorToSVGColor, enumName, getFloatString, colorCorrect
+from .methods import socketColorToSVGColor, enumName, getFloatString, colorCorrect, insertIntoSortedByKey
 from .constants import IGNORE_PROPS, CATEGORY_NAMES
 
 
@@ -41,20 +41,34 @@ def curve(curving, type='VALUE', sampling=40) -> widgets.Widget:
     
     def evaluate_curve_n(n):
         pairs = []
-        for N in range(sampling+1):
+        # we can skip outermost values as they are part of curve map points
+        for N in range(1, sampling):
             x = curving.clip_min_x + N * (curving.clip_max_x-curving.clip_min_x) * (1.0 / sampling)
             y = curving.evaluate(curving.curves[n], x)
+            pairs.append((x, y))
+
+        
+        # insert points
+        for curve_point in curving.curves[n].points:
+            point_x, point_y = curve_point.location
+            pairs = insertIntoSortedByKey((point_x, point_y), pairs, lambda x: x[0])
+
+        # normalize
+        norm_pairs = []
+        for x, y in pairs:
             calc_y = (y-curving.clip_min_y) / (curving.clip_max_y-curving.clip_min_y)
-            pairs.append((
+            norm_pairs.append((
                 (x-curving.clip_min_x) / (curving.clip_max_x-curving.clip_min_x),
                 2 * calc_y - 1 if type == 'CORRECT' else calc_y
             ))
-        return pairs
+
+        return norm_pairs
+                    
     
     match type:
         case "VALUE":
             points = evaluate_curve_n(0)
-            return widgets.Curves(curves=[('axis_w', points, False)])
+            return widgets.Curves(curves=[('axis_w', points, True)])
         case "CRGB":
             return widgets.Curves(curves=[
                 ('axis_w', evaluate_curve_n(3), True),
@@ -77,10 +91,18 @@ def ramp(node, n=50) -> widgets.Ramp:
     color_mode = node.color_ramp.color_mode
     interpolation = enumName(node.color_ramp, 'interpolation' if color_mode == 'RGB' else 'hue_interpolation') 
 
+    evals = [(i/n, node.color_ramp.evaluate(min(i/n, 1.0))) for i in range(n+1)]
+
+    stops=[(element.position, element.color[:3]) for element in node.color_ramp.elements]
+    for stop in stops:
+        evals = insertIntoSortedByKey(stop, evals, key=lambda x: x[0])
+
+    print(evals)
+
     return widgets.Ramp(color_mode=color_mode,
                         interpolation=interpolation,
-                        stops=[(element.position, element.color) for element in node.color_ramp.elements],
-                        evals=[node.color_ramp.evaluate(min(i/n, 1.0)) for i in range(n+1)])
+                        stops=stops,
+                        evals=evals)
 
 def generateCustomProps(node):
     
@@ -437,8 +459,8 @@ node_specifications = {
     },
     'CompositorNodeValToRGB': {
         'class': 'converter_node',
-        'props': lambda node, _: [
-            ramp(node)
+        'props': lambda node, args: [
+            ramp(node, args['quality'])
         ]
     },
     'CompositorNodeCombineColor': {
@@ -2255,8 +2277,8 @@ node_specifications = {
     },
     'ShaderNodeValToRGB': {
         'class': 'converter_node',
-        'props': lambda node, _: [
-            ramp(node)
+        'props': lambda node, args: [
+            ramp(node, args['quality'])
         ]
     },
     'ShaderNodeCombineColor': {
