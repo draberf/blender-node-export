@@ -352,9 +352,9 @@ class UIInspectPanel(UIPanel):
             text='Export'
         )
 
-        layout.operator(
-            operator='ui.inspector',
-            icon='NODE',
-            text='Inspect Selected'
-        )
+        #layout.operator(
+        #    operator='ui.inspector',
+        #    icon='NODE',
+        #    text='Inspect Selected'
+        #)
 panels.append(UIInspectPanel)
