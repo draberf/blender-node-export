@@ -461,14 +461,14 @@ class Ramp(Widget):
         if self.kwargs['use_gradient']:
             
             grad = ET.SubElement(elem, 'linearGradient', id='ramp_grad')
-            for i, (start, _) in enumerate(zip(self.evals[:-1], self.evals[1:])):
+            for x, color in self.evals[:-1]:
                 ET.SubElement(grad, 'stop', attrib={
-                    'offset':str(i/len(self.evals)),
-                    'stop-color':socketColorToSVGColor(start)
+                    'offset':str(x),
+                    'stop-color':socketColorToSVGColor(color, corrected=False)
                 })
             ET.SubElement(grad, 'stop', attrib={
                 'offset':'1',
-                'stop-color':socketColorToSVGColor(self.evals[-1])
+                'stop-color':socketColorToSVGColor(self.evals[-1][1], corrected=False)
             })
             ET.SubElement(elem, 'rect', attrib={
                 'x':'0',
@@ -479,12 +479,11 @@ class Ramp(Widget):
             })
 
         else:
-            bar_width = width/(len(self.evals)-1)
-
-            for i, (start, _) in enumerate(zip(self.evals[:-1], self.evals[1:])):
-                x_start = i * bar_width
+            for (start, color), (end, _) in zip(self.evals[:-1], self.evals[1:]):
+                x_start = start * width
+                bar_width = (end-start) * width
         
-                color_string = str(socketColorToSVGColor(start))
+                color_string = str(socketColorToSVGColor(color, corrected=False))
                 ET.SubElement(elem, 'rect', attrib={
                     'x':str(x_start),
                     'y':str(self.height()/3.0 + constants.SOCKET_GAP),
