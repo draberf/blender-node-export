@@ -123,14 +123,15 @@ class Boolean(Widget):
 
         # add value to rectangle, draw checkmark
         if self.value:
-            rect.set('fill', '#7777dd')
+            rect.set('class', 'bool_true')
             check = ET.SubElement(elem,'polyline', fill='none', stroke='white')
             check.set('stroke-width', "1")
+            check.set('class', 'checkmark')
             check.set('points', f"{constants.LINKED_SOCKET_HEIGHT*0.4}, {constants.LINKED_SOCKET_HEIGHT*0.5},\
                       {constants.LINKED_SOCKET_HEIGHT*0.5}, {constants.LINKED_SOCKET_HEIGHT*0.6},\
                         {constants.LINKED_SOCKET_HEIGHT*0.7}, {constants.LINKED_SOCKET_HEIGHT*0.3}")
         else:
-            rect.set('fill', '#222222')
+            rect.set('class', 'bool_false')
 
         # add nameplate (svg offset by button width)
         elem.append(Label(text=self.name).prepend_id(self.id).svg(width=width-constants.LINKED_SOCKET_HEIGHT, x=constants.LINKED_SOCKET_HEIGHT))
