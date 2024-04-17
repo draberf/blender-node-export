@@ -27,9 +27,13 @@ class Widget():
     def fill_svg(self, elem, width=0) -> None:
         return
 
-    def svg(self, x=0, y=0, width=0, resize=True) -> ET.Element:
+    def svg(self, x=0, y=0, width=0, resize=True, **kwargs) -> ET.Element:
+        
         if resize:
-            return self.svg(x=x+DEFAULT_PADDING*width, y=y, width=(1-2*DEFAULT_PADDING)*width, resize=False)
+            return self.svg(x=x+DEFAULT_PADDING*width, y=y, width=(1-2*DEFAULT_PADDING)*width, resize=False, **kwargs)
+        
+        self.kwargs = kwargs
+        
         elem = ET.Element('g', id=self.id)
         clip_id = self.id+'_clip'
         g_id = self.id+'_g'
