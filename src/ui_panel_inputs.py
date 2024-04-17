@@ -18,6 +18,9 @@ class ExportPropertyGroup(bpy.types.PropertyGroup):
     # toggle whether export should only include selected nodes
     export_selected_only: bpy.props.BoolProperty(name="Export Selected Only", default=False)
 
+    # use rounded corners
+    rounded_corners: bpy.props.BoolProperty(name="Rounded Corners", default=True)
+
     # graphical quality of certain elements
     fidelity: bpy.props.IntProperty(name="Element Fidelity", min=0, max=50, default=10)
 
@@ -109,7 +112,6 @@ def resetColors(prop_group, context):
         setattr(prop_group, k, v)
     
     prop_group.header_opacity = HEADER_OPACITY
-
    
 
 class UIInspectOperator(bpy.types.Operator):
@@ -191,6 +193,7 @@ operators.append(UIColorResetOperator)
 def dumpProperties(group) -> dict:
 
     output = {
+        'rounded_corners': group.rounded_corners,
         'fidelity': group.fidelity,
         'use_gradients': group.use_gradients,
         'rect_outline': group.rect_outline,
@@ -252,7 +255,7 @@ panels.append(UIParentPanel)
 class UIQualityPanel(UIPanel):
     bl_parent_id = 'NODE_EDITOR_PT_export_parent'
     bl_idname = "NODE_EDITOR_PT_quality"
-    bl_label = "Element Quality"
+    bl_label = "Detail"
 
     def draw(self, context):
         
@@ -261,6 +264,7 @@ class UIQualityPanel(UIPanel):
 
         layout.prop(props, 'fidelity')
         layout.prop(props, 'use_gradients')
+        layout.prop(props, 'rounded_corners')
 
 
 panels.append(UIQualityPanel)
