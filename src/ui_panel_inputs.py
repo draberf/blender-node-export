@@ -62,25 +62,38 @@ class ExportPropertyGroup(bpy.types.PropertyGroup):
     # target file to export into
     output: bpy.props.StringProperty(name = "Output", subtype='FILE_PATH')
 
+def getElementColors(context):
+    elem_colors = {}
+    theme = context.preferences.themes[0]
+    elem_colors['color_base'] = theme.node_editor.node_backdrop
+    elem_colors['color_string_field'] = theme.user_interface.wcol_text.inner
+    elem_colors['color_bool_false'] = theme.user_interface.wcol_option.inner
+    elem_colors['color_bool_true'] = theme.user_interface.wcol_option.inner_sel
+    elem_colors['color_value_field'] = theme.user_interface.wcol_numslider.inner
+    elem_colors['color_value_progress'] = theme.user_interface.wcol_numslider.item
+    elem_colors['color_axis_x'] = theme.user_interface.axis_x
+    elem_colors['color_axis_y'] = theme.user_interface.axis_y
+    elem_colors['color_axis_z'] = theme.user_interface.axis_z
+    elem_colors['color_text'] = theme.user_interface.wcol_regular.text
+
+    return elem_colors
+
+def getCategoryColors(context):
+    theme = context.preferences.themes[0]
+    return {'header_color_'+name:getattr(theme.node_editor, name+'_node') for name in CATEGORY_NAMES}
+
+
 def resetColors(prop_group, context):
 
-    theme = context.preferences.themes[0]
+    for k, v in getElementColors(context).items():
+        setattr(prop_group, k, v)
 
-    # theme.user_interace
-    prop_group.color_base = theme.node_editor.node_backdrop
-    prop_group.color_string_field = theme.user_interface.wcol_text.inner
-    prop_group.color_bool_false = theme.user_interface.wcol_option.inner
-    prop_group.color_bool_true = theme.user_interface.wcol_option.inner_sel
-    prop_group.color_value_field = theme.user_interface.wcol_numslider.inner
-    prop_group.color_value_progress = theme.user_interface.wcol_numslider.item
-    prop_group.color_axis_x = theme.user_interface.axis_x
-    prop_group.color_axis_y = theme.user_interface.axis_y
-    prop_group.color_axis_z = theme.user_interface.axis_z
-    prop_group.color_text = theme.user_interface.wcol_regular.text
-
+    for k, v in getCategoryColors(context).items():
+        setattr(prop_group, k, v)
+    
     prop_group.header_opacity = HEADER_OPACITY
-    for name in CATEGORY_NAMES:
-        setattr(prop_group, 'header_color_'+name, getattr(theme.node_editor, name+'_node'))
+
+   
 
 class UIInspectOperator(bpy.types.Operator):
     bl_idname = "ui.inspector"
