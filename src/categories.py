@@ -54,23 +54,23 @@ def curve(curving, type='VALUE', sampling=40) -> widgets.Widget:
     match type:
         case "VALUE":
             points = evaluate_curve_n(0)
-            return widgets.Curves(curves=[('black', points, False)])
+            return widgets.Curves(curves=[('axis_w', points, False)])
         case "CRGB":
             return widgets.Curves(curves=[
-                ('#222222', evaluate_curve_n(3), True),
-                *[(color, evaluate_curve_n(N), False) for N, color in enumerate(['red', 'green', 'blue'])]
+                ('axis_w', evaluate_curve_n(3), True),
+                *[(color, evaluate_curve_n(N), False) for N, color in enumerate(['axis_x', 'axis_y', 'axis_z'])]
             ])
         case "XYZ":
             return widgets.Curves(curves=[
-                (color, evaluate_curve_n(N), False) for N, color in enumerate(['red', 'green', 'blue'])
+                (color, evaluate_curve_n(N), False) for N, color in enumerate(['axis_x', 'axis_y', 'axis_z'])
             ])
         case "CORRECT":
             return widgets.Curves(curves=[
-                (color, evaluate_curve_n(N), False) for N, color in enumerate(['red', 'green', 'blue'])
+                (color, evaluate_curve_n(N), False) for N, color in enumerate(['axis_x', 'axis_y', 'axis_z'])
             ], hue_background=True)
         case _:
             print(f"WARNING: Undefined curve type {type}.")
-            return widgets.Curves(curves=[('black'), evaluate_curve_n(0), False])
+            return widgets.Curves(curves=[('axis_w'), evaluate_curve_n(0), False])
 
 def ramp(node, n=50) -> widgets.Ramp:
 
