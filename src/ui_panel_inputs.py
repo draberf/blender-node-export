@@ -119,11 +119,10 @@ class UIInspectOperator(bpy.types.Operator):
             return {'CANCELLED'}
 
         for node in nodes:
-
-            print(">>>", node.bl_idname, node.name)
+            print(">>>", node.bl_idname, node.name, node.dimensions)
             print("Inputs:")
-            for input in node.outputs:
-                print(">", input.name)
+            for input   in node.outputs:
+                print(">", input.name, input.hide, input.enabled, input.is_unavailable)
                 if input.type == 'RGBA':
                     for prop in input.bl_rna.properties:
                         print(">>>", prop, prop.type, prop.subtype, "name", prop.name)
