@@ -16,8 +16,18 @@ class ExportPropertyGroup(bpy.types.PropertyGroup):
     # toggle whether export should only include selected nodes
     export_selected_only: bpy.props.BoolProperty(name="Export Selected Only", default=False)
 
+    # graphical quality of certain elements
+    fidelity: bpy.props.IntProperty(name="Element Fidelity", min=0, max=50, default=10)
+
+    # use gradients for certain elements
+    use_gradients: bpy.props.BoolProperty(name="Use Gradients", default=False)
+
     # use category defaults automatically
     use_theme_colors: bpy.props.BoolProperty(name="Use theme colors", default=False)
+
+    # add outline to rectangles
+    rect_outline:           bpy.props.FloatProperty(name="Outline Thickness", min=0, soft_max=10)
+    rect_outline_color:     bpy.props.FloatVectorProperty(name="Outline Color", subtype='COLOR_GAMMA', min=0, max=1, size=4)
 
     # node element colors
     color_base:             bpy.props.FloatVectorProperty(name="Base",          subtype='COLOR_GAMMA', min=0, max=1, size=4)
