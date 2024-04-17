@@ -318,6 +318,8 @@ class Dropdown(Widget):
 
 class ColorPicker(Widget):
     
+    css_classname = 'picker'
+
     def __init__(self, color=[1.0,0.0,0.0], **kwargs) -> None:
         super().__init__(**kwargs)
         self.color = color
@@ -389,6 +391,8 @@ class SelectBar(Widget):
 
 class Curves(Widget):
     
+    css_classname = 'curves'
+
     def __init__(self, curves=[], hue_background=False) -> None:
         super().__init__()
         self.curves = curves
@@ -430,6 +434,8 @@ class Curves(Widget):
 
 class Ramp(Widget):
     
+    css_classname = 'ramp'
+
     def __init__(self, color_mode="RGB", interpolation="Ease", stops=[], evals=[[0.0,0.0,0.0]], use_gradient=False) -> None:
         super().__init__()
         self.stops=stops
@@ -500,6 +506,8 @@ class Font(Placeholder):
 
 
 class String(Widget):
+
+    css_classname = 'string'
 
     def __init__(self, value="", name="") -> None:
         super().__init__()
