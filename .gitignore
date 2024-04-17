@@ -168,3 +168,4 @@ src/*_old.py
 *.png
 *.pdf
 *.zip
+*.conf
