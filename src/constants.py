@@ -78,7 +78,7 @@ CATEGORY_NAMES = (
 )
 
 ELEMENTS = (
-    'base', 'string_field',
+    'text', 'base', 'string_field',
     'bool_false', 'bool_true',
     'value_field', 'value_progress',
     'axis_x', 'axis_y', 'axis_z'
