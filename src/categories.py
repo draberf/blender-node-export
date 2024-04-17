@@ -97,8 +97,6 @@ def ramp(node, n=50) -> widgets.Ramp:
     for stop in stops:
         evals = insertIntoSortedByKey(stop, evals, key=lambda x: x[0])
 
-    print(evals)
-
     return widgets.Ramp(color_mode=color_mode,
                         interpolation=interpolation,
                         stops=stops,
@@ -132,8 +130,6 @@ def generateCustomProps(node):
                         widgets.String(value=getattr(node, prop.identifier))
                     ])
                 case 'ENUM':
-                    print([item for item in node.bl_rna.properties.items()])
-                    print('>>>>>', prop.identifier)
                     wids.extend([
                         widgets.Label(text=prop.name),
                         dropdown(node, prop.identifier)
