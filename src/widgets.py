@@ -70,8 +70,7 @@ class Placeholder(Widget):
         line2 = ET.SubElement(elem, 'line', x1='0', y1=str(self.height()), x2=str(width), y2='0')
         for elem in [rect, line1, line2]:        
             elem.set('fill', 'none')
-            elem.set('stroke', '#cccccc')
-            elem.set('stroke-width', '0.5')
+            elem.set('style', 'stroke:#cccccc;stroke-width:0.5')
 
 class Label(Widget):
 
