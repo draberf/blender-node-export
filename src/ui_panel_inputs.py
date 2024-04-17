@@ -152,15 +152,7 @@ class UIExportOperator(bpy.types.Operator):
 
         doctype = "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">"
 
-
-        tree = Converter(context,
-                         selected_only=props.export_selected_only,
-                         use_default_colors=props.use_theme_colors,
-                         custom_colors={
-                             name+'_node':getattr(props, 'header_color_'+name) for name in CATEGORY_NAMES
-                         },
-                         header_opacity=props.header_opacity
-                         ).convert()
+        tree = Converter(context).convert()
         
         with open(bpy.path.abspath(context.scene.export_svg_props.output), "w+") as f:
             f.write(header)
