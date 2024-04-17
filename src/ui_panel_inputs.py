@@ -1,3 +1,5 @@
+import json
+
 import bpy
 
 from .uinodes import Converter
@@ -65,9 +67,14 @@ class ExportPropertyGroup(bpy.types.PropertyGroup):
     # colors of nodes
     node_color: bpy.props.FloatVectorProperty(name="Base Color", subtype='COLOR', min=0, max=1)
 
-    # outline settings
-    outline_thickness: bpy.props.FloatProperty(name="Outline Thickness", min=0, max=10)
-    outline_color: bpy.props.FloatVectorProperty(name="Outline Color", subtype='COLOR', min=0, max=1)
+    # config file mode
+    config_mode:        bpy.props.EnumProperty(items=[
+            ('SAVE', "Save", "Export a configuration file"),
+            ('LOAD', "Load", "Import a configuration file"),
+        ], name="Mode", default='LOAD')
+    
+    config_save_path:   bpy.props.StringProperty(name = "Save to", subtype='FILE_PATH')
+    config_load_path:   bpy.props.StringProperty(name = "Load from", subtype='FILE_PATH')
 
     # target file to export into
     output: bpy.props.StringProperty(name = "Output", subtype='FILE_PATH')
@@ -179,8 +186,53 @@ class UIColorResetOperator(bpy.types.Operator):
 
         resetColors(context.scene.export_svg_props, context)
         return {'FINISHED'}
-
 operators.append(UIColorResetOperator)
+
+def dumpProperties(group) -> dict:
+
+    output = {
+        'fidelity': group.fidelity,
+        'use_gradients': group.use_gradients,
+        'rect_outline': group.rect_outline,
+        'rect_outline_color': group.rect_outline_color[0:],
+    }
+
+    for name in ['color_'+x for x in ELEMENTS]+['header_color_'+x for x in CATEGORY_NAMES]+['node_color']:
+        output[name] = getattr(group, name)[0:]
+
+    return output
+
+def loadProperties(json_string, group):
+    
+    for k, v in json.loads(json_string).items():
+        setattr(group, k, v)
+
+class UIConfigExportOperator(bpy.types.Operator):
+    bl_idname = 'ui.config_export'
+    bl_label = "Save"
+
+    def execute(self, context):
+        
+        with open(bpy.path.abspath(context.scene.export_svg_props.config_save_path), "w+") as f:
+            dump = json.dumps(dumpProperties(context.scene.export_svg_props), indent=4)
+            f.write(dump)
+
+            return {'FINISHED'}
+operators.append(UIConfigExportOperator)
+
+class UIConfigImportOperator(bpy.types.Operator):
+    bl_idname = 'ui.config_import'
+    bl_label = "Load"
+
+    def execute(self, context):
+
+        with open(bpy.path.abspath(context.scene.export_svg_props.config_load_path), "r+") as f:
+            loadProperties(f.read(), context.scene.export_svg_props)
+
+            return {'FINISHED'}
+operators.append(UIConfigImportOperator)
+
+
 
 class UIPanel(bpy.types.Panel):
     bl_space_type = 'NODE_EDITOR'
@@ -245,8 +297,35 @@ class UIColorPanel(UIPanel):
 
 panels.append(UIColorPanel)
 
+class UIConfigPanel(UIPanel):
+    bl_parent_id = 'NODE_EDITOR_PT_export_parent'
+    bl_idname = "NODE_EDITOR_PT_conf"
+    bl_label = "Save/Load Configuration"
+
+    def draw(self, context):
+         
+        layout = self.layout
+        props = context.scene.export_svg_props
+
+        layout.prop(props, 'config_mode', text="")
+
+        save_row = layout.column()
+        save_row.prop(props, 'config_save_path')
+        save_row.operator('ui.config_export')
+        
+        load_row = layout.column()
+        load_row.prop(props, 'config_load_path')
+        load_row.operator('ui.config_import')
+
+        # enable/disable
+        save_row.enabled = (props.config_mode == 'SAVE')
+        load_row.enabled = (props.config_mode == 'LOAD')
+
+panels.append(UIConfigPanel)
+
 class UIInspectPanel(UIPanel):
     bl_parent_id = 'NODE_EDITOR_PT_export_parent'
+    bl_idname = "NODE_EDITOR_PT_export"
     bl_label = "Export"
 
     def draw(self, context):
