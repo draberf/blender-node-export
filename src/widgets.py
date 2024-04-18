@@ -336,7 +336,7 @@ class ColorPicker(Widget):
         elem.attrib.pop('clip-path')
 
         defs = ET.SubElement(elem, 'defs')
-        grad = ET.SubElement(defs, 'linearGradient', id='vertical_grad', x1='0', x2='0', y1='0', y2='1')
+        grad = ET.SubElement(defs, 'linearGradient', id='vertical_grad', x1='0', x2='0', y1='0', y2=str(self.height()), gradientUnits='userSpaceOnUse')
         ET.SubElement(grad, 'stop', attrib={'offset':  '0%', 'stop-color':'white'})
         ET.SubElement(grad, 'stop', attrib={'offset':'100%', 'stop-color':'black'})
 
