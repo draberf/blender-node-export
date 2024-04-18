@@ -277,10 +277,20 @@ class Converter():
         ## color wheel
         color_wheel = ET.SubElement(defs, 'symbol', id='color_wheel')
         ### add 'cloud' over gradient
-        cloud = ET.SubElement(color_wheel, 'radialGradient', id='cloud_gradient')
-        ET.SubElement(cloud, 'stop', attrib={'offset':  '0%', 'stop-opacity':'1'  , 'stop-color':'white'})
-        ET.SubElement(cloud, 'stop', attrib={'offset': '60%', 'stop-opacity':'0.5', 'stop-color':'white'})
-        ET.SubElement(cloud, 'stop', attrib={'offset':'100%', 'stop-opacity':'0'  , 'stop-color':'white'})
+        cloud_lin = ET.SubElement(color_wheel, 'linearGradient', id='cloud_gradient_linear')
+        ET.SubElement(cloud_lin, 'stop', attrib={'offset':   '0', 'stop-opacity':'1'  , 'stop-color':'white'})
+        ET.SubElement(cloud_lin, 'stop', attrib={'offset': '0.6', 'stop-opacity':'0.5', 'stop-color':'white'})
+        ET.SubElement(cloud_lin, 'stop', attrib={'offset': '1.0', 'stop-opacity':'0'  , 'stop-color':'white'})
+        cloud = ET.SubElement(color_wheel, 'radialGradient', attrib={
+            'id':'cloud_gradient',
+            'xlink:href':'#cloud_gradient_linear',
+            'cx':'0',
+            'cy':'0',
+            'fx':'0',
+            'fy':'0',
+            'r':'50',
+            'gradientUnits':'userSpaceOnUse'
+        })
         radius=50
         grp = ET.SubElement(color_wheel, 'g', transform=f'translate({radius},{radius})')
         steps=2*self.quality
@@ -314,7 +324,11 @@ class Converter():
 
     def convert(self) -> ET.ElementTree:
         
-        svg = ET.Element('svg', version="1.1", xmlns="http://www.w3.org/2000/svg")
+        svg = ET.Element('svg', attrib={
+            'version':'1.1',
+            'xmlns':'http://www.w3.org/2000/svg',
+            'xmlns:xlink':'http://www.w3.org/1999/xlink'
+        })
 
         svg.append(self.makeDefs())
 
