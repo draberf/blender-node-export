@@ -49,7 +49,7 @@ class Widget():
             'ry':'3' if self.kwargs['rounded_corners'] else '0'
         })
         g = ET.SubElement(elem, 'g', id=g_id, attrib={
-            'clip-path': f'url(#{clip_id})'
+            'clip-path': f'url(#{clip_id}) '
             })
         self.fill_svg(g, width=width)
         elem.set('transform',f'translate({x},{y})')
