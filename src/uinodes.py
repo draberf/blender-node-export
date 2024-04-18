@@ -344,7 +344,7 @@ class Converter():
             to_x, to_y, _ = self.anchor_refs[link[1]]
             is_muted = link[2]
 
-            opacity = '100%' if not is_muted else '20%'
+            opacity = '1' if not is_muted else '0.2'
 
             color1 = from_anchor_object.color
 
@@ -496,9 +496,9 @@ class UINode():
         clip_id = f'{self.id}_super_clip'
         clip = ET.SubElement(supergroup, 'clipPath', id=clip_id)
         clip.append(clip_rect)
-        group = ET.SubElement(supergroup, 'g', attrib={'clip-path':f'url(#{clip_id}'})
+        group = ET.SubElement(supergroup, 'g', attrib={'clip-path':f'url(#{clip_id})'})
         supergroup.append(clip_rect)
-        if self.muted: supergroup.set('opacity', '50%')
+        if self.muted: supergroup.set('opacity', '0.5')
         
         # frame
         rect = self.frame()
@@ -675,7 +675,7 @@ class UIHiddenNode(UINode):
 
         # create group
         group = ET.Element('g', transform=f'translate({self.x},{self.y})', id=f'{self.id}')
-        if self.muted: group.set('opacity', '50%')
+        if self.muted: group.set('opacity', '0.5')
         
         # add round rectangle base
         ET.SubElement(group, 'rect', attrib={
@@ -692,7 +692,7 @@ class UIHiddenNode(UINode):
             'height':str(self.h),
             'rx':str(self.h/2),
             'ry':str(self.h/2),
-            'opacity':str(header_opacity)+'%',
+            'opacity':str(header_opacity/100),
             'fill':self.color,
             'stroke':'none'
         })
@@ -720,7 +720,7 @@ class UIHeader():
         rect = ET.SubElement(group, 'rect', attrib={
             'width':f'{self.width}',
             'height':f'{self.height}',
-            'opacity':str(opacity)+'%',
+            'opacity':str(opacity/100),
             'fill':self.color,
             'stroke':'none'
         })
