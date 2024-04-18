@@ -49,7 +49,7 @@ class Widget():
             'ry':'3' if self.kwargs['rounded_corners'] else '0'
         })
         g = ET.SubElement(elem, 'g', id=g_id, attrib={
-            'clip-path': f'url(#{clip_id}) '
+            'clip-path': f'url(#{clip_id})'
             })
         self.fill_svg(g, width=width)
         elem.set('transform',f'translate({x},{y})')
@@ -331,6 +331,9 @@ class ColorPicker(Widget):
         return 90.0
     
     def fill_svg(self, elem, width=DEFAULT_WIDTH) -> ET.Element:
+
+        # unset clipping from super element
+        elem.attrib.pop('clip-path')
 
         defs = ET.SubElement(elem, 'defs')
         grad = ET.SubElement(defs, 'linearGradient', id='vertical_grad', x1='0', x2='0', y1='0', y2='1')
