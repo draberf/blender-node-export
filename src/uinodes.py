@@ -64,22 +64,42 @@ def getFloatString(value: float, spaces: int = 5) -> str:
     s += (5-len(s))*"0"
     return s
 
-def style(colors, outline) -> ET.Element:
+def style(colors) -> ET.Element:
     
     style_elem = ET.Element('style')
 
     style_elem.text = '\n'.join([
-        "text { font-family: Sans, Arial; font-size: 0.6em; fill: "+colors['color_text']+" }",
-        "rect { stroke-width:"+str(outline['thickness'])+";stroke:"+methods.socketColorToSVGColor(outline['color'])+" }"
-        ".checkmark { stroke:"+colors['color_text']+" } ",
+
+        # texts
+        "text { font-family: Sans, Arial; font-size: 0.6em; fill: "+colors['text_base']+" }",
+        ".string text { fill: "+colors['text_string']+" }",
+        ".bool_true  text { fill: "+colors['text_boolean_true'] +" }",
+        ".bool_false text { fill: "+colors['text_boolean_false']+" }",
+        ".dropdown text { fill: "+colors['text_dropdown']+" }",
+        ".value text { fill: "+colors['text_slider']+" }",
+
+        # generic
+        "rect { stroke-width:"+str(colors['outline_thickness'])+";stroke:"+colors['outline_color']+" }",
         ".nodeframe { fill:"+colors['color_base']+" } ",
         ".marker { stroke-width: "+str(constants.MARKER_LINE)+"px; stroke: black}",
         ".arrow { stroke-width: 1; stroke: white; fill:none}",
-        ".string { fill:"+colors['color_string_field']+"}",
+        
+        # booleans
+        ".checkmark { stroke:"+colors['color_checkmark']+" } ",
         ".bool_false {fill:"+colors['color_bool_false']+"}",
         ".bool_true  {fill:"+colors['color_bool_true'] +"}",
+
+        # values
         ".value_bar {fill:"+colors['color_value_field']+"}",
         ".progress_bar {fill:"+colors['color_value_progress']+"}",
+
+        # strings
+        ".string { fill:"+colors['color_string_field']+"}",
+
+        # dropdowns
+        ".dropdown { fill:"+colors['color_dropdown']+"}",
+
+        # aces
         ".axis_x {stroke:"+colors['color_axis_x']+"}",
         ".axis_y {stroke:"+colors['color_axis_y']+"}",
         ".axis_z {stroke:"+colors['color_axis_z']+"}",
@@ -174,24 +194,10 @@ class Converter():
         # obtain properties
         props = context.scene.export_svg_props
 
-        self.colors = {}
-        if props.use_theme_colors:
-            prefs = methods.getColorsFromPreferences(context)
-            self.colors = {name+'_node':methods.socketColorToSVGColor(prefs['header_color_'+name]) for name in constants.CATEGORY_NAMES}
-            self.colors.update({'color_'+name:methods.socketColorToSVGColor(prefs['color_'+name]) for name in constants.ELEMENTS})
-            self.colors['noodliness'] = prefs['noodliness']
-            self.colors['header_opacity'] = prefs['header_opacity']
-        else:
-            self.colors = {name+'_node':methods.socketColorToSVGColor(getattr(props, 'header_color_'+name)) for name in constants.CATEGORY_NAMES}
-            self.colors.update({'color_'+name:methods.socketColorToSVGColor(getattr(props, 'color_'+name)) for name in constants.ELEMENTS})
-            self.colors['noodliness'] = context.preferences.themes[0].node_editor.noodle_curving
-            self.colors['header_opacity'] = props.header_opacity
-        
-        self.outline = {
-            'thickness':props.rect_outline if props.rect_outline > 0.005 else 0,
-            'color':props.rect_outline_color
-        }
-        self.header_opacity = self.colors['header_opacity']
+        self.colors = methods.getConfigurationFromContext(context)
+
+        print(self.colors)
+
 
         self.rounded_corners = props.rounded_corners
         self.quality = props.fidelity
@@ -261,7 +267,7 @@ class Converter():
 
         defs = ET.Element('defs')
 
-        defs.append(style(self.colors, self.outline))
+        defs.append(style(self.colors))
 
         # add symbols
 
@@ -391,7 +397,7 @@ class Converter():
         # add nodes to final SVG
         for node in self.nodes:
             try:
-                out = node.svg(self.header_opacity, use_gradient=self.use_gradient)
+                out = node.svg(self.colors['header_opacity'], use_gradient=self.use_gradient)
                 if out: svg.append(out)
             except Exception as e:
                 print(node.name)
