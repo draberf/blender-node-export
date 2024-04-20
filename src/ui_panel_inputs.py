@@ -3,8 +3,9 @@ import json
 import bpy
 
 from .uinodes import Converter
-from .constants import IGNORE_PROPS, HEADER_OPACITY, ELEMENTS
+from .constants import IGNORE_PROPS, HEADER_OPACITY, ELEMENTS, TEXTS
 from .categories import CATEGORY_NAMES
+from .methods import getTextColors, getElementColors, getCategoryColors
 
 TARGET = "D:\\skola_mit\\dp\\blender-node-export\\output.svg"
 
@@ -31,20 +32,31 @@ class ExportPropertyGroup(bpy.types.PropertyGroup):
     use_theme_colors: bpy.props.BoolProperty(name="Use theme colors", default=False)
 
     # add outline to rectangles
-    rect_outline:           bpy.props.FloatProperty(name="Outline Thickness", min=0, soft_max=10)
+    rect_outline:           bpy.props.FloatProperty(name="Outline Thickness", min=0, soft_max=10, default=0.3)
     rect_outline_color:     bpy.props.FloatVectorProperty(name="Outline Color", subtype='COLOR_GAMMA', min=0, max=1, size=4)
+
+    # text colors
+    use_generic_text:       bpy.props.BoolProperty(name="Use Generic Color", default=False)
+    text_generic:           bpy.props.FloatVectorProperty(name="Generic",    subtype='COLOR_GAMMA', min=0, max=1, size=3) 
+    text_base:              bpy.props.FloatVectorProperty(name="Base",       subtype='COLOR_GAMMA', min=0, max=1, size=3)
+    text_string:            bpy.props.FloatVectorProperty(name="String",     subtype='COLOR_GAMMA', min=0, max=1, size=3)
+    text_boolean_true:      bpy.props.FloatVectorProperty(name="Bool True",  subtype='COLOR_GAMMA', min=0, max=1, size=3)
+    text_boolean_false:     bpy.props.FloatVectorProperty(name="Bool False", subtype='COLOR_GAMMA', min=0, max=1, size=3)
+    text_dropdown:          bpy.props.FloatVectorProperty(name="Dropdown",   subtype='COLOR_GAMMA', min=0, max=1, size=3)
+    text_slider:            bpy.props.FloatVectorProperty(name="Slider",     subtype='COLOR_GAMMA', min=0, max=1, size=3)
 
     # node element colors
     color_base:             bpy.props.FloatVectorProperty(name="Base",          subtype='COLOR_GAMMA', min=0, max=1, size=4)
     color_string_field:     bpy.props.FloatVectorProperty(name="String Field",  subtype='COLOR_GAMMA', min=0, max=1, size=4)
+    color_dropdown:         bpy.props.FloatVectorProperty(name="Dropdown",      subtype='COLOR_GAMMA', min=0, max=1, size=4)
     color_bool_false:       bpy.props.FloatVectorProperty(name="False",         subtype='COLOR_GAMMA', min=0, max=1, size=4)
     color_bool_true:        bpy.props.FloatVectorProperty(name="True",          subtype='COLOR_GAMMA', min=0, max=1, size=4)
+    color_checkmark:        bpy.props.FloatVectorProperty(name="Checkmark",     subtype='COLOR_GAMMA', min=0, max=1, size=4)
     color_value_field:      bpy.props.FloatVectorProperty(name="Value",         subtype='COLOR_GAMMA', min=0, max=1, size=4)
     color_value_progress:   bpy.props.FloatVectorProperty(name="Progress Bar",  subtype='COLOR_GAMMA', min=0, max=1, size=4)
     color_axis_x:           bpy.props.FloatVectorProperty(name="Axis X",        subtype='COLOR_GAMMA', min=0, max=1, size=3)
     color_axis_y:           bpy.props.FloatVectorProperty(name="Axis Y",        subtype='COLOR_GAMMA', min=0, max=1, size=3)
     color_axis_z:           bpy.props.FloatVectorProperty(name="Axis Z",        subtype='COLOR_GAMMA', min=0, max=1, size=3)
-    color_text:             bpy.props.FloatVectorProperty(name="Text",          subtype='COLOR_GAMMA', min=0, max=1, size=3)
 
     # colors of node headers
     header_color_input:         bpy.props.FloatVectorProperty(name="Input",     subtype='COLOR_GAMMA', min=0, max=1, size=3) 
@@ -82,27 +94,6 @@ class ExportPropertyGroup(bpy.types.PropertyGroup):
     # target file to export into
     output: bpy.props.StringProperty(name = "Output", subtype='FILE_PATH')
 
-def getElementColors(context):
-    elem_colors = {}
-    theme = context.preferences.themes[0]
-    elem_colors['color_base'] = theme.node_editor.node_backdrop
-    elem_colors['color_string_field'] = theme.user_interface.wcol_text.inner
-    elem_colors['color_bool_false'] = theme.user_interface.wcol_option.inner
-    elem_colors['color_bool_true'] = theme.user_interface.wcol_option.inner_sel
-    elem_colors['color_value_field'] = theme.user_interface.wcol_numslider.inner
-    elem_colors['color_value_progress'] = theme.user_interface.wcol_numslider.item
-    elem_colors['color_axis_x'] = theme.user_interface.axis_x
-    elem_colors['color_axis_y'] = theme.user_interface.axis_y
-    elem_colors['color_axis_z'] = theme.user_interface.axis_z
-    elem_colors['color_text'] = theme.user_interface.wcol_regular.text
-
-    return elem_colors
-
-def getCategoryColors(context):
-    theme = context.preferences.themes[0]
-    return {'header_color_'+name:getattr(theme.node_editor, name+'_node') for name in CATEGORY_NAMES}
-
-
 def resetColors(prop_group, context):
 
     for k, v in getElementColors(context).items():
@@ -110,8 +101,12 @@ def resetColors(prop_group, context):
 
     for k, v in getCategoryColors(context).items():
         setattr(prop_group, k, v)
+
+    for k, v in getTextColors(context).items():
+        setattr(prop_group, k, v)
     
     prop_group.header_opacity = HEADER_OPACITY
+    prop_group.use_generic_text = False
    
 
 class UIInspectOperator(bpy.types.Operator):
@@ -198,9 +193,16 @@ def dumpProperties(group) -> dict:
         'use_gradients': group.use_gradients,
         'rect_outline': group.rect_outline,
         'rect_outline_color': group.rect_outline_color[0:],
+        'node_color': group.node_color[0:]
     }
 
-    for name in ['color_'+x for x in ELEMENTS]+['header_color_'+x for x in CATEGORY_NAMES]+['node_color']:
+    for name in ['color_'+x for x in ELEMENTS]:
+        output[name] = getattr(group, name)[0:]
+
+    for name in ['header_color_'+x for x in CATEGORY_NAMES]:
+        output[name] = getattr(group, name)[0:]
+
+    for name in ['text_'+x for x in TEXTS]:
         output[name] = getattr(group, name)[0:]
 
     return output
@@ -235,11 +237,19 @@ class UIConfigImportOperator(bpy.types.Operator):
             return {'FINISHED'}
 operators.append(UIConfigImportOperator)
 
-
+### PANELS ###
 
 class UIPanel(bpy.types.Panel):
     bl_space_type = 'NODE_EDITOR'
     bl_region_type = 'UI'
+
+class UIColorPanel(UIPanel):
+    bl_parent_id = 'NODE_EDITOR_PT_color_parent'
+    
+    @classmethod
+    def poll(cls, context):
+        return not context.scene.export_svg_props.use_theme_colors
+
 
 class UIParentPanel(UIPanel):
     bl_category = "Export"
@@ -265,41 +275,90 @@ class UIQualityPanel(UIPanel):
         layout.prop(props, 'fidelity')
         layout.prop(props, 'use_gradients')
         layout.prop(props, 'rounded_corners')
-
-
 panels.append(UIQualityPanel)
 
-
-class UIColorPanel(UIPanel):
+class UIOutlinePanel(UIPanel):
     bl_parent_id = 'NODE_EDITOR_PT_export_parent'
-    bl_idname = "NODE_EDITOR_PT_color"
+    bl_idname = 'NODE_EDITOR_PT_outline'
+    bl_label = "Outline"
+
+    def draw(self, context):
+
+        layout = self.layout
+        props = context.scene.export_svg_props
+        
+        layout.prop(props, 'rect_outline')
+        layout.prop(props, 'rect_outline_color')
+panels.append(UIOutlinePanel)
+
+
+class UIColorParentPanel(UIPanel):
+    bl_parent_id = 'NODE_EDITOR_PT_export_parent'
+    bl_idname = 'NODE_EDITOR_PT_color_parent'
     bl_label = "Colors"
 
-    @classmethod
-    def poll(cls, context):
-        return (context.object is not None)
+
+    def draw(self, context):
+        layout = self.layout
+        props = context.scene.export_svg_props
+
+        layout.prop(props, 'use_theme_colors')
+
+        row = layout.row()
+        row.operator(
+            operator='ui.color_reset',
+            text="Reset Colors"
+        )
+        row.enabled = not props.use_theme_colors
+
+
+panels.append(UIColorParentPanel)
+
+class UIColorTextPanel(UIColorPanel):
+    bl_idname = 'NODE_EDITOR_PT_color_text'
+    bl_label = "Text"
+
+    def draw(self, context):
+        layout = self.layout
+        props = context.scene.export_svg_props
+
+        layout.prop(props, 'use_generic_text')
+
+        row = layout.row()
+        row.prop(props, 'text_generic')
+        row.enabled = props.use_generic_text
+
+        # skip first (-> generic)
+        for name in TEXTS[1:]:
+            row = layout.row()
+            row.prop(props, 'text_'+name)
+            row.enabled = not props.use_generic_text
+panels.append(UIColorTextPanel)
+
+class UIColorElemPanel(UIColorPanel):
+    bl_idname = 'NODE_EDITOR_PT_elements'
+    bl_label = "Elements"
+
+    def draw(self, context):
+        layout = self.layout
+        props = context.scene.export_svg_props
+
+        for color_name in ['color_'+elem for elem in ELEMENTS]:
+            layout.prop(props, color_name)
+panels.append(UIColorElemPanel)
+
+class UIColorHeaderPanel(UIColorPanel):
+    bl_idname = "NODE_EDITOR_PT_headers"
+    bl_label = "Headers"
     
     def draw(self, context):
         layout = self.layout
         props = context.scene.export_svg_props
 
-        layout.prop(props, 'rect_outline')
-        layout.prop(props, 'rect_outline_color')
-
-        layout.prop(props, 'use_theme_colors')
-
         # https://blender.stackexchange.com/questions/41387/how-to-deactivate-a-ui-element-in-an-add-on
-        for color_name in ['color_'+elem for elem in ELEMENTS]+['header_color_'+name for name in CATEGORY_NAMES]+['header_opacity']:
-            row = layout.row()
-            row.prop(props, color_name)
-            row.enabled = not props.use_theme_colors
-
-        layout.operator(
-            operator='ui.color_reset',
-            text='Reset Colors'
-        )
-
-panels.append(UIColorPanel)
+        for color_name in ['header_color_'+name for name in CATEGORY_NAMES]+['header_opacity']:
+            layout.prop(props, color_name)
+panels.append(UIColorHeaderPanel)
 
 class UIConfigPanel(UIPanel):
     bl_parent_id = 'NODE_EDITOR_PT_export_parent'
