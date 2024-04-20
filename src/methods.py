@@ -66,28 +66,89 @@ def getBezierExtrema(x0: float, x1: float, x2: float, x3: float) -> tuple[float,
     )
 
 
-def getColorsFromPreferences(context) -> dict[list[float]]:
+def getTextColors(context):
+    text_colors = {}
+    theme = context.preferences.themes[0]
+    text_colors['text_generic']         = theme.node_editor.space.text
+    text_colors['text_base']            = theme.node_editor.space.text
+    text_colors['text_string']          = theme.user_interface.wcol_text.text
+    text_colors['text_boolean_true']    = theme.user_interface.wcol_option.text_sel
+    text_colors['text_boolean_false']   = theme.user_interface.wcol_option.text
+    text_colors['text_dropdown']        = theme.user_interface.wcol_menu.text
+    text_colors['text_slider']          = theme.user_interface.wcol_numslider.text
+    
+    return text_colors
+
+def getElementColors(context):
+    elem_colors = {}
+    theme = context.preferences.themes[0]
+    elem_colors['color_base'] = theme.node_editor.node_backdrop
+    elem_colors['color_string_field'] = theme.user_interface.wcol_text.inner
+    elem_colors['color_dropdown'] = theme.user_interface.wcol_menu.inner
+    elem_colors['color_bool_false'] = theme.user_interface.wcol_option.inner
+    elem_colors['color_bool_true'] = theme.user_interface.wcol_option.inner_sel
+    elem_colors['color_checkmark'] = theme.user_interface.wcol_option.item
+    elem_colors['color_value_field'] = theme.user_interface.wcol_numslider.inner
+    elem_colors['color_value_progress'] = theme.user_interface.wcol_numslider.item
+    elem_colors['color_axis_x'] = theme.user_interface.axis_x
+    elem_colors['color_axis_y'] = theme.user_interface.axis_y
+    elem_colors['color_axis_z'] = theme.user_interface.axis_z
+    elem_colors['color_text'] = theme.user_interface.wcol_regular.text
+
+    return elem_colors
+
+def getCategoryColors(context):
+    theme = context.preferences.themes[0]
+    return {'header_color_'+name:getattr(theme.node_editor, name+'_node') for name in CATEGORY_NAMES}
+
+def getConfigurationFromContext(context) -> dict:
     
     output = {}
     
     theme = context.preferences.themes[0]
+    props = context.scene.export_svg_props
 
-    output['color_base'] = theme.node_editor.node_backdrop
-    output['color_string_field'] = theme.user_interface.wcol_text.inner
-    output['color_bool_false'] = theme.user_interface.wcol_option.inner
-    output['color_bool_true'] = theme.user_interface.wcol_option.inner_sel
-    output['color_value_field'] = theme.user_interface.wcol_numslider.inner
-    output['color_value_progress'] = theme.user_interface.wcol_numslider.item
-    output['color_axis_x'] = theme.user_interface.axis_x
-    output['color_axis_y'] = theme.user_interface.axis_y
-    output['color_axis_z'] = theme.user_interface.axis_z
-    output['color_text'] = theme.user_interface.wcol_regular.text
+    # Details
+
+    output['fidelity'] = props.fidelity
+    output['use_gradients'] = props.use_gradients
+    output['rounded_corners'] = props.rounded_corners
+
+    # Outline
+    output['outline_thickness'] = props.rect_outline
+    output['outline_color']     = socketColorToSVGColor(props.rect_outline_color)
+
+    # Color
+
+    if props.use_theme_colors:
+        # Text
+        for k, v in getTextColors(context).items():
+            output[k] = socketColorToSVGColor(v)
+
+        # Elements
+        for k, v in getElementColors(context).items():
+            output[k] = socketColorToSVGColor(v)
+
+        cat_colors = getCategoryColors(context)
+        for name in CATEGORY_NAMES:
+            output[name+'_node'] = socketColorToSVGColor(cat_colors['header_color_'+name])
+
+    else:
+        # Text
+        for name in TEXTS[1:]:
+            color = props.text_generic if props.use_generic_text else getattr(props, 'text_'+name)
+            output['text_'+name] = socketColorToSVGColor(color)
+
+        # Elements
+        for name in ELEMENTS:
+            output['color_'+name] = socketColorToSVGColor(getattr(props, 'color_'+name))
+
+        # Headers
+        for name in CATEGORY_NAMES:
+            output[name+'_node'] = socketColorToSVGColor(getattr(props, 'header_color_'+name))
 
     output['noodliness'] = theme.node_editor.noodle_curving
     output['header_opacity'] = HEADER_OPACITY
-
-    for name in CATEGORY_NAMES:
-       output['header_color_'+name] = getattr(theme.node_editor, name+'_node')
 
     return output
 
