@@ -78,8 +78,8 @@ CATEGORY_NAMES = (
 )
 
 ELEMENTS = (
-    'text', 'base', 'string_field',
-    'bool_false', 'bool_true',
+    'base', 'string_field', 'dropdown',
+    'bool_false', 'bool_true', 'checkmark',
     'value_field', 'value_progress',
     'axis_x', 'axis_y', 'axis_z'
 )
