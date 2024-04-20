@@ -84,4 +84,10 @@ ELEMENTS = (
     'axis_x', 'axis_y', 'axis_z'
 )
 
+TEXTS = (
+    'generic', 'base', 'string',
+    'boolean_true', 'boolean_false',
+    'slider', 'dropdown'
+)
+
 ROUND_CORNER = 5
