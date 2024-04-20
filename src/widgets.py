@@ -49,6 +49,7 @@ class Widget():
             'ry':'3' if self.kwargs['rounded_corners'] else '0'
         })
         g = ET.SubElement(elem, 'g', id=g_id, attrib={
+            'class':self.css_classname,
             'clip-path': f'url(#{clip_id}) '
             })
         self.fill_svg(g, width=width)
@@ -118,6 +119,8 @@ class Boolean(Widget):
         return constants.LINKED_SOCKET_HEIGHT
 
     def fill_svg(self, elem, width=0) -> ET.Element:
+
+        elem.set('class', 'bool_true' if self.value else 'bool_false')
 
         # add rectangle for checkbox
         rect = ET.SubElement(elem, 'rect', attrib={
@@ -311,7 +314,7 @@ class Dropdown(Widget):
                       'y':'0',
                       'width':str(width),
                       'height':str(self.height()),
-                      'class':'string'
+                      'class':'dropdown'
         })
         
 
@@ -454,6 +457,10 @@ class Ramp(Widget):
         return 3*constants.LINKED_SOCKET_HEIGHT
     
     def fill_svg(self, elem, width=DEFAULT_WIDTH) -> ET.Element:
+
+        # ignore clipping
+        elem.attrib.pop('clip-path')
+
 
         elem.append(
             Columns(wids=[
