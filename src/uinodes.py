@@ -58,12 +58,6 @@ ARROW_DEFS = {
     })
 }
 
-def getFloatString(value: float, spaces: int = 5) -> str:
-
-    s = str(value)[:5]
-    s += (5-len(s))*"0"
-    return s
-
 def style(colors) -> ET.Element:
     
     style_elem = ET.Element('style')
