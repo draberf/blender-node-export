@@ -169,5 +169,4 @@ def insertIntoSortedByKey(e, arr, key) -> list:
             return arr[:midpoint+1] + insertIntoSortedByKey(e, arr[midpoint+1:], key)
     else:
         return insertIntoSortedByKey(e, arr[:midpoint-1], key) + arr[midpoint-1:]
-    
 

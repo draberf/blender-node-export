@@ -3,12 +3,156 @@ from . import constants
 
 from math import pi
 
-from .methods import getFloatString, polarToCartesian, socketColorToSVGColor
+from .methods import getFloatString, polarToCartesian, socketColorToSVGColor, enumName, insertIntoSortedByKey
+from .constants import IGNORE_PROPS
 
 from colorsys import rgb_to_hsv
 
+# convert unconnected input socket to widget
+
 DEFAULT_WIDTH = 100.0
 DEFAULT_PADDING = 0.06
+
+
+def dropdown(node, prop, label="") -> 'Widget':
+    if not label:
+        return Dropdown(value=enumName(node, prop))
+    else:
+        return LabeledDropdown(name=label, value=enumName(node, prop))
+
+
+def selectBar(node, prop) -> 'Widget':
+    options = [option.name for option in node.bl_rna.properties[prop].enum_items]
+    try:
+        index = [option.identifier for option in node.bl_rna.properties[prop].enum_items].index(getattr(node, prop))
+    except ValueError as ve:
+        for key, item in node.bl_rna.properties[prop].enum_items.items():
+            print(">>", key, item.name)
+        raise ve
+    return SelectBar(options=options, select_index=index)
+
+def object(object) -> 'Widget':
+    if not object: return String(name="Object:", value="")
+    return String(name="Object:", value=object.name)
+
+def image(image) -> 'Widget':
+    if not image: return SelectBar(["+ New", "Open"], -1)
+    return String(value=image.name)
+
+def curve(curving, type='VALUE', sampling=40) -> 'Widget':
+    
+    def evaluate_curve_n(n):
+        pairs = []
+        # we can skip outermost values as they are part of curve map points
+        for N in range(1, sampling):
+            x = curving.clip_min_x + N * (curving.clip_max_x-curving.clip_min_x) * (1.0 / sampling)
+            y = curving.evaluate(curving.curves[n], x)
+            pairs.append((x, y))
+
+        
+        # insert points
+        for curve_point in curving.curves[n].points:
+            point_x, point_y = curve_point.location
+            pairs = insertIntoSortedByKey((point_x, point_y), pairs, lambda x: x[0])
+
+        # normalize
+        norm_pairs = []
+        for x, y in pairs:
+            calc_y = (y-curving.clip_min_y) / (curving.clip_max_y-curving.clip_min_y)
+            norm_pairs.append((
+                (x-curving.clip_min_x) / (curving.clip_max_x-curving.clip_min_x),
+                2 * calc_y - 1 if type == 'CORRECT' else calc_y
+            ))
+
+        return norm_pairs
+                    
+    
+    match type:
+        case "VALUE":
+            points = evaluate_curve_n(0)
+            return Curves(curves=[('axis_w', points, True)])
+        case "CRGB":
+            return Curves(curves=[
+                ('axis_w', evaluate_curve_n(3), True),
+                *[(color, evaluate_curve_n(N), False) for N, color in enumerate(['axis_x', 'axis_y', 'axis_z'])]
+            ])
+        case "XYZ":
+            return Curves(curves=[
+                (color, evaluate_curve_n(N), False) for N, color in enumerate(['axis_x', 'axis_y', 'axis_z'])
+            ])
+        case "CORRECT":
+            return Curves(curves=[
+                (color, evaluate_curve_n(N), False) for N, color in enumerate(['axis_x', 'axis_y', 'axis_z'])
+            ], hue_background=True)
+        case _:
+            print(f"WARNING: Undefined curve type {type}.")
+            return Curves(curves=[('axis_w'), evaluate_curve_n(0), False])
+
+def ramp(node, n=50) -> 'Ramp':
+
+    color_mode = node.color_ramp.color_mode
+    interpolation = enumName(node.color_ramp, 'interpolation' if color_mode == 'RGB' else 'hue_interpolation') 
+
+    evals = [(i/n, node.color_ramp.evaluate(min(i/n, 1.0))) for i in range(n+1)]
+
+    stops=[(element.position, element.color[:3]) for element in node.color_ramp.elements]
+    for stop in stops:
+        evals = insertIntoSortedByKey(stop, evals, key=lambda x: x[0])
+
+    return Ramp(color_mode=color_mode,
+                        interpolation=interpolation,
+                        stops=stops,
+                        evals=evals)
+
+def generateCustomProps(node):
+    
+    wids = []
+    
+    for prop in node.bl_rna.properties:
+        if not prop.identifier: continue
+        if prop.identifier in IGNORE_PROPS: continue
+
+        try:
+            match prop.type:
+                case 'BOOLEAN':
+                    wids.append(Boolean(name=prop.name, value=getattr(node, prop.identifier)))
+                case 'INT':
+                    wids.extend([
+                        Label(text=prop.name),
+                        Value(value=getattr(node, prop.identifier))
+                    ])
+                case 'FLOAT':
+                    wids.extend([
+                        Label(text=prop.name),
+                        Float(value=getattr(node, prop.identifier))
+                    ])
+                case 'STRING':
+                    wids.extend([
+                        Label(text=prop.name),
+                        String(value=getattr(node, prop.identifier))
+                    ])
+                case 'ENUM':
+                    wids.extend([
+                        Label(text=prop.name),
+                        dropdown(node, prop.identifier)
+                    ])
+                case 'POINTER' | 'COLLECTION':
+                    obj = getattr(node, prop.identifier)
+                    obj_name = ""
+                    if obj:
+                        if 'name' in obj.bl_rna.properties:
+                            obj_name = obj.name
+                    wids.extend([
+                        Label(text=prop.name),
+                        String(value=obj_name)
+                    ])
+        except:
+            wids.extend([
+                Label(text=prop.name),
+                Placeholder()
+            ])
+    
+    return wids
 
 class Widget():
     
