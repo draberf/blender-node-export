@@ -154,9 +154,13 @@ class UINode():
         
         if specification:
             if 'props' in specification:
-                for widget in specification['props'](node, args):
-                    if not widget: continue
-                    register_widget(widget)
+                try:
+                    for widget in specification['props'](node, args):
+                        if not widget: continue
+                        register_widget(widget)
+                except:
+                    print(node.name)
+                    register_widget(widgets.Placeholder())
 
         for in_socket in self.inputs:
             make_socket_widget(in_socket, False)
