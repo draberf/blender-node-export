@@ -1646,7 +1646,7 @@ node_specifications = {
 
     'ShaderNodeAmbientOcclusion': {
         'class': 'input_node',
-        "props": lambda node: [
+        "props": lambda node, _: [
             widgets.Value(name="Samples", value=str(node.samples)),
             widgets.Boolean(name="Inside", value=node.inside),
             widgets.Boolean(name="Only Local", value=node.only_local)
@@ -1654,7 +1654,7 @@ node_specifications = {
     },
     'ShaderNodeAttribute': {
         'class': 'input_node',
-        "props": lambda node: [
+        "props": lambda node, _: [
             dropdown(node, 'attribute_type', label="Type:"),
             widgets.String(name="Name:", value=node.attribute_name)
         ]
