@@ -45,10 +45,6 @@ MARKER_DEFS = {
     }
 
 ARROW_DEFS = {
-    'left':('polyline',{
-        'points': '5 2 2 5 5 8',
-        'class': 'arrow'
-    }),
     'right':('polyline',{
         'points': '5 2 8 5 5 8',
         'class': 'arrow'
