@@ -176,8 +176,6 @@ class Widget():
         if resize:
             return self.svg(x=x+DEFAULT_PADDING*width, y=y, width=(1-2*DEFAULT_PADDING)*width, resize=False, **kwargs)
         
-        print(self.id)
-
         self.kwargs = kwargs
         
         elem = ET.Element('g', id=self.id)
@@ -499,9 +497,9 @@ class ColorPicker(Widget):
         ET.SubElement(elem, 'use', href='#color_wheel',transform=f'translate({wheel_center_x-wheel_width/2.0},{wheel_center_y-wheel_width/2.0}) scale({scale_factor})')
 
         r, g, b = self.color[:3]
-        print(r, g, b)
+        #print(r, g, b)
         h, s, v = rgb_to_hsv(r, g, b)
-        print(h, s, v)
+        #print(h, s, v)
         
         # marker on wheel
         polar = polarToCartesian(s, (h-0.75)*2*pi)
