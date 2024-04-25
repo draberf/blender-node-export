@@ -1880,6 +1880,13 @@ node_specifications = {
         'class': 'shader_node'
     },
 
+    'ShaderNodeBsdfSheen': {
+        'class': 'shader_node',
+        'props': lambda node, _: [
+            dropdown(node, 'distrubtion')
+        ]
+    },
+
     'ShaderNodeBsdfVelvet': {
         'class': 'shader_node'
     },
