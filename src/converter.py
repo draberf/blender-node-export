@@ -309,7 +309,7 @@ class Converter():
             ET.SubElement(svg, 'path', d=f"M {from_x},{from_y} C {control_x1},{from_y} {control_x2},{to_y} {to_x},{to_y}",
                             style=f"stroke:{color1};stroke-width:2;fill:none;opacity:{opacity}")
             
-            if self.curving > 0 and from_x > to_x:
+            if self.curving > 0 and control_x1 > control_x2:
                 x1, x2 = methods.getBezierExtrema(from_x, control_x1, control_x2, to_x)
                 self.vb_min_x = min(self.vb_min_x, min(x1, x2))
                 svg_w = max(svg_w, max(x1-self.vb_min_x, x2-self.vb_min_x))
