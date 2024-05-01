@@ -2064,7 +2064,7 @@ node_specifications = {
             'FLOAT': 'converter_node',
             'VECTOR': 'vector_node',
             'RGBA': 'color_node',
-            'ROTATION': 'vector_node'
+            'ROTATION': 'converter_node'
         }[node.data_type],
         'props': lambda node, _: [
             dropdown(node, 'data_type'),
