@@ -115,7 +115,8 @@ def getConfigurationFromContext(context) -> dict:
 
     output['fidelity'] = props.fidelity
     output['use_gradients'] = props.use_gradients
-    output['rounded_corners'] = props.rounded_corners
+    output['round_l'] = str(ROUND_CORNER) if props.rounded_corners else '0'
+    output['round_s'] = '3px' if props.rounded_corners else '0'
 
     # Outline
     output['outline_thickness'] = props.rect_outline

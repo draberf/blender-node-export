@@ -69,6 +69,10 @@ def style(colors) -> ET.Element:
         ".dropdown text { fill: "+colors['text_dropdown']+" }",
         ".value text { fill: "+colors['text_slider']+" }",
 
+        # corners
+        ".corner_l { rx:" + colors['round_l'] + " }",
+        ".corner_s { rx:" + colors['round_s'] + " }",
+
         # generic
         "rect { stroke-width:"+str(colors['outline_thickness'])+";stroke:"+colors['outline_color']+" }",
         ".nodeframe { fill:"+colors['color_base']+" } ",
@@ -131,9 +135,10 @@ class Converter():
         self.use_gradient = props.use_gradients
 
         widget_args = {
-            'rounded_corners': self.rounded_corners,
             'quality': self.quality,
-            'use_gradient': self.use_gradient
+            'use_gradient': self.use_gradient,
+            'corner_s': '3px' if props.rounded_corners else '0',
+            'corner_l': '5px' if props.rounded_corners else '0', 
         }
 
         self.nodes = []
