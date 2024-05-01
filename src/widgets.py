@@ -188,8 +188,7 @@ class Widget():
             'y':'0',
             'width':str(width),
             'height':str(self.height()),
-            'rx':'3' if self.kwargs['rounded_corners'] else '0',
-            'ry':'3' if self.kwargs['rounded_corners'] else '0'
+            'rx': PROPERTIES['corner_s']
         })
         g = ET.SubElement(elem, 'g', id=g_id, attrib={
             'class':self.css_classname,
@@ -271,7 +270,8 @@ class Boolean(Widget):
             'y':        str(constants.LINKED_SOCKET_HEIGHT*0.2),
             'width':    str(constants.LINKED_SOCKET_HEIGHT*0.6),
             'height':   str(constants.LINKED_SOCKET_HEIGHT*0.6),
-            'stroke':   'none'
+            'stroke':   'none',
+            'rx':       PROPERTIES['corner_s']
         })
 
         # add value to rectangle, draw checkmark
@@ -287,7 +287,7 @@ class Boolean(Widget):
             rect.set('class', 'bool_false')
 
         # add nameplate (svg offset by button width)
-        elem.append(Label(text=self.name).prepend_id(self.id).svg(width=width-constants.LINKED_SOCKET_HEIGHT, x=constants.LINKED_SOCKET_HEIGHT, rounded_corners=self.kwargs['rounded_corners']))
+        elem.append(Label(text=self.name).prepend_id(self.id).svg(width=width-constants.LINKED_SOCKET_HEIGHT, x=constants.LINKED_SOCKET_HEIGHT))
 
 class Columns(Widget):
     
@@ -316,7 +316,7 @@ class Columns(Widget):
         offset=0.0
         for i, wid in enumerate(self.wids):
             widget_width = col_width if not self.ratios else width*self.ratios[i]/self.ratio_sum
-            elem.append(wid.svg(width=widget_width, x=offset, resize=self.resize_override, rounded_corners=self.kwargs['rounded_corners']))
+            elem.append(wid.svg(width=widget_width, x=offset, resize=self.resize_override))
             offset += widget_width
 
 class FortySixty(Columns):
@@ -368,10 +368,10 @@ class Value(Widget):
 
         # label
         if not self.name:
-            elem.append(Label(str(self.value), alignment='C').prepend_id(self.id).svg(width=width-2*PADDING, x=PADDING, resize=False, rounded_corners=self.kwargs['rounded_corners']))
+            elem.append(Label(str(self.value), alignment='C').prepend_id(self.id).svg(width=width-2*PADDING, x=PADDING, resize=False))
         else:
-            elem.append(Label(self.name).prepend_id(self.id).svg(width=(width/2.0)-PADDING, x=PADDING, resize=False, rounded_corners=self.kwargs['rounded_corners']))
-            elem.append(Label(str(self.value), alignment='R').prepend_id(self.id).svg(width=(width/2.0)-PADDING, x=width/2.0, resize=False, rounded_corners=self.kwargs['rounded_corners']))
+            elem.append(Label(self.name).prepend_id(self.id).svg(width=(width/2.0)-PADDING, x=PADDING, resize=False))
+            elem.append(Label(str(self.value), alignment='R').prepend_id(self.id).svg(width=(width/2.0)-PADDING, x=width/2.0, resize=False))
 
 class Float(Value):
 
@@ -412,9 +412,9 @@ class Vector(Widget):
     
     def fill_svg(self, elem, width=DEFAULT_WIDTH) -> ET.Element:
 
-        elem.append(Label(text=self.name).prepend_id(self.id).svg(width=width, resize=False, rounded_corners=self.kwargs['rounded_corners']))
+        elem.append(Label(text=self.name).prepend_id(self.id).svg(width=width, resize=False))
         for i, value in enumerate(self.values):
-            elem.append(Float(value=value).prepend_id(self.id).svg(width=width, y=(i+1)*constants.LINKED_SOCKET_HEIGHT, resize=False, rounded_corners=self.kwargs['rounded_corners']))
+            elem.append(Float(value=value).prepend_id(self.id).svg(width=width, y=(i+1)*constants.LINKED_SOCKET_HEIGHT, resize=False))
         
 class LabeledDropdown(Widget):
 
@@ -435,8 +435,8 @@ class LabeledDropdown(Widget):
 
         widths = [max(0.25*width, self.MIN_LABEL_WIDTH), min(0.75*width, width-self.MIN_LABEL_WIDTH)]
 
-        elem.append(Label(self.name).prepend_id(self.id).svg(width=widths[0], resize=False, rounded_corners=self.kwargs['rounded_corners']))
-        elem.append(Dropdown(self.value).prepend_id(self.id).svg(width=widths[1], x=widths[0], resize=False, rounded_corners=self.kwargs['rounded_corners']))
+        elem.append(Label(self.name).prepend_id(self.id).svg(width=widths[0], resize=False))
+        elem.append(Dropdown(self.value).prepend_id(self.id).svg(width=widths[1], x=widths[0], resize=False))
 
 class Dropdown(Widget):
 
@@ -463,7 +463,7 @@ class Dropdown(Widget):
 
         ET.SubElement(elem, 'use', href='#down_arrow', x=str(width-20.0), y=str(self.height()/2.0-6.0))
         
-        elem.append(Label(text=self.value).prepend_id(self.id).svg(width=width, rounded_corners=self.kwargs['rounded_corners']))
+        elem.append(Label(text=self.value).prepend_id(self.id).svg(width=width))
 
 class ColorPicker(Widget):
     
@@ -536,9 +536,9 @@ class SelectBar(Widget):
             rect.set('y', '0')
             rect.set('width', str(w))
             rect.set('height', str(self.height()))
-            rect.set('style', f"fill:{color_class}")
+            rect.set('class', color_class)
             
-            elem.append(Label(opt, alignment='C').prepend_id(self.id+'_'+str(i)).svg(width=w, x=i*w, rounded_corners=self.kwargs['rounded_corners']))
+            elem.append(Label(opt, alignment='C').prepend_id(self.id+'_'+str(i)).svg(width=w, x=i*w))
         
 
 class Curves(Widget):
@@ -611,7 +611,7 @@ class Ramp(Widget):
                 Empty(),
                 Dropdown(value=self.color_mode),
                 Dropdown(value=self.interpolation),
-            ], resize_override=False).prepend_id(self.id).svg(width=width, resize=False, rounded_corners=self.kwargs['rounded_corners'])
+            ], resize_override=False).prepend_id(self.id).svg(width=width, resize=False)
         )
 
         if self.kwargs['use_gradient']:
@@ -697,7 +697,7 @@ class String(Widget):
             elem.append(FortySixty(wids=[
                 Label(text=self.name),
                 String(self.value)
-            ], resize_override=False).prepend_id(self.id).svg(width=width, resize=False, rounded_corners=self.kwargs['rounded_corners']))
+            ], resize_override=False).prepend_id(self.id).svg(width=width, resize=False))
         else:
             rect = ET.SubElement(elem, 'rect', attrib={
                 'x': '0',
@@ -707,7 +707,7 @@ class String(Widget):
                 'class': 'string'
             })
             
-            elem.append(Label(text=self.value).prepend_id(self.id).svg(width=width, rounded_corners=self.kwargs['rounded_corners']))
+            elem.append(Label(text=self.value).prepend_id(self.id).svg(width=width))
 
 
 class IES(String):
