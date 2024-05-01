@@ -129,8 +129,6 @@ class Converter():
 
         print(self.colors)
 
-
-        self.rounded_corners = props.rounded_corners
         self.quality = props.fidelity
         self.use_gradient = props.use_gradients
 
