@@ -13,6 +13,7 @@ from colorsys import rgb_to_hsv
 DEFAULT_WIDTH = 100.0
 DEFAULT_PADDING = 0.06
 
+PROPERTIES = {}
 
 def dropdown(node, prop, label="") -> 'Widget':
     if not label:
