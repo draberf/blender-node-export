@@ -169,7 +169,7 @@ class Widget():
     def height(self) -> float:
         return 0.0
 
-    def fill_svg(self, elem, width=0) -> None:
+    def fill_svg(self, elem: ET.Element, width=0) -> None:
         return
 
     def svg(self, x=0, y=0, width=0, resize=True, **kwargs) -> ET.Element:
