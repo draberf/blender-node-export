@@ -2217,7 +2217,7 @@ node_specifications = {
         'props': lambda node, _: [
             dropdown(node, 'operation')
         ],
-        'name_behavior': lambda node: node.operation
+        'name_behavior': lambda node: enumName(node, 'operation')
     },
     'ShaderNodeWavelength': {
         'class': 'converter_node'
