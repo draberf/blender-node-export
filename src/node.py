@@ -11,7 +11,10 @@ from . import methods
 from .header import UIHeader
 from .marker import UIShape
 
-def getImageWidgetString(socket):
+
+def getImageWidgetString(socket: bpy.types.NodeSocket) -> str:
+    """Returns an appropriate string representation of an object pointed to by socket."""
+
     if not socket.default_value: return ""
     if socket.default_value.source in ['FILE', 'SEQUENCE', 'MOVIE']:
         return socket.default_value.filepath
@@ -23,6 +26,8 @@ def getObjectName(socket):
     return socket.default_value.name
 
 def value_socket(socket) -> widgets.Widget:
+    """Returns the representation of a value-type socket based on it being a factor subtype."""
+
     prop = socket.bl_rna.properties['default_value']
     if prop.subtype == 'FACTOR':
         return widgets.Float(socket.name, socket.default_value, minmax=(prop.soft_min, prop.soft_max))
@@ -68,6 +73,7 @@ SOCKET_WIDGET_DEFS = {
 }
 
 def widgetFactory(socket) -> widgets.Widget:
+    """Returns a Widget representing a socket."""
     
     if socket.is_output:
         return widgets.Label(text=socket.name, alignment='R')
@@ -115,27 +121,22 @@ class UINode():
 
         self.anchors = {}
 
-
-        # process header
-        if not self.is_placeholder:
-            self.color_class = specification['class'] if specification['class'] else specification['class_behavior'](node)
-        else:
-            print(f"WARNING: Node {node.bl_idname} does not have a default specification. Placeholder object will be used instead.")
-            self.color_class = 'layout_node'
-
-        self.uiheader = UIHeader(self.name, self.w, color=colors[self.color_class])
-
-        self.rounded_corners = False
-        if 'rounded_corners' in args:
-            if args['rounded_corners']:
-                self.rounded_corners = True
+        self.color_class = specification['class']
+        if not self.color_class: self.color_class = specification['class_behavior'](node)
+        try:
+            self.uiheader = UIHeader(self.name, self.w, color=colors[self.color_class])
+        except KeyError as KE:
+            print(self.color_class)
+            print(specification)
+            print(colors.keys())
+            raise KE
 
         # new Widget stack method + coords
         self.height_widget_pairs = []
         self.height = self.uiheader.height + constants.TOP_PADDING
 
 
-        def register_widget(widget):
+        def registerWidget(widget):
             self.height_widget_pairs.append((self.height, widget))
             self.height += widget.height() + constants.SOCKET_GAP
 
@@ -145,7 +146,7 @@ class UINode():
                 self.y+self.height+constants.LINKED_SOCKET_HEIGHT/2,
                 UIShape(socket))
             try:
-                register_widget(widgetFactory(socket))
+                registerWidget(widgetFactory(socket))
             except AttributeError:
                 raise Exception(node.name)
 
@@ -158,10 +159,10 @@ class UINode():
                 try:
                     for widget in specification['props'](node, args):
                         if not widget: continue
-                        register_widget(widget)
+                        registerWidget(widget)
                 except:
-                    print(node.name)
-                    register_widget(widgets.Placeholder())
+                    print("Error when converting a prop of", node.name, "-- using Placeholder instead.")
+                    registerWidget(widgets.Placeholder())
 
         for in_socket in self.inputs:
             make_socket_widget(in_socket, False)
@@ -178,8 +179,7 @@ class UINode():
         clip_rect = ET.Element('rect', attrib={
             'width':str(self.w),
             'height':str(self.h),
-            'rx':str(constants.ROUND_CORNER if self.rounded_corners else 0),
-            'ry':str(constants.ROUND_CORNER if self.rounded_corners else 0),
+            'rx':widgets.PROPERTIES['corner_l'],
             'style':'fill:none'
         })
         clip_id = f'{self.id}_super_clip'
@@ -197,7 +197,7 @@ class UINode():
         group.append(self.uiheader.svg(opacity=header_opacity))
 
         # new widgets rendering
-        group.extend([widget.prepend_id(f'{self.id}_{str(i)}').svg(width=self.w, y=height, use_gradient=use_gradient, rounded_corners=self.rounded_corners) for i, (height, widget) in enumerate(self.height_widget_pairs)])
+        group.extend([widget.prepend_id(f'{self.id}_{str(i)}').svg(width=self.w, y=height, use_gradient=use_gradient) for i, (height, widget) in enumerate(self.height_widget_pairs)])
 
         return supergroup
 
@@ -301,11 +301,11 @@ class UIHiddenNode(UINode):
         # name
         specification = {}
         self.is_placeholder = False
-        if not node.bl_idname in categories.node_specifications:
-            specification = categories.node_specifications['PlaceholderNode']
+        if not node.bl_idname in categories.NODE_SPECIFICATIONS:
+            specification = categories.NODE_SPECIFICATIONS['PlaceholderNode']
             self.is_placeholder = True
         else:
-            specification = categories.node_specifications[node.bl_idname]
+            specification = categories.NODE_SPECIFICATIONS[node.bl_idname]
 
         self.name = node.name
         if node.label:
@@ -386,9 +386,11 @@ class UIHiddenNode(UINode):
             'stroke':'none'
         })
 
+        # add arrow
+        ET.SubElement(group, 'use', href='#right_arrow', transform=f'translate(5,{self.h / 2 - 5})')
 
         # add name
-        label = ET.SubElement(group, 'text', x=f"{6}", y=f"{self.h/2+3}")
+        label = ET.SubElement(group, 'text', x='18', y=f"{self.h/2+3}")
         label.text = self.name
 
         return group
