@@ -94,7 +94,7 @@ def style(colors) -> ET.Element:
         # dropdowns
         ".dropdown { fill:"+colors['color_dropdown']+"}",
 
-        # aces
+        # axes
         ".axis_x {stroke:"+colors['color_axis_x']+"}",
         ".axis_y {stroke:"+colors['color_axis_y']+"}",
         ".axis_z {stroke:"+colors['color_axis_z']+"}",
