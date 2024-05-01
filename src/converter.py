@@ -62,7 +62,7 @@ def style(colors) -> ET.Element:
     style_elem.text = '\n'.join([
 
         # texts
-        "text { font-family: Sans, Arial; font-size: 0.6em; fill: "+colors['text_base']+" }",
+        "text { font-family: sans-serif, arial; font-size: 10px; fill: "+colors['text_base']+" }",
         ".string text { fill: "+colors['text_string']+" }",
         ".bool_true  text { fill: "+colors['text_boolean_true'] +" }",
         ".bool_false text { fill: "+colors['text_boolean_false']+" }",
