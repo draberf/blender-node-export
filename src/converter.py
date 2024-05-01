@@ -141,6 +141,8 @@ class Converter():
             'corner_l': '5px' if props.rounded_corners else '0', 
         }
 
+        widgets.PROPERTIES = widget_args
+
         self.nodes = []
         self.node_frames = []
 
