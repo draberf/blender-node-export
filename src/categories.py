@@ -16,7 +16,7 @@ CHANNEL_MATTE_OPTS = {
 
 CATEGORIES = [name+'_node' for name in CATEGORY_NAMES]
 
-node_specifications = {
+NODE_SPECIFICATIONS = {
 
     ### COMPOSITOR NODES ###
 

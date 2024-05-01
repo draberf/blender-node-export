@@ -83,11 +83,12 @@ class UINode():
     def __init__(self, node: bpy.types.Node, colors: {str}, args = {}):
         specification = {}
         self.is_placeholder = False
-        if not node.bl_idname in categories.node_specifications:
-            specification = categories.node_specifications['PlaceholderNode']
+        if not node.bl_idname in categories.NODE_SPECIFICATIONS:
+            specification = categories.NODE_SPECIFICATIONS['PlaceholderNode']
+            print(f"WARNING: Node {node.bl_idname} does not have a default specification. Placeholder object will be used instead.")
             self.is_placeholder = True
         else:
-            specification = categories.node_specifications[node.bl_idname]
+            specification = categories.NODE_SPECIFICATIONS[node.bl_idname]
 
         self.name = node.name
         if node.label:
