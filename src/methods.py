@@ -36,6 +36,9 @@ def enumName(node, enum_name):
 
 def getFloatString(value: float, decimal_points: int = 3) -> str:
 
+    if decimal_points == 3:
+        return f'{value:.3f}'
+
     rounded = round(abs(value)*(10**decimal_points))
     s = ('-' if value<0 else '')+('0' if abs(value)<1 else '')+str(rounded)[:-decimal_points]+'.'+str(rounded)[-decimal_points:]
     return s
