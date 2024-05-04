@@ -83,8 +83,18 @@ def widgetFactory(socket) -> widgets.Widget:
 
     return SOCKET_WIDGET_DEFS[socket.type](socket)
 
-# class wrapper for a single node
 class UINode():
+
+    def __init__(self) -> None:
+        pass
+
+    def getAnchors(self):
+            return {
+                k:(self.x + x, self.y + y, shape) for k, (x, y, shape) in self.anchors.items()
+            }
+
+# class wrapper for a single node
+class UINodeRegular(UINode):
 
     def __init__(self, node: bpy.types.Node, colors: {str}, args = {}):
         specification = {}
@@ -107,9 +117,6 @@ class UINode():
         self.h *= constants.NODE_DIM_RATIO
         self.x =  node.location[0]
         self.y = -node.location[1]
-        if node.parent:
-            self.x += node.parent.location[0]
-            self.y -= node.parent.location[1]
         self.outputs = [output for output in node.outputs.values() if all([not output.hide, output.enabled, not output.is_unavailable])]
         self.inputs = [input for input in node.inputs.values() if all([not input.hide, input.enabled, not input.is_unavailable])]
 
@@ -142,8 +149,8 @@ class UINode():
 
         def make_socket_widget(socket, is_offset):
             self.anchors[socket.as_pointer()] = (
-                self.x + (self.w if is_offset else 0),
-                self.y+self.height+constants.LINKED_SOCKET_HEIGHT/2,
+                (self.w if is_offset else 0),
+                self.height+constants.LINKED_SOCKET_HEIGHT/2,
                 UIShape(socket))
             try:
                 registerWidget(widgetFactory(socket))
@@ -168,7 +175,8 @@ class UINode():
             make_socket_widget(in_socket, False)
 
         # adjust node height
-        self.h = max(self.h, self.height+constants.BOTTOM_PADDING)
+        self.h = max(self.h, self.height+constants.BOTTOM_PADDING)   
+
 
     def is_frame(self) -> bool:
         return False
@@ -211,7 +219,7 @@ class UINode():
 
         return frame_items
 
-class UIRedirectNode(UINode):
+class UIRedirectNode(UINodeRegular):
 
     def __init__(self, node: bpy.types.Node, colors: str):
         
@@ -222,17 +230,15 @@ class UIRedirectNode(UINode):
         self.w, self.h = 0, 0
         self.x =  node.location[0]
         self.y = -node.location[1]
-        if node.parent:
-            self.x += node.parent.location[0]
-            self.y -= node.parent.location[1]
 
-        self.anchors = {node.inputs[0].as_pointer(): (self.x, self.y, UIShape(node.inputs[0]))}
+        self.anchors = {node.inputs[0].as_pointer(): (0, 0, UIShape(node.inputs[0]))}
         self.anchors.update({output.as_pointer(): (self.x, self.y, UIShape(output, render=False)) for output in node.outputs})
-    
+
+
     def svg(self, *args, **kwargs):
         return None
 
-class UIFrameNode(UINode):
+class UIFrameNode(UINodeRegular):
 
     def __init__(self, node: bpy.types.Node):
         
@@ -240,14 +246,12 @@ class UIFrameNode(UINode):
         if node.label:
             self.name = node.label
 
+        self.is_empty = True
+
+        # placeholder values
         self.w, self.h = node.dimensions
-        self.w *= constants.NODE_DIM_RATIO
-        self.h *= constants.NODE_DIM_RATIO
-        self.x =  node.location[0] - self.w/2 + 70.0
-        self.y = -node.location[1] - self.h/2 + 50.0
-        if node.parent:
-            self.x += node.parent.location[0]
-            self.y -= node.parent.location[1]
+        self.x =  node.location[0]
+        self.y = -node.location[1]
 
         self.color = 'black' if not node.use_custom_color else methods.socketColorToSVGColor(node.color)
 
@@ -256,25 +260,51 @@ class UIFrameNode(UINode):
 
         self.anchors = {}
 
+        self.ptr = node.as_pointer()
+
     def is_frame(self) -> bool:
         return True
-    
-    def updateDimensions(self) -> None:
-        
-        if self.boundaries_set: return
-        
-        for node in self.children:
-            if node.is_frame():
-                node.updateDimensions()
-            self.x = min(self.x, node.x-40)
-            self.y = min(self.y, node.y-40)
-            self.w = max(self.w, (node.x+node.w)-self.x+40)
-            self.h = max(self.h, (node.y+node.h)-self.y+40)
 
-        self.boundaries_set = True
+    def updateOnTree(self, tree):
 
+        if not self.ptr in tree:
+            return
+        
+        self.is_empty = False
+        own_list = tree[self.ptr]
+
+
+
+        # initialize
+        first = own_list[0]
+        first.x += self.x
+        first.y += self.y
+        if first.is_frame():
+            first.updateOnTree(tree)
+        min_x = first.x 
+        min_y = first.y 
+        max_x = first.x + first.w
+        max_y = first.y + first.h
+
+        for child in tree[self.ptr][1:]:
+            child.x += self.x
+            child.y += self.y
+            if child.is_frame():
+                child.updateOnTree(tree)
+            min_x = min(min_x, child.x)
+            min_y = min(min_y, child.y)
+            max_x = max(max_x, child.x+child.w)
+            max_y = max(max_y, child.y+child.h)
+            
+        self.x = min_x - constants.FRAME_NODE_PADDING
+        self.y = min_y - constants.FRAME_NODE_PADDING
+        self.w = max_x - min_x + 2 * constants.FRAME_NODE_PADDING
+        self.h = max_y - min_y + 2 * constants.FRAME_NODE_PADDING
 
     def svg(self) -> ET.Element:
+
+        if self.is_empty: return None
+
         group = ET.Element('g', transform=f'translate({self.x},{self.y})')
         
         ET.SubElement(group, 'rect', attrib={
@@ -282,7 +312,7 @@ class UIFrameNode(UINode):
             'y': '0',
             'width': str(self.w),
             'height': str(self.h),
-            'style':f'fill:{self.color};stroke:none'
+            'style':f'fill:{self.color};stroke:none;opacity:0.8'
         })
 
         if self.name:
@@ -295,7 +325,7 @@ class UIFrameNode(UINode):
 
         return group
 
-class UIHiddenNode(UINode):
+class UIHiddenNode(UINodeRegular):
     
     def __init__(self, node: bpy.types.Node, colors: str, args={}):
         # name
@@ -328,9 +358,6 @@ class UIHiddenNode(UINode):
         self.x =  node.location[0]
         self.y = -node.location[1]
 
-        if node.parent:
-            self.x += node.parent.location[0]
-            self.y -= node.parent.location[1]
         self.outputs = [output for output in node.outputs.values() if all([not output.hide, output.enabled, not output.is_unavailable])]
         self.inputs = [input for input in node.inputs.values() if all([not input.hide, input.enabled, not input.is_unavailable])]
 
@@ -358,7 +385,7 @@ class UIHiddenNode(UINode):
             y += self.h/2
 
             # add to anchor
-            self.anchors[socket.as_pointer()] = (self.x + x, self.y + y, UIShape(socket))
+            self.anchors[socket.as_pointer()] = (x, y, UIShape(socket))
 
     def svg(self, header_opacity, use_gradient=False):
 

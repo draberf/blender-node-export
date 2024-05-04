@@ -113,7 +113,7 @@ def nodeFactory(n, colors, args) -> node.UINode:
             return node.UIRedirectNode(n, colors=colors)
         case _:
             if n.hide: return node.UIHiddenNode(n, colors=colors, args=args)
-            return node.UINode(n, colors=colors, args=args)
+            return node.UINodeRegular(n, colors=colors, args=args)
 
 class Converter():
 
@@ -155,25 +155,13 @@ class Converter():
             filtered_nodes = nodetree.nodes
 
 
-        self.vb_min_x =  filtered_nodes[0].location[0]
-        self.vb_min_y = -filtered_nodes[0].location[1]
-        self.vb_max_x =  filtered_nodes[0].location[0]
-        self.vb_max_y = -filtered_nodes[0].location[1]
-
-
-        frame_ptrs = {}
+        # process Nodes, including nesting into Frames
+        top_level = []
         frame_children = {}
+
         for n in filtered_nodes:
 
             node_object = nodeFactory(n, self.colors, args=widget_args)
-
-
-            self.anchor_refs.update(node_object.anchors)
-            if n.bl_idname == 'NodeFrame':
-                self.node_frames.append(node_object)
-                frame_ptrs[n.as_pointer()] = node_object
-            else:
-                self.nodes.append(node_object)
 
             if n.parent:
                 ptr = n.parent.as_pointer()
@@ -181,17 +169,33 @@ class Converter():
                     frame_children[ptr] = [node_object]
                 else:
                     frame_children[ptr].append(node_object)
+            else:
+                # non-nested, fine
+                top_level.append(node_object)
 
             if n.mute:
                 self.links.extend([(link.from_socket.as_pointer(), link.to_socket.as_pointer(), True) for link in n.internal_links])
+        
+        print(top_level)
+        print(frame_children)
+        for node_object in top_level:
+            if node_object.is_frame():
+                node_object.updateOnTree(frame_children)
+                self.node_frames.append(node_object)
+            else:
+                self.nodes.append(node_object)
+                self.anchor_refs.update(node_object.getAnchors())
 
-        # process frame sizes
-        for ptr, frame in frame_ptrs.items():
-            if ptr in frame_children:
-                frame.children = frame_children[ptr]
+        for frame_contents in frame_children.values():
+            for node_object in frame_contents:
+                if node_object.is_frame():
+                    self.node_frames.append(node_object)
+                else:
+                    self.nodes.append(node_object)
+                    self.anchor_refs.update(node_object.getAnchors())
 
-        for frame in frame_ptrs.values():
-            frame.updateDimensions()
+        # if any frame is actually empty, drop it from further consideration
+        self.node_frames = [nf for nf in self.node_frames if not nf.is_empty]
 
     def makeDefs(self) -> ET.Element:
 
@@ -272,9 +276,16 @@ class Converter():
 
         # add node frames to final SVG
         for frame in self.node_frames:
-            svg.append(frame.svg())
+            out = frame.svg()
+            if out: svg.append(out)
 
-        for n in self.nodes+self.node_frames:
+        n = (self.nodes+self.node_frames)[0]
+        self.vb_min_x = n.x
+        self.vb_min_y = n.y
+        self.vb_max_x = n.x+n.w
+        self.vb_max_y = n.y+n.h
+
+        for n in (self.nodes+self.node_frames)[1:]:
             
             self.vb_min_x = min(self.vb_min_x, n.x)
             self.vb_min_y = min(self.vb_min_y, n.y)
@@ -326,12 +337,8 @@ class Converter():
 
         # add nodes to final SVG
         for n in self.nodes:
-            try:
-                out = n.svg(self.colors['header_opacity'], use_gradient=self.use_gradient)
-                if out: svg.append(out)
-            except Exception as e:
-                print(n.name)
-                raise e
+            out = n.svg(self.colors['header_opacity'], use_gradient=self.use_gradient)
+            if out: svg.append(out)
 
         # add anchors to final SVG
         for x, y, anchor in self.anchor_refs.values():
