@@ -127,8 +127,6 @@ class Converter():
 
         self.colors = methods.getConfigurationFromContext(context)
 
-        print(self.colors)
-
         self.quality = props.fidelity
         self.use_gradient = props.use_gradients
 
