@@ -1,7 +1,7 @@
 import bpy
 from re import search
 import xml.etree.ElementTree as ET
-from math import pi
+from math import pi, inf
 
 from . import categories
 from . import constants
@@ -85,63 +85,83 @@ def widgetFactory(socket) -> widgets.Widget:
 
 class UINode():
 
-    def __init__(self) -> None:
-        pass
+    is_frame = False
 
-    def getAnchors(self):
-            return {
-                k:(self.x + x, self.y + y, shape) for k, (x, y, shape) in self.anchors.items()
-            }
-
-# class wrapper for a single node
-class UINodeRegular(UINode):
-
-    def __init__(self, node: bpy.types.Node, colors: {str}, args = {}):
-        specification = {}
-        self.is_placeholder = False
-        if not node.bl_idname in categories.NODE_SPECIFICATIONS:
-            specification = categories.NODE_SPECIFICATIONS['PlaceholderNode']
-            print(f"WARNING: Node {node.bl_idname} does not have a default specification. Placeholder object will be used instead.")
-            self.is_placeholder = True
-        else:
-            specification = categories.NODE_SPECIFICATIONS[node.bl_idname]
-
-        self.name = node.name
-        if node.label:
-            self.name = node.label
-        elif 'name_behavior' in specification:
-            self.name = specification['name_behavior'](node)
-        elif search(r'.[0-9]{3}$', self.name): self.name = self.name[:-4]
+    def __init__(self, node: bpy.types.Node, colors = {}, args = {}) -> None:
+        
         self.w, self.h = node.dimensions
         self.w *= constants.NODE_DIM_RATIO
         self.h *= constants.NODE_DIM_RATIO
         self.x =  node.location[0]
         self.y = -node.location[1]
+
+        self.muted = node.mute
+
+    def svg(self, header_opacity=60, use_gradient=False) -> None | ET.Element:
+        return None
+    
+    # return the Node's socket anchor absolute positions + shape
+    def getAnchors(self):
+            return {
+                k:(self.x + x, self.y + y, shape) for k, (x, y, shape) in self.anchors.items()
+            }
+
+
+
+class UINodeSpecified(UINode):
+    
+    def __init__(self, node: bpy.types.Node, colors={}, args={}) -> None:
+        super().__init__(node, colors, args)
+
+        # load specification
+        self.is_placeholder = False
+        if not node.bl_idname in categories.NODE_SPECIFICATIONS:
+            self.specification = categories.NODE_SPECIFICATIONS['PlaceholderNode']
+            print(f"WARNING: Node {node.bl_idname} does not have a default specification. Placeholder object will be used instead.")
+            self.is_placeholder = True
+        else:
+            self.specification = categories.NODE_SPECIFICATIONS[node.bl_idname]
+
+        # set display name
+        self.name = node.name
+        if node.label:
+            self.name = node.label
+        elif 'name_behavior' in self.specification:
+            self.name = self.specification['name_behavior'](node)
+        elif search(r'.[0-9]{3}$', self.name): self.name = self.name[:-4]
+        
         self.outputs = [output for output in node.outputs.values() if all([not output.hide, output.enabled, not output.is_unavailable])]
         self.inputs = [input for input in node.inputs.values() if all([not input.hide, input.enabled, not input.is_unavailable])]
 
-        self.muted = node.mute
-        
-        # for identifying widgets
-        self.id = node.name.replace(' ', '_')
-
-
-        self.anchors = {}
-
-        self.color_class = specification['class']
-        if not self.color_class: self.color_class = specification['class_behavior'](node)
+        # set color class
+        self.color_class = self.specification['class']
+        if not self.color_class: self.color_class = self.specification['class_behavior'](node)
         try:
             self.uiheader = UIHeader(self.name, self.w, color=colors[self.color_class])
         except KeyError as KE:
             print(self.color_class)
-            print(specification)
+            print(self.specification)
             print(colors.keys())
             raise KE
 
+        # prepare anchors dictionary
+        self.anchors = {}
+
+    
+
+
+# class wrapper for a single node
+class UINodeRegular(UINodeSpecified):
+
+    def __init__(self, node: bpy.types.Node, colors: {str}, args = {}):
+        super().__init__(node, colors, args)
+        
         # new Widget stack method + coords
         self.height_widget_pairs = []
         self.height = self.uiheader.height + constants.TOP_PADDING
 
+        # for identifying widgets
+        self.id = node.name.replace(' ', '_')
 
         def registerWidget(widget):
             self.height_widget_pairs.append((self.height, widget))
@@ -157,30 +177,27 @@ class UINodeRegular(UINode):
             except AttributeError:
                 raise Exception(node.name)
 
-
+        # process outputs
         for out_socket in self.outputs:
             make_socket_widget(out_socket, True)
         
-        if specification:
-            if 'props' in specification:
+        # process props
+        if self.specification:
+            if 'props' in self.specification:
                 try:
-                    for widget in specification['props'](node, args):
+                    for widget in self.specification['props'](node, args):
                         if not widget: continue
                         registerWidget(widget)
                 except:
                     print("Error when converting a prop of", node.name, "-- using Placeholder instead.")
                     registerWidget(widgets.Placeholder())
 
+        # process inputs
         for in_socket in self.inputs:
             make_socket_widget(in_socket, False)
 
         # adjust node height
         self.h = max(self.h, self.height+constants.BOTTOM_PADDING)   
-
-
-    def is_frame(self) -> bool:
-        return False
-
 
     def svg(self, header_opacity=60, use_gradient=False) -> ET.Element:
         supergroup = ET.Element('g', transform=f'translate({self.x},{self.y})', id=f'{self.id}')
@@ -219,10 +236,12 @@ class UINodeRegular(UINode):
 
         return frame_items
 
-class UIRedirectNode(UINodeRegular):
+class UIRedirectNode(UINode):
 
-    def __init__(self, node: bpy.types.Node, colors: str):
+    def __init__(self, node: bpy.types.Node, colors = {}, args = {}):
+        super().__init__(node, colors, args)
         
+     
         self.name = "Redirect Node"
 
         self.muted = False
@@ -232,15 +251,18 @@ class UIRedirectNode(UINodeRegular):
         self.y = -node.location[1]
 
         self.anchors = {node.inputs[0].as_pointer(): (0, 0, UIShape(node.inputs[0]))}
-        self.anchors.update({output.as_pointer(): (self.x, self.y, UIShape(output, render=False)) for output in node.outputs})
+        self.anchors.update({output.as_pointer(): (0, 0, UIShape(output, render=False)) for output in node.outputs})
 
 
     def svg(self, *args, **kwargs):
         return None
 
-class UIFrameNode(UINodeRegular):
+class UIFrameNode(UINode):
 
-    def __init__(self, node: bpy.types.Node):
+    is_frame = True
+
+    def __init__(self, node: bpy.types.Node, colors={}, args={}):
+        super().__init__(node, colors, args)
         
         self.name = ""
         if node.label:
@@ -262,35 +284,28 @@ class UIFrameNode(UINodeRegular):
 
         self.ptr = node.as_pointer()
 
-    def is_frame(self) -> bool:
-        return True
-
     def updateOnTree(self, tree):
 
         if not self.ptr in tree:
             return
         
-        self.is_empty = False
-        own_list = tree[self.ptr]
+        min_x = inf
+        max_x = -inf
 
+        min_y = inf
+        max_y = -inf
 
-
-        # initialize
-        first = own_list[0]
-        first.x += self.x
-        first.y += self.y
-        if first.is_frame():
-            first.updateOnTree(tree)
-        min_x = first.x 
-        min_y = first.y 
-        max_x = first.x + first.w
-        max_y = first.y + first.h
-
-        for child in tree[self.ptr][1:]:
+        for child in tree[self.ptr]:
             child.x += self.x
             child.y += self.y
-            if child.is_frame():
+            if child.is_frame:
                 child.updateOnTree(tree)
+                if child.is_empty:
+                    continue
+                else:
+                    self.is_empty = False
+            else:
+                self.is_empty = False
             min_x = min(min_x, child.x)
             min_y = min(min_y, child.y)
             max_x = max(max_x, child.x+child.w)
@@ -312,6 +327,7 @@ class UIFrameNode(UINodeRegular):
             'y': '0',
             'width': str(self.w),
             'height': str(self.h),
+            'rx':widgets.PROPERTIES['corner_l'],
             'style':f'fill:{self.color};stroke:none;opacity:0.8'
         })
 
@@ -325,51 +341,12 @@ class UIFrameNode(UINodeRegular):
 
         return group
 
-class UIHiddenNode(UINodeRegular):
+class UIHiddenNode(UINodeSpecified):
     
-    def __init__(self, node: bpy.types.Node, colors: str, args={}):
-        # name
-        specification = {}
-        self.is_placeholder = False
-        if not node.bl_idname in categories.NODE_SPECIFICATIONS:
-            specification = categories.NODE_SPECIFICATIONS['PlaceholderNode']
-            self.is_placeholder = True
-        else:
-            specification = categories.NODE_SPECIFICATIONS[node.bl_idname]
-
-        self.name = node.name
-        if node.label:
-            self.name = node.label
-        elif 'name_behavior' in specification:
-            self.name = specification['name_behavior'](node)
-
-        # color
-        if not self.is_placeholder:
-            self.color_class = specification['class'] if specification['class'] else specification['class_behavior'](node)
-        else:
-            print(f"WARNING: Node {node.bl_idname} does not have a default specification. Placeholder object will be used instead.")
-            self.color_class = 'layout_node'
-        self.color=colors[self.color_class]
-
-        # position & size
-        self.w, self.h = node.dimensions
-        self.w *= constants.NODE_DIM_RATIO
-        self.h *= constants.NODE_DIM_RATIO
-        self.x =  node.location[0]
-        self.y = -node.location[1]
-
-        self.outputs = [output for output in node.outputs.values() if all([not output.hide, output.enabled, not output.is_unavailable])]
-        self.inputs = [input for input in node.inputs.values() if all([not input.hide, input.enabled, not input.is_unavailable])]
-
-        self.muted = node.mute
+    def __init__(self, node: bpy.types.Node, colors = {}, args={}):
+        super().__init__(node, colors, args)
         
-        # for identifying widgets
-        self.id = node.name.replace(' ', '_')
-
-
-        # markers
-        self.anchors = {}
-
+        # prepare anchors
         for i, (t, socket) in [*enumerate(zip(len(self.inputs)*['input'], self.inputs))]+[*enumerate(zip(len(self.outputs)*['output'], self.outputs))]:
 
             # calculate angle

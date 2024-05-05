@@ -176,22 +176,26 @@ class Converter():
             if n.mute:
                 self.links.extend([(link.from_socket.as_pointer(), link.to_socket.as_pointer(), True) for link in n.internal_links])
         
-        print(top_level)
-        print(frame_children)
+        # iterate over Nodes w/o a parent
         for node_object in top_level:
-            if node_object.is_frame():
+            # traverse down Frame trees
+            if node_object.is_frame:
                 node_object.updateOnTree(frame_children)
                 self.node_frames.append(node_object)
+            # register Node and get its anchors
             else:
                 self.nodes.append(node_object)
                 self.anchor_refs.update(node_object.getAnchors())
 
+        # iterate over nested Nodes; already pre-processed
         for frame_contents in frame_children.values():
+            # add frames
             for node_object in frame_contents:
-                if node_object.is_frame():
+                if node_object.is_frame:
                     self.node_frames.append(node_object)
                 else:
                     self.nodes.append(node_object)
+                    # anchors need to be retrieved AFTER preprocessing (Nodes need to be repositioned first)
                     self.anchor_refs.update(node_object.getAnchors())
 
         # if any frame is actually empty, drop it from further consideration
