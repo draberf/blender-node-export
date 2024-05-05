@@ -17,7 +17,7 @@ class ExportPropertyGroup(bpy.types.PropertyGroup):
     use_gradients: bpy.props.BoolProperty(name="Use Gradients", default=False)
 
     # use category defaults automatically
-    use_theme_colors: bpy.props.BoolProperty(name="Use theme colors", default=False)
+    use_theme_colors: bpy.props.BoolProperty(name="Use theme colors", default=True)
 
     # add outline to rectangles
     rect_outline:           bpy.props.FloatProperty(name="Outline Thickness", min=0, soft_max=10, default=0.3)
