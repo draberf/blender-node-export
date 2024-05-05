@@ -90,7 +90,7 @@ operators.append(UIExportOperator)
 
 class UIColorResetOperator(bpy.types.Operator):
     bl_idname = 'ui.color_reset'
-    bl_label = "Reset Colors"
+    bl_label = "Reset to Default"
 
     def execute(self, context):
 
