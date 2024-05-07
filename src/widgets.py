@@ -648,6 +648,7 @@ class Ramp(Widget):
                     'style':f'fill:{color_string};stroke:{color_string};stroke-weight:0.1'
                 })
 
+        # add stops
         for x, color in self.stops:
             g = ET.SubElement(elem, 'g', attrib={'transform': f'translate({x*width-5}, {2*self.height()/3 - 2})'})
             ET.SubElement(g, 'polygon', attrib={
