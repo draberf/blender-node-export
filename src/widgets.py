@@ -747,4 +747,4 @@ class Angle(Float):
 
     def __init__(self, name="", value=0, minmax=None) -> None:
         super().__init__(name, value, minmax)
-        self.value = getFloatString(value, decimal_points=1)+"%"
+        self.value = getFloatString(value, decimal_points=1)+"°"
