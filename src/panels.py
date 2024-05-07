@@ -78,7 +78,6 @@ class UIColorParentPanel(UIPanel):
         row = layout.row()
         row.operator(
             operator='ui.color_reset',
-            text="Reset Colors"
         )
         row.enabled = not props.use_theme_colors
 
