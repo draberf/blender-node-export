@@ -31,7 +31,7 @@ def socketColorToSVGColor(color: list[float], corrected=True) -> str:
     return "rgb("+",".join([str(round(colorCorrect(x)*255)) for x in color[:3]])+")"
     
 
-def enumName(node, enum_name):
+def enumName(node: bpy.types.Node, enum_name: str) -> str:
     return node.bl_rna.properties[enum_name].enum_items[getattr(node, enum_name)].name
 
 def getFloatString(value: float, decimal_points: int = 3) -> str:
