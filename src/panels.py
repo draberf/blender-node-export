@@ -19,7 +19,7 @@ class UIColorPanel(UIPanel):
     
     @classmethod
     def poll(cls, context):
-        return not context.scene.export_svg_props.use_theme_colors
+        return not context.preferences.addons[__package__].preferences.use_theme_colors
 
 
 class UIParentPanel(UIPanel):
@@ -41,7 +41,7 @@ class UIQualityPanel(UIPanel):
     def draw(self, context):
         
         layout = self.layout
-        props = context.scene.export_svg_props
+        props = context.preferences.addons[__package__].preferences
 
         layout.prop(props, 'fidelity')
         layout.prop(props, 'use_gradients')
@@ -56,7 +56,7 @@ class UIOutlinePanel(UIPanel):
     def draw(self, context):
 
         layout = self.layout
-        props = context.scene.export_svg_props
+        props = context.preferences.addons[__package__].preferences
         
         layout.prop(props, 'rect_outline')
         layout.prop(props, 'rect_outline_color')
@@ -71,7 +71,7 @@ class UIColorParentPanel(UIPanel):
 
     def draw(self, context):
         layout = self.layout
-        props = context.scene.export_svg_props
+        props = context.preferences.addons[__package__].preferences
 
         layout.prop(props, 'use_theme_colors')
 
@@ -90,7 +90,7 @@ class UIColorTextPanel(UIColorPanel):
 
     def draw(self, context):
         layout = self.layout
-        props = context.scene.export_svg_props
+        props = context.preferences.addons[__package__].preferences
 
         layout.prop(props, 'use_generic_text')
 
@@ -111,7 +111,7 @@ class UIColorElemPanel(UIColorPanel):
 
     def draw(self, context):
         layout = self.layout
-        props = context.scene.export_svg_props
+        props = context.preferences.addons[__package__].preferences
 
         for color_name in ['color_'+elem for elem in ELEMENTS]:
             layout.prop(props, color_name)
@@ -123,7 +123,7 @@ class UIColorHeaderPanel(UIColorPanel):
     
     def draw(self, context):
         layout = self.layout
-        props = context.scene.export_svg_props
+        props = context.preferences.addons[__package__].preferences
 
         # https://blender.stackexchange.com/questions/41387/how-to-deactivate-a-ui-element-in-an-add-on
         for color_name in ['header_color_'+name for name in CATEGORY_NAMES]+['header_opacity']:
@@ -138,7 +138,7 @@ class UIConfigPanel(UIPanel):
     def draw(self, context):
          
         layout = self.layout
-        props = context.scene.export_svg_props
+        props = context.preferences.addons[__package__].preferences
 
         layout.prop(props, 'config_mode', text="")
 
@@ -164,7 +164,7 @@ class UIInspectPanel(UIPanel):
     def draw(self, context):
 
         layout = self.layout
-        props = context.scene.export_svg_props
+        props = context.preferences.addons[__package__].preferences
 
         row = layout.row()
         row.label(text="Export target")

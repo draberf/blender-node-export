@@ -109,7 +109,7 @@ def getConfigurationFromContext(context) -> dict:
     output = {}
     
     theme = context.preferences.themes[0]
-    props = context.scene.export_svg_props
+    props = context.preferences.addons[__package__].preferences
 
     # Details
 

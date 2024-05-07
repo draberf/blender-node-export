@@ -72,7 +72,7 @@ class UIExportOperator(bpy.types.Operator):
     def execute(self, context):
 
 
-        props = context.scene.export_svg_props
+        props = context.preferences.addons[__package__].preferences
 
         header = "<?xml version='1.0' encoding='utf-8'?>"
 
@@ -80,7 +80,7 @@ class UIExportOperator(bpy.types.Operator):
 
         tree = Converter(context).convert()
         
-        with open(bpy.path.abspath(context.scene.export_svg_props.output), "w+") as f:
+        with open(bpy.path.abspath(context.preferences.addons[__package__].preferences.output), "w+") as f:
             f.write(header)
             f.write(doctype)
             tree.write(f, encoding='unicode')
@@ -94,7 +94,7 @@ class UIColorResetOperator(bpy.types.Operator):
 
     def execute(self, context):
 
-        resetColors(context.scene.export_svg_props, context)
+        resetColors(context.preferences.addons[__package__].preferences, context)
         return {'FINISHED'}
 operators.append(UIColorResetOperator)
 
@@ -131,8 +131,8 @@ class UIConfigExportOperator(bpy.types.Operator):
 
     def execute(self, context):
         
-        with open(bpy.path.abspath(context.scene.export_svg_props.config_save_path), "w+") as f:
-            dump = json.dumps(dumpProperties(context.scene.export_svg_props), indent=4)
+        with open(bpy.path.abspath(context.preferences.addons[__package__].preferences.config_save_path), "w+") as f:
+            dump = json.dumps(dumpProperties(context.preferences.addons[__package__].preferences), indent=4)
             f.write(dump)
 
             return {'FINISHED'}
@@ -144,8 +144,8 @@ class UIConfigImportOperator(bpy.types.Operator):
 
     def execute(self, context):
 
-        with open(bpy.path.abspath(context.scene.export_svg_props.config_load_path), "r+") as f:
-            loadProperties(f.read(), context.scene.export_svg_props)
+        with open(bpy.path.abspath(context.preferences.addons[__package__].preferences.config_load_path), "r+") as f:
+            loadProperties(f.read(), context.preferences.addons[__package__].preferences)
 
             return {'FINISHED'}
 operators.append(UIConfigImportOperator)

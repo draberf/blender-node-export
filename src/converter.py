@@ -123,7 +123,7 @@ class Converter():
         nodetree = context.space_data.node_tree
 
         # obtain properties
-        props = context.scene.export_svg_props
+        props = context.preferences.addons[__package__].preferences
 
         self.colors = methods.getConfigurationFromContext(context)
 

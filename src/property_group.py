@@ -2,7 +2,8 @@ import bpy
 
 from .constants import HEADER_OPACITY
 
-class ExportPropertyGroup(bpy.types.PropertyGroup):
+class ExportPropertyGroup(bpy.types.AddonPreferences):
+    bl_idname = __package__
 
     # toggle whether export should only include selected nodes
     export_selected_only: bpy.props.BoolProperty(name="Export Selected Only", default=False)
