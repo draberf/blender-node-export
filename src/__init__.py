@@ -33,9 +33,10 @@ if "bpy" in locals():
             print(locals())
 
 import bpy
-from .src import property_group, panels, operators
+from . import property_group, panels, operators
 import sys, importlib
-to_reload = [module for (m_name, module) in sys.modules.items() if m_name[:len("NodeExportToSVG.src.")] == "NodeExportToSVG.src."]
+print(sys.modules.items())
+to_reload = [module for (m_name, module) in sys.modules.items() if m_name[:len(__package__)] == __package__]
 for module in to_reload:
     importlib.reload(module)
 
@@ -43,7 +44,6 @@ def register():
 
     # register properties
     bpy.utils.register_class(property_group.ExportPropertyGroup)
-    bpy.types.Scene.export_svg_props = bpy.props.PointerProperty(type=property_group.ExportPropertyGroup)
 
     for cls in operators.operators+panels.panels:
         bpy.utils.register_class(cls)
@@ -51,8 +51,7 @@ def register():
 def unregister():
 
     # unregister properties
-    del bpy.types.Scene.export_svg_props
     bpy.utils.unregister_class(property_group.ExportPropertyGroup)
 
-    for cls in panels.operators+operators.panels:
+    for cls in operators.operators+panels.panels:
         bpy.utils.unregister_class(cls)
