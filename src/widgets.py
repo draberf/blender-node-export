@@ -545,7 +545,7 @@ class Curves(Widget):
     
     css_classname = 'curves'
 
-    def __init__(self, curves=[], hue_background=False) -> None:
+    def __init__(self, curves: list[tuple[tuple[float, float, float], list[tuple[float, float]], bool]] = [], hue_background=False) -> None:
         super().__init__()
         self.curves = curves
         self.hue_background = hue_background
