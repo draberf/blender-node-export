@@ -87,6 +87,12 @@ class UIExportOperator(bpy.types.Operator):
             f.write(doctype)
             tree.write(f, encoding='unicode')
 
+        def draw(self, _):
+            self.layout.label(text = f'Succesfully exported graph to {abs_path}.')
+
+        # https://blender.stackexchange.com/questions/109711/how-to-popup-simple-message-box-from-python-console
+        context.window_manager.popup_menu(draw, title='Success', icon = 'INFO')
+
         return {'FINISHED'}
 operators.append(UIExportOperator)
 
