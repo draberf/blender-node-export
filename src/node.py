@@ -356,8 +356,6 @@ class UIHiddenNode(UINodeSpecified):
             # calculate position
             x, y = methods.polarToCartesian(self.h/2, -angle)
 
-            print(t, x, y, step, angle)
-
             x += (self.h/2) if t == 'input' else (self.w-self.h/2)
             y += self.h/2
 
