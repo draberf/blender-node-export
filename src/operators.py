@@ -80,7 +80,9 @@ class UIExportOperator(bpy.types.Operator):
 
         tree = Converter(context).convert()
         
-        with open(bpy.path.abspath(context.preferences.addons[__package__].preferences.output), "w+") as f:
+        abs_path = bpy.path.abspath(context.preferences.addons[__package__].preferences.output )
+
+        with open(abs_path, "w+") as f:
             f.write(header)
             f.write(doctype)
             tree.write(f, encoding='unicode')
