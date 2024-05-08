@@ -402,10 +402,11 @@ class Vector(Widget):
 
     css_classname = 'vector'
 
-    def __init__(self, name="", values=[0,0,0]) -> None:
+    def __init__(self, name="", values=[0,0,0], elem_class=Float) -> None:
         super().__init__()
         self.name = name
         self.values = values
+        self.elem_class = elem_class
 
     def height(self):
         return 4*constants.LINKED_SOCKET_HEIGHT
@@ -414,7 +415,7 @@ class Vector(Widget):
 
         elem.append(Label(text=self.name).prepend_id(self.id).svg(width=width, resize=False))
         for i, value in enumerate(self.values):
-            elem.append(Float(value=value).prepend_id(self.id).svg(width=width, y=(i+1)*constants.LINKED_SOCKET_HEIGHT, resize=False))
+            elem.append(self.elem_class(name='XYZ'[i],value=value).prepend_id(self.id + '_' + str(i)).svg(width=width, y=(i+1)*constants.LINKED_SOCKET_HEIGHT, resize=False))
         
 class LabeledDropdown(Widget):
 
