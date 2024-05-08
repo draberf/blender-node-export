@@ -25,6 +25,7 @@ def resetColors(prop_group, context):
 class UIInspectOperator(bpy.types.Operator):
     bl_idname = "ui.inspector"
     bl_label = "Inspector"
+    bl_description = "Inspects selected Nodes, printing required information (based on implementation)"
 
     def execute(self, context):
         
@@ -66,6 +67,7 @@ operators.append(UIInspectOperator)
 class UIExportOperator(bpy.types.Operator):
     bl_idname = "ui.exporter"
     bl_label = "Exporter"
+    bl_description = "Exports Node graph as a vector image to target file."
     
     def execute(self, context):
 
@@ -97,6 +99,7 @@ operators.append(UIExportOperator)
 class UIColorResetOperator(bpy.types.Operator):
     bl_idname = 'ui.color_reset'
     bl_label = "Reset to Default"
+    bl_description = "Resets colors to default (in Preferences > Themes)"
 
     def execute(self, context):
 
@@ -134,6 +137,7 @@ def loadProperties(json_string, group):
 class UIConfigExportOperator(bpy.types.Operator):
     bl_idname = 'ui.config_export'
     bl_label = "Save"
+    bl_description = "Saves current configuration to target file"
 
     def execute(self, context):
         
@@ -147,6 +151,7 @@ operators.append(UIConfigExportOperator)
 class UIConfigImportOperator(bpy.types.Operator):
     bl_idname = 'ui.config_import'
     bl_label = "Load"
+    bl_description = "Changes configuration to that in target file"
 
     def execute(self, context):
 
