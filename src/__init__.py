@@ -35,7 +35,6 @@ if "bpy" in locals():
 import bpy
 from . import property_group, panels, operators
 import sys, importlib
-print(sys.modules.items())
 to_reload = [module for (m_name, module) in sys.modules.items() if m_name[:len(__package__)] == __package__]
 for module in to_reload:
     importlib.reload(module)
