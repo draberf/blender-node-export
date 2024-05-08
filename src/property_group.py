@@ -6,26 +6,58 @@ class ExportPropertyGroup(bpy.types.AddonPreferences):
     bl_idname = __package__
 
     # toggle whether export should only include selected nodes
-    export_selected_only: bpy.props.BoolProperty(name="Export Selected Only", default=False)
+    export_selected_only: bpy.props.BoolProperty(
+        name="Export Selected Only",
+        description="Limit export only to selected Nodes and their links. (Exports everything if nothing is selected.)",
+        default=False
+    )
 
     # use rounded corners
-    rounded_corners: bpy.props.BoolProperty(name="Rounded Corners", default=True)
+    rounded_corners: bpy.props.BoolProperty(
+        name="Round Corners",
+        description="Add round corners to elements",
+        default=True
+    )
 
     # graphical quality of certain elements
-    fidelity: bpy.props.IntProperty(name="Element Fidelity", min=0, max=50, default=10)
+    fidelity: bpy.props.IntProperty(
+        name="Element Quality",
+        description="Control the quality of complex UI widgets (2-50)",
+        min=2, max=50, default=10
+    )
 
     # use gradients for certain elements
-    use_gradients: bpy.props.BoolProperty(name="Use Gradients", default=False)
+    use_gradients: bpy.props.BoolProperty(
+        name="Use Gradients",
+        description="Use gradients for Color Picker and Ramp widgets",
+        default=False
+    )
 
     # use category defaults automatically
-    use_theme_colors: bpy.props.BoolProperty(name="Use theme colors", default=True)
+    use_theme_colors: bpy.props.BoolProperty(
+        name="Use theme colors",
+        description="Use colors defined in Preferences > Themes",
+        default=True
+    )
 
     # add outline to rectangles
-    rect_outline:           bpy.props.FloatProperty(name="Outline Thickness", min=0, soft_max=10, default=0.3)
-    rect_outline_color:     bpy.props.FloatVectorProperty(name="Outline Color", subtype='COLOR_GAMMA', min=0, max=1, size=4)
+    rect_outline:           bpy.props.FloatProperty(
+        name="Outline Thickness",
+        description="Define thickness of element outlines",
+        min=0, soft_max=10, default=0.3
+    )
+    rect_outline_color:     bpy.props.FloatVectorProperty(
+        name="Outline Color",
+        description="Define color of element outlines",
+        subtype='COLOR_GAMMA', min=0, max=1, size=4
+    )
 
     # text colors
-    use_generic_text:       bpy.props.BoolProperty(name="Use Generic Color", default=False)
+    use_generic_text:       bpy.props.BoolProperty(
+        name="Use Generic Color",
+        description="Use the same (\"Generic\") color for all Text elements",
+        default=False
+    )
     text_generic:           bpy.props.FloatVectorProperty(name="Generic",    subtype='COLOR_GAMMA', min=0, max=1, size=3) 
     text_base:              bpy.props.FloatVectorProperty(name="Base",       subtype='COLOR_GAMMA', min=0, max=1, size=3)
     text_string:            bpy.props.FloatVectorProperty(name="String",     subtype='COLOR_GAMMA', min=0, max=1, size=3)
@@ -72,13 +104,28 @@ class ExportPropertyGroup(bpy.types.AddonPreferences):
     node_color: bpy.props.FloatVectorProperty(name="Base Color", subtype='COLOR', min=0, max=1)
 
     # config file mode
-    config_mode:        bpy.props.EnumProperty(items=[
+    config_mode:        bpy.props.EnumProperty(
+        items=[
             ('SAVE', "Save", "Export a configuration file"),
             ('LOAD', "Load", "Import a configuration file"),
-        ], name="Mode", default='LOAD')
+        ],
+        description="Choose between saving and loading a configuration file",
+        name="Mode", default='LOAD')
     
-    config_save_path:   bpy.props.StringProperty(name = "Save to", subtype='FILE_PATH')
-    config_load_path:   bpy.props.StringProperty(name = "Load from", subtype='FILE_PATH')
+    config_save_path:   bpy.props.StringProperty(
+        name = "Save to",
+        description = "Target file name to save configuration to",
+        subtype='FILE_PATH'
+    )
+    config_load_path:   bpy.props.StringProperty(
+        name = "Load from",
+        description = "File name to load configuration from",
+        subtype='FILE_PATH'
+    )
 
     # target file to export into
-    output: bpy.props.StringProperty(name = "Output", subtype='FILE_PATH')
+    output: bpy.props.StringProperty(
+        name = "Output",
+        description = "Target file name to export graph to",
+        subtype='FILE_PATH'
+    )
