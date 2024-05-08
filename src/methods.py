@@ -59,7 +59,6 @@ def getBezierExtrema(x0: float, x1: float, x2: float, x3: float) -> tuple[float,
     
     try:
         t1, t2 = solveQuadratic((-3*x0 + 9*x1 - 9*x2 + 3*x3)/100.0, (6*x0 - 12*x1 + 6*x2)/100.0, (-3*x0 + 3*x1)/100.0)
-        print(t1, t2)
     except Exception as e:
         print(x0, x1, x2, x3)
         raise e
