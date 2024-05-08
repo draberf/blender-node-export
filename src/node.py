@@ -42,12 +42,9 @@ SOCKET_WIDGET_DEFS = {
         widgets.Label(text=socket.name),
         widgets.RGBA(color=methods.socketColorToSVGColor(socket.default_value[:3], corrected=socket.bl_rna.properties['default_value'].subtype == 'COLOR_GAMMA'))
     ]),
-    'VECTOR': lambda socket: widgets.Vector(name=socket.name, values=socket.default_value) if not socket.hide_value else widgets.Label(text=socket.name),
-    'ROTATION': lambda socket: widgets.Vector(name=socket.name, values=socket.default_value) if not socket.hide_value else widgets.Label(text=socket.name),
-    'INT': lambda socket: widgets.FortySixty(wids=[
-        widgets.Label(text=socket.name),
-        widgets.Label(text=str(socket.default_value), alignment='R')
-    ]),
+    'VECTOR': lambda socket: widgets.Vector(name=socket.name, values=socket.default_value),
+    'ROTATION': lambda socket: widgets.Vector(name=socket.name, values=socket.default_value, elem_class=widgets.Angle),
+    'INT': lambda socket: value_socket(socket),
     'IMAGE': lambda socket: widgets.FortySixty(wids=[
         widgets.Label(text=socket.name),
         widgets.Label(text=getImageWidgetString(socket), alignment='R')
@@ -78,7 +75,7 @@ def widgetFactory(socket) -> widgets.Widget:
     if socket.is_output:
         return widgets.Label(text=socket.name, alignment='R')
 
-    if socket.is_linked:
+    if socket.is_linked or socket.hide_value:
         return widgets.Label(text=socket.name)
 
     return SOCKET_WIDGET_DEFS[socket.type](socket)
