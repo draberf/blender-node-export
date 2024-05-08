@@ -40,15 +40,13 @@ class UIInspectOperator(bpy.types.Operator):
             print("Inputs:")
             for input   in node.outputs:
                 print(">", input.name, input.hide, input.enabled, input.is_unavailable)
-                if input.type == 'RGBA':
-                    for prop in input.bl_rna.properties:
-                        print(">>>", prop, prop.type, prop.subtype, "name", prop.name)
+                for prop in input.bl_rna.properties:
+                    print(">>", prop.name, getattr(input, prop.identifier))
                         
             for input in node.inputs:
                 print(">", input.name)
-                if input.type == 'RGBA':
-                    for prop in input.bl_rna.properties:
-                        print(">>>", prop, prop.type, prop.subtype, "name", prop.name)
+                for prop in input.bl_rna.properties:
+                    print(">>>", prop, prop.type, prop.subtype, "name", prop.name, '    ', getattr(input, prop.identifier))
 
 
 
