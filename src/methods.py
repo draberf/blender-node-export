@@ -3,7 +3,7 @@ import cmath
 import bpy
 from math import sqrt
 
-from .constants import HEADER_OPACITY, CATEGORY_NAMES, TEXTS, ELEMENTS, ROUND_CORNER
+from .constants import HEADER_OPACITY, CATEGORY_NAMES, TEXTS, ELEMENTS, ROUND_CORNER, SOCKET_COLORS
 
 # in: mathutils.Color with r, g, b, methods
 # out: color representation in SVG-compliant format
