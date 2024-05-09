@@ -142,6 +142,9 @@ def getConfigurationFromContext(context) -> dict:
         for name in CATEGORY_NAMES:
             output[name+'_node'] = socketColorToSVGColor(cat_colors['header_color_'+name])
 
+        # Sockets
+        output.update(getSocketColors())
+
     else:
         # Text
         for name in TEXTS[1:]:
@@ -155,6 +158,10 @@ def getConfigurationFromContext(context) -> dict:
         # Headers
         for name in CATEGORY_NAMES:
             output[name+'_node'] = socketColorToSVGColor(getattr(props, 'header_color_'+name))
+
+        for name in SOCKET_COLORS.keys():
+            color = props.socket_color_generic if props.use_generic_socket else getattr(props, 'socket_color_'+name.lower())
+            output['socket_color_'+name.lower()] = socketColorToSVGColor(color)
 
     output['noodliness'] = theme.node_editor.noodle_curving
     output['header_opacity'] = HEADER_OPACITY
