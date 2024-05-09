@@ -103,6 +103,12 @@ def getCategoryColors(context):
     theme = context.preferences.themes[0]
     return {'header_color_'+name:getattr(theme.node_editor, name+'_node') for name in CATEGORY_NAMES}
 
+def getSocketColors():
+    elem_colors = {}
+    for key, value in SOCKET_COLORS.items():
+        elem_colors['socket_color_'+key.lower()] = value
+    return elem_colors
+
 def getConfigurationFromContext(context) -> dict:
     
     output = {}
