@@ -35,7 +35,7 @@ class ExportPropertyGroup(bpy.types.AddonPreferences):
 
     # use category defaults automatically
     use_theme_colors: bpy.props.BoolProperty(
-        name="Use theme colors",
+        name="Use Theme colors",
         description="Use colors defined in Preferences > Themes",
         default=True
     )
@@ -54,7 +54,7 @@ class ExportPropertyGroup(bpy.types.AddonPreferences):
 
     # text colors
     use_generic_text:       bpy.props.BoolProperty(
-        name="Use Generic Color",
+        name="Use generic text color",
         description="Use the same (\"Generic\") color for all Text elements",
         default=False
     )
@@ -99,6 +99,32 @@ class ExportPropertyGroup(bpy.types.AddonPreferences):
 
     # opacity of header -- ADD HOVER INFO TO THIS
     header_opacity: bpy.props.FloatProperty(name="Header Opacity", subtype='PERCENTAGE', min=0, max=100, default=HEADER_OPACITY)
+
+    # socket colors
+    use_generic_socket:         bpy.props.BoolProperty(
+        name="Use generic socket color",
+        description="Use the same (\"Generic\") color for all socket marker",
+        default=False
+    )
+
+    socket_color_generic:       bpy.props.FloatVectorProperty(name="Generic",   subtype='COLOR_GAMMA', min=0, max=1, size=3)
+    socket_color_custom:        bpy.props.FloatVectorProperty(name="Custom",    subtype='COLOR_GAMMA', min=0, max=1, size=3)
+    socket_color_value:         bpy.props.FloatVectorProperty(name="Value",     subtype='COLOR_GAMMA', min=0, max=1, size=3)
+    socket_color_int:           bpy.props.FloatVectorProperty(name="Int",       subtype='COLOR_GAMMA', min=0, max=1, size=3)
+    socket_color_boolean:       bpy.props.FloatVectorProperty(name="Boolean",   subtype='COLOR_GAMMA', min=0, max=1, size=3)
+    socket_color_vector:        bpy.props.FloatVectorProperty(name="Vector",    subtype='COLOR_GAMMA', min=0, max=1, size=3)
+    socket_color_rotation:      bpy.props.FloatVectorProperty(name="Rotation",  subtype='COLOR_GAMMA', min=0, max=1, size=3)
+    socket_color_menu:          bpy.props.FloatVectorProperty(name="Menu",      subtype='COLOR_GAMMA', min=0, max=1, size=3)
+    socket_color_string:        bpy.props.FloatVectorProperty(name="String",    subtype='COLOR_GAMMA', min=0, max=1, size=3)
+    socket_color_rgba:          bpy.props.FloatVectorProperty(name="RGBa"  ,    subtype='COLOR_GAMMA', min=0, max=1, size=3)
+    socket_color_shader:        bpy.props.FloatVectorProperty(name="Shader",    subtype='COLOR_GAMMA', min=0, max=1, size=3)
+    socket_color_object:        bpy.props.FloatVectorProperty(name="Object",    subtype='COLOR_GAMMA', min=0, max=1, size=3)
+    socket_color_image:         bpy.props.FloatVectorProperty(name="Image",     subtype='COLOR_GAMMA', min=0, max=1, size=3)
+    socket_color_geometry:      bpy.props.FloatVectorProperty(name="Geometry",  subtype='COLOR_GAMMA', min=0, max=1, size=3)
+    socket_color_collection:    bpy.props.FloatVectorProperty(name="Collection",subtype='COLOR_GAMMA', min=0, max=1, size=3)
+    socket_color_texture:       bpy.props.FloatVectorProperty(name="Texture",   subtype='COLOR_GAMMA', min=0, max=1, size=3)
+    socket_color_material:      bpy.props.FloatVectorProperty(name="Material",  subtype='COLOR_GAMMA', min=0, max=1, size=3)
+
 
     # colors of nodes
     node_color: bpy.props.FloatVectorProperty(name="Base Color", subtype='COLOR', min=0, max=1)
