@@ -55,55 +55,6 @@ ARROW_DEFS = {
     })
 }
 
-def style(colors) -> ET.Element:
-    
-    style_elem = ET.Element('style')
-
-    style_elem.text = '\n'.join([
-
-        # texts
-        "text { font-family: sans-serif, arial; font-size: 10px; fill: "+colors['text_base']+" }",
-        ".string text { fill: "+colors['text_string']+" }",
-        ".bool_true  text { fill: "+colors['text_boolean_true'] +" }",
-        ".bool_false text { fill: "+colors['text_boolean_false']+" }",
-        ".dropdown text { fill: "+colors['text_dropdown']+" }",
-        ".value text { fill: "+colors['text_slider']+" }",
-
-        # corners
-        ".corner_l { rx:" + colors['round_l'] + " }",
-        ".corner_s { rx:" + colors['round_s'] + " }",
-
-        # generic
-        "rect { stroke-width:"+str(colors['outline_thickness'])+";stroke:"+colors['outline_color']+" }",
-        ".nodeframe { fill:"+colors['color_base']+" } ",
-        ".marker { stroke-width: "+str(constants.MARKER_LINE)+"px; stroke: black}",
-        ".arrow { stroke-width: 1; stroke: white; fill:none}",
-        
-        # booleans
-        ".checkmark { stroke:"+colors['color_checkmark']+" } ",
-        ".bool_false {fill:"+colors['color_bool_false']+"}",
-        ".bool_true  {fill:"+colors['color_bool_true'] +"}",
-
-        # values
-        ".value_bar {fill:"+colors['color_value_field']+"}",
-        ".progress_bar {fill:"+colors['color_value_progress']+"}",
-
-        # strings
-        ".string { fill:"+colors['color_string_field']+"}",
-
-        # dropdowns
-        ".dropdown { fill:"+colors['color_dropdown']+"}",
-
-        # axes
-        ".axis_x {stroke:"+colors['color_axis_x']+"}",
-        ".axis_y {stroke:"+colors['color_axis_y']+"}",
-        ".axis_z {stroke:"+colors['color_axis_z']+"}",
-        ".axis_w {"+"stroke:black"+"}",
-    ])
-
-    return style_elem
-
-
 def nodeFactory(n, colors, args) -> node.UINode:
 
     match n.bl_idname:
@@ -201,11 +152,70 @@ class Converter():
         # if any frame is actually empty, drop it from further consideration
         self.node_frames = [nf for nf in self.node_frames if not nf.is_empty]
 
+        
+    def style(self) -> ET.Element:
+
+        colors = self.colors
+        
+        style_elem = ET.Element('style')
+
+        style_elem.text = '\n'.join([
+
+            # texts
+            "text { font-family: sans-serif, arial; font-size: 10px; fill: "+colors['text_base']+" }",
+            "text { font-family: sans-serif, arial; font-size: 10px; fill: "+colors['text_base']+" }",
+            ".string text { fill: "+colors['text_string']+" }",
+            ".bool_true  text { fill: "+colors['text_boolean_true'] +" }",
+            ".bool_false text { fill: "+colors['text_boolean_false']+" }",
+            ".dropdown text { fill: "+colors['text_dropdown']+" }",
+            ".value text { fill: "+colors['text_slider']+" }",
+
+            # corners
+            ".corner_l { rx:" + colors['round_l'] + " }",
+            ".corner_s { rx:" + colors['round_s'] + " }",
+
+            # generic
+            "rect { stroke-width:"+str(colors['outline_thickness'])+";stroke:"+colors['outline_color']+" }",
+            ".nodeframe { fill:"+colors['color_base']+" } ",
+            ".marker { stroke-width: "+str(constants.MARKER_LINE)+"px; stroke: black}",
+            ".arrow { stroke-width: 1; stroke: white; fill:none}",
+            
+            # booleans
+            ".checkmark { stroke:"+colors['color_checkmark']+" } ",
+            ".bool_false {fill:"+colors['color_bool_false']+"}",
+            ".bool_true  {fill:"+colors['color_bool_true'] +"}",
+
+            # values
+            ".value_bar {fill:"+colors['color_value_field']+"}",
+            ".progress_bar {fill:"+colors['color_value_progress']+"}",
+
+            # strings
+            ".string { fill:"+colors['color_string_field']+"}",
+
+            # dropdowns
+            ".dropdown { fill:"+colors['color_dropdown']+"}",
+
+            # axes
+            ".axis_x {stroke:"+colors['color_axis_x']+"}",
+            ".axis_y {stroke:"+colors['color_axis_y']+"}",
+            ".axis_z {stroke:"+colors['color_axis_z']+"}",
+            ".axis_w {"+"stroke:black"+"}",
+
+            # sockets
+            *([
+                ".marker ."+name.lower()+" { fill: "+colors['socket_color_'+name.lower()]+" }" for name in constants.SOCKET_COLORS.keys()
+            ])
+        ])
+
+        return style_elem
+
+
+
     def makeDefs(self) -> ET.Element:
 
         defs = ET.Element('defs')
 
-        defs.append(style(self.colors))
+        defs.append(self.style())
 
         # add symbols
 
@@ -312,7 +322,7 @@ class Converter():
 
             opacity = '1' if not is_muted else '0.2'
 
-            color1 = from_anchor_object.color
+            color1 = self.colors['socket_color_'+from_anchor_object.type]
 
             diff_x = abs(to_x - from_x)
             control_x1 = from_x + fac*diff_x
