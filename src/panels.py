@@ -1,6 +1,6 @@
 import bpy
 
-from .constants import ELEMENTS, TEXTS
+from .constants import ELEMENTS, TEXTS, SOCKET_COLORS
 from .categories import CATEGORY_NAMES
 
 TARGET = "D:\\skola_mit\\dp\\blender-node-export\\output.svg"
@@ -130,6 +130,23 @@ class UIColorHeaderPanel(UIColorPanel):
             layout.prop(props, color_name)
 panels.append(UIColorHeaderPanel)
 
+class UIColorSocketPanel(UIColorPanel):
+    bl_idname = "NODE_EDITOR_PT_sockets"
+    bl_label = "Sockets"
+
+    def draw(self, context):
+        layout = self.layout
+        props = context.preferences.addons[__package__].preferences
+
+        layout.prop(props, 'use_generic_socket')
+        
+        for color_name in ['socket_color_'+name.lower() for name in SOCKET_COLORS.keys()]:
+            row = layout.row()
+            row.prop(props, color_name)
+            if color_name == 'socket_color_generic': row.enabled = props.use_generic_socket
+            else: row.enabled = not props.use_generic_socket
+panels.append(UIColorSocketPanel)
+
 class UIConfigPanel(UIPanel):
     bl_parent_id = 'NODE_EDITOR_PT_export_parent'
     bl_idname = "NODE_EDITOR_PT_conf"
@@ -181,9 +198,15 @@ class UIInspectPanel(UIPanel):
             text='Export'
         )
 
-        #layout.operator(
-        #    operator='ui.inspector',
-        #    icon='NODE',
-        #    text='Inspect Selected'
-        #)
+        layout.operator(
+            operator='ui.inspector',
+            icon='NODE',
+            text='Inspect Selected'
+        )
+
+        layout.operator(
+            operator='ui.test_size',
+            icon='NODE',
+            text='Test Size'
+        )
 panels.append(UIInspectPanel)

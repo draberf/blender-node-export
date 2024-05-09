@@ -1,7 +1,7 @@
 import bpy, json
 
-from .methods import getElementColors, getCategoryColors, getTextColors
-from .constants import HEADER_OPACITY, IGNORE_PROPS, ELEMENTS, CATEGORY_NAMES, TEXTS
+from .methods import getElementColors, getCategoryColors, getTextColors, getSocketColors, colorStringToArray
+from .constants import HEADER_OPACITY, IGNORE_PROPS, ELEMENTS, CATEGORY_NAMES, TEXTS, SOCKET_COLORS
 from .converter import Converter
 
 
@@ -17,6 +17,9 @@ def resetColors(prop_group, context):
 
     for k, v in getTextColors(context).items():
         setattr(prop_group, k, v)
+
+    for k, v in getSocketColors().items():
+        setattr(prop_group, k, colorStringToArray(v))
     
     prop_group.header_opacity = HEADER_OPACITY
     prop_group.use_generic_text = False
@@ -127,6 +130,9 @@ def dumpProperties(group) -> dict:
     for name in ['text_'+x for x in TEXTS]:
         output[name] = getattr(group, name)[0:]
 
+    for name in ['socket_color'+x.lower() for x in SOCKET_COLORS.keys()]:
+        output[name] = getattr(group, name)[0:]
+
     return output
 
 def loadProperties(json_string, group):
@@ -160,3 +166,33 @@ class UIConfigImportOperator(bpy.types.Operator):
 
             return {'FINISHED'}
 operators.append(UIConfigImportOperator)
+
+class UIAllNodesSizeOperator(bpy.types.Operator):
+    bl_idname = 'ui.test_size'
+    bl_label = 'Test size'
+    bl_description = "Finds the size of each Node's SVG representation"
+
+    def execute(self, context):
+
+        prefs = context.preferences.addons[__package__].preferences
+        
+        old_select = prefs.export_selected_only
+
+        prefs.export_selected_only = True
+
+        for node in context.space_data.node_tree.nodes:
+            bpy.ops.node.select_all(action='DESELECT')
+            node.select = True
+
+            print(Converter(context).convert())
+
+            print('====')
+
+        prefs.export_selected_only = old_select
+
+        return {'FINISHED'}
+operators.append(UIAllNodesSizeOperator)
+
+
+
+
