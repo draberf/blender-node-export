@@ -20,7 +20,7 @@ bl_info = {
 if "bpy" in locals():
     files = [
         'constants', 'methods', 'widgets',
-        'categories', 'header', 'shape',
+        'categories', 'header', 'marker',
         'node', 'converter', 'property_group',
         'panels', 'operators'
     ]
