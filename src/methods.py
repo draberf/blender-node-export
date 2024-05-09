@@ -179,3 +179,10 @@ def insertIntoSortedByKey(e, arr, key) -> list:
     else:
         return insertIntoSortedByKey(e, arr[:midpoint-1], key) + arr[midpoint-1:]
 
+def colorStringToArray(color: str) -> tuple[float, float, float]:
+    arr = []
+
+    for i in range(1,6,2):
+        arr.append(int(color[i:i+2], 16)/256)
+
+    return arr
