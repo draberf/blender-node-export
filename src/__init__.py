@@ -32,23 +32,6 @@ bl_info = {
     "category": "Import-Export"
 }
 
-# this helps with reloads
-# https://blender.stackexchange.com/questions/28504/blender-ignores-changes-to-python-scripts/28505#28505
-if "bpy" in locals():
-    files = [
-        'constants', 'methods', 'widgets',
-        'categories', 'header', 'marker',
-        'node', 'converter', 'property_group',
-        'panels', 'operators'
-    ]
-    import importlib
-    for file in files:
-        if file in locals():
-            importlib.reload(eval(file))
-        else:
-            print(f"file {file} not in locals")
-            print(locals())
-
 import bpy
 from . import property_group, panels, operators
 import sys, importlib
