@@ -170,3 +170,4 @@ src/*_old.py
 *.pdf
 *.zip
 *.conf
+*.csv
