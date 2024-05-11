@@ -162,6 +162,7 @@ cython_debug/
 # custom ignores:
 all_nodes.txt
 checklist.txt
+stats.txt
 install.sh
 src/*_old.py
 *.svg
