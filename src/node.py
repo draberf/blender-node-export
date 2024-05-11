@@ -381,6 +381,8 @@ class UIHiddenNode(UINodeSpecified):
             # add to anchor
             self.anchors[socket.as_pointer()] = (x, y, UIShape(socket))
 
+            self.color=colors[self.color_class]
+
     def svg(self, header_opacity, use_gradient=False):
 
         # create group
