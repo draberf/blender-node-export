@@ -19,6 +19,7 @@ This file is part of Node Exporter to SVG.
 '''
 
 import bpy, json
+import xml.etree.ElementTree as ET
 
 from .methods import getElementColors, getCategoryColors, getTextColors, getSocketColors, colorStringToArray
 from .constants import HEADER_OPACITY, IGNORE_PROPS, ELEMENTS, CATEGORY_NAMES, TEXTS, SOCKET_COLORS
@@ -52,7 +53,7 @@ class UIInspectOperator(bpy.types.Operator):
 
     def execute(self, context):
         
-        print("====")
+        print("====genus")
 
 
         if not (nodes := context.selected_nodes):
@@ -60,14 +61,17 @@ class UIInspectOperator(bpy.types.Operator):
             return {'CANCELLED'}
 
         for node in nodes:
+            print("")
             print(">>>", node.bl_idname, node.name, node.dimensions)
             print("Inputs:")
             for input   in node.outputs:
+                break
                 print(">", input.name, input.hide, input.enabled, input.is_unavailable)
                 for prop in input.bl_rna.properties:
                     print(">>", prop.name, getattr(input, prop.identifier))
                         
             for input in node.inputs:
+                break
                 print(">", input.name)
                 for prop in input.bl_rna.properties:
                     print(">>>", prop, prop.type, prop.subtype, "name", prop.name, '    ', getattr(input, prop.identifier))
@@ -78,9 +82,6 @@ class UIInspectOperator(bpy.types.Operator):
             for prop in node.bl_rna.properties:
                 if prop.identifier in IGNORE_PROPS: continue
                 print(">", prop, prop.type, prop.subtype, "name", prop.name)
-                if prop.type == "ENUM":
-                    for key, item in prop.enum_items.items():
-                        print(">>", key, item.name, item.identifier)
                 #for attr in prop.bl_rna.properties:
                 #    print("> >", attr, ":  ", getattr(prop, attr.identifier))
     
@@ -200,19 +201,46 @@ class UIAllNodesSizeOperator(bpy.types.Operator):
 
         prefs.export_selected_only = True
 
-        for node in context.space_data.node_tree.nodes:
-            bpy.ops.node.select_all(action='DESELECT')
-            node.select = True
+        abs_path = bpy.path.abspath(context.preferences.addons[__package__].preferences.output )
 
-            print(Converter(context).convert())
+        with open(abs_path, "w+") as f:
 
-            print('====')
+            for node in [n for n in context.space_data.node_tree.nodes if n.select]:
+                bpy.ops.node.select_all(action='DESELECT')
+                node.select = True
+
+                tree = Converter(context).convert()
+                tree.getroot().remove(tree.getroot()[0])
+                ET.indent(tree)
+                s = ET.tostring(tree.getroot())
+                f.write(node.bl_idname+','+str(len(s.split(b'\n')))+','+str(len(s))+'\n')
+
+                
 
         prefs.export_selected_only = old_select
 
         return {'FINISHED'}
 operators.append(UIAllNodesSizeOperator)
 
+class UITimeOperator(bpy.types.Operator):
+    bl_idname = 'ui.test_time'
+    bl_label = 'Test time'
+    bl_description = "Profiles export of the selected Nodes."
 
+    def execute(self, context):
+        
+        import cProfile
 
+        profile = cProfile.Profile()
 
+        profile.enable()
+
+        for _ in range(1000):
+            bpy.ops.ui.exporter()
+
+        profile.disable()
+
+        profile.print_stats()
+
+        return {'FINISHED'}
+operators.append(UITimeOperator)
