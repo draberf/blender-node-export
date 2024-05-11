@@ -115,6 +115,10 @@ class UINode():
 
         self.muted = node.mute
 
+        self.id = node.name.replace(' ', '_')
+
+        self.anchors = {}
+
     def svg(self, header_opacity=60, use_gradient=False) -> None | ET.Element:
         return None
     
@@ -177,9 +181,6 @@ class UINodeRegular(UINodeSpecified):
         # new Widget stack method + coords
         self.height_widget_pairs = []
         self.height = self.uiheader.height + constants.TOP_PADDING
-
-        # for identifying widgets
-        self.id = node.name.replace(' ', '_')
 
         def registerWidget(widget):
             self.height_widget_pairs.append((self.height, widget))
