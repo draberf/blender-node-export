@@ -921,6 +921,12 @@ NODE_SPECIFICATIONS = {
             dropdown(node, 'domain')
         ]
     },
+    'GeometryNodeBlurAttribute': {
+        'class': 'attribute_node',
+        'props': lambda node, _: [
+            dropdown(node, 'data_type')
+        ]
+    },
 
 
     # Geometry > Color
@@ -1129,6 +1135,37 @@ NODE_SPECIFICATIONS = {
     'GeometryNodeSetPosition': {
         'class': 'geometry_node'
     },
+    'GeometryNodeProximity': {
+        'class': 'geometry_node',
+        'props': lambda node, _: [
+            dropdown(node, 'target_element')
+        ]
+    },
+    'GeometryNodeIndexOfNearest': {
+        'class': 'converter_node'
+    },
+    'GeometryNodeBake': {
+        'class': 'geometry_node',
+        'props': lambda node, _: [
+            widgets.SelectBar(options=['Animation', 'Still'], select_index=-1),
+            widgets.SelectBar(options=['Bake'], select_index=-1)
+        ]
+    },
+    'GeometryNodeSortElements': {
+        'class': 'geometry_node',
+        'props': lambda node, _: [
+            dropdown(node, 'domain')
+        ]
+    },
+    'GeometryNodeTransformGeometry': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodeSplitToInstances': {
+        'class': 'geometry_node',
+        'props': lambda node, _: [
+            dropdown(node, 'domain')
+        ]
+    },
 
     # Geometry > Input
 
@@ -1210,6 +1247,196 @@ NODE_SPECIFICATIONS = {
     },
     'GeometryNodeInputSceneTime': {
         'class': 'input_node'
+    },
+    'GeometryNodeInputActiveCamera': {
+        'class': 'input_node'  
+    },
+    'GeometryNodeImageInfo': {
+        'class': 'input_node'
+    },
+
+    # Geometry > Curves (as of 4.1)
+    
+    'GeometryNodeInputCurveHandlePositions': {
+        'class': 'input_node'
+    },
+    'GeometryNodeInputTangent': {
+        'class': 'input_node'
+    },
+    'GeometryNodeInputCurveTilt': {
+        'class': 'input_node'
+    },
+    'GeometryNodeCurveEndpointSelection': {
+        'class': 'input_node'
+    },
+    'GeometryNodeCurveHandleTypeSelection': {
+        'class': 'input_node',
+        'props': lambda node, _: [
+            widgets.SelectBar(['Left', 'Right'], -1),
+            dropdown(node, 'handle_type')
+        ]
+    },
+    'GeometryNodeInputSplineCyclic': {
+        'class': 'input_node'
+    },
+    'GeometryNodeSplineLength': {
+        'class': 'input_node'
+    },
+    'GeometryNodeSplineParameter': {
+        'class': 'input_node'
+    },
+    'GeometryNodeInputSplineResolution': {
+        'class': 'input_node'
+    },
+    'GeometryNodeSetCurveNormal': {
+        'class': 'geometry_node',
+        'props': lambda node, _: [
+            dropdown(node, 'mode')
+        ]
+    },
+    'GeometryNodeSetCurveRadius': {
+        'class': 'geometry_node',
+    },
+    'GeometryNodeSetCurveTilt': {
+        'class': 'geometry_node',
+    },
+    'GeometryNodeSetCurveHandlePositions': {
+        'class': 'geometry_node',
+        'props': lambda node, _: [
+            selectBar(node, 'mode')
+        ]
+    },
+    'GeometryNodeCurveSetHandles': {
+        'class': 'geometry_node',
+        'props': lambda node, _: [
+            widgets.SelectBar(options=['Left', 'Right'], select_index=0),
+            dropdown(node, 'handle_type')
+        ]
+    },
+    'GeometryNodeSetSplineCyclic': {
+        'class': 'geometry_node',
+    },
+    'GeometryNodeSetSplineResolution': {
+        'class': 'geometry_node',
+    },
+    'GeometryNodeCurveSplineType': {
+        'class': 'geometry_node',
+        'props': lambda node, _: [
+            dropdown(node, 'spline_type')
+        ]
+    },
+    'GeometryNodeInterpolateCurves': {
+        'class': 'geometry_node'
+    },
+    'GeometryNodePrimitiveBezierSegment': {
+        'class': 'geometry_node',
+        'props': lambda node, _: [
+            selectBar(node, 'mode')
+        ]
+    },
+    'GeometryNodeQuadraticBezier': {
+        'class': 'geometry_node',
+    },
+
+    # Geometry > Mesh
+
+    'GeometryNodeEdgesToFaceGroups': {
+        'class': 'input_node'
+    },
+    'GeometryNodeMeshFaceSetBoundaries': {
+        'class': 'input_node'
+    },
+    'GeometryNodeInputMeshFaceIsPlanar': {
+        'class': 'input_node'
+    },
+    'GeometryNodeInputShadeSmooth': {
+        'class': 'input_node'
+    },
+    'GeometryNodeInputEdgeSmooth': {
+        'class': 'input_node'
+    },
+    'GeometryNodeCornersOfEdge': {
+        'class': 'input_node'
+    },
+
+    # Geometry > Points
+
+    'GeometryNodePointsToCurves': {
+        'class': 'geometry_node'
+    },
+
+    # Geometry > Simulation
+    
+    'GeometryNodeSimulationInput': {
+        'class': 'group_node'
+    },
+    'GeometryNodeSimulationOutput': {
+        'class': 'group_node'
+    },
+    
+    # Geometry > Utilities
+
+    'GeometryNodeFieldAtIndex': {
+        'class': 'converter_node',
+        'props': lambda node, _: [
+            dropdown(node, 'data_type'),
+            dropdown(node, 'domain')
+        ]
+    },
+    'GeometryNodeFieldOnDomain': {
+        'class': 'converter_node',
+        'props': lambda node, _: [
+            dropdown(node, 'data_type'),
+            dropdown(node, 'domain')
+        ]
+    },
+    'FunctionNodeAxisAngleToRotation': {
+        'class': 'converter_node'
+    },
+    'FunctionNodeEulerToRotation': {
+        'class': 'converter_node'
+    },
+    'FunctionNodeInvertRotation': {
+        'class': 'converter_node'
+    },
+    'FunctionNodeRotateRotation': {
+        'class': 'converter_node',
+        'props': lambda node, _: [
+            selectBar(node, 'rotation_space')
+        ]
+    },
+    'FunctionNodeRotateVector': {
+        'class': 'converter_node'
+    },
+    'FunctionNodeRotationToAxisAngle': {
+        'class': 'converter_node'
+    },
+    'FunctionNodeRotationToEuler': {
+        'class': 'converter_node'
+    },
+    'FunctionNodeRotationToQuaternion': {
+        'class': 'converter_node'
+    },
+    'FunctionNodeQuaternionToRotation': {
+        'class': 'converter_node'
+    },
+    'GeometryNodeIndexSwitch': {
+        'class': 'converter_node',
+        'props': lambda node, _: [
+            dropdown(node, 'data_type')
+        ]
+    },
+    'GeometryNodeMenuSwitch': {
+        'class': 'converter_node',
+        'props': lambda node, _: [
+            dropdown(node, 'data_type')
+        ]
+    },
+    'GeometryNodeRepeatInput': {
+        'class': 'group_node'
+    },
+    'GeometryNodeRepeatOutput': {
+        'class': 'group_node'
     },
     
     # Geometry > Instances
