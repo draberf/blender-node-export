@@ -164,7 +164,7 @@ all_nodes.txt
 checklist.txt
 stats.txt
 install.sh
-src/*_old.py
+*.py
 *.svg
 *.png
 *.pdf
