@@ -229,4 +229,10 @@ class UIInspectPanel(UIPanel):
             icon='NODE',
             text='Test Size'
         )
+
+        layout.operator(
+            operator='ui.test_time',
+            icon='NODE',
+            text='Test Time'
+        )
 panels.append(UIInspectPanel)
