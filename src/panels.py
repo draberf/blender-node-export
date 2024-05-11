@@ -33,6 +33,7 @@ panels = []
 class UIPanel(bpy.types.Panel):
     bl_space_type = 'NODE_EDITOR'
     bl_region_type = 'UI'
+    bl_options = {'DEFAULT_CLOSED'}
 
 class UIColorPanel(UIPanel):
     bl_parent_id = 'NODE_EDITOR_PT_color_parent'
@@ -46,6 +47,7 @@ class UIParentPanel(UIPanel):
     bl_category = "Export"
     bl_idname = "NODE_EDITOR_PT_export_parent"
     bl_label = "Export to SVG"
+    bl_options = set()
 
     def draw(self, context):
         ...
@@ -57,6 +59,7 @@ class UIQualityPanel(UIPanel):
     bl_parent_id = 'NODE_EDITOR_PT_export_parent'
     bl_idname = "NODE_EDITOR_PT_quality"
     bl_label = "Detail"
+    bl_options = set()
 
     def draw(self, context):
         
@@ -197,6 +200,7 @@ class UIInspectPanel(UIPanel):
     bl_parent_id = 'NODE_EDITOR_PT_export_parent'
     bl_idname = "NODE_EDITOR_PT_export"
     bl_label = "Export"
+    bl_options = set()
 
     def draw(self, context):
 
