@@ -1227,6 +1227,12 @@ NODE_SPECIFICATIONS = {
     'GeometryNodeInputID': {
         'class': 'input_node'
     },
+    'GeometryNodeInputImage': {
+        'class': 'input_node',
+        'props': lambda node, _: [
+            image(node.image)
+        ]
+    },
     'GeometryNodeInputIndex': {
         'class': 'input_node'
     },
