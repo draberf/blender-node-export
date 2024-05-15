@@ -1,6 +1,8 @@
 # blender-node-export
 A Blender extension to export Node Graphs to SVG
 
+[See it in action!](https://youtu.be/KYiybW2WdeE)
+
 # Installation
 For curated archives to install through Blender's add-on manager, go to the [Release tags](https://github.com/draberf/blender-node-export/tags).
 
