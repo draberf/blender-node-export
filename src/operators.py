@@ -104,7 +104,7 @@ class UIExportOperator(bpy.types.Operator):
 
         tree = Converter(context).convert()
         
-        abs_path = bpy.path.abspath(context.preferences.addons[__package__].preferences.output )
+        abs_path = bpy.path.abspath(context.preferences.addons[__package__].preferences.output)
 
         with open(abs_path, "w+") as f:
             f.write(header)
@@ -114,7 +114,6 @@ class UIExportOperator(bpy.types.Operator):
         def draw(self, _):
             self.layout.label(text = f'Succesfully exported graph to {abs_path}.')
 
-        # https://blender.stackexchange.com/questions/109711/how-to-popup-simple-message-box-from-python-console
         context.window_manager.popup_menu(draw, title='Success', icon = 'INFO')
 
         return {'FINISHED'}
@@ -151,7 +150,7 @@ def dumpProperties(group) -> dict:
     for name in ['text_'+x for x in TEXTS]:
         output[name] = getattr(group, name)[0:]
 
-    for name in ['socket_color'+x.lower() for x in SOCKET_COLORS.keys()]:
+    for name in ['socket_color_'+x.lower() for x in SOCKET_COLORS.keys()]:
         output[name] = getattr(group, name)[0:]
 
     return output
@@ -231,15 +230,16 @@ class UITimeOperator(bpy.types.Operator):
         
         import cProfile
 
-        profile = cProfile.Profile()
+        profile = cProfile.Profile(builtins=False)
 
         profile.enable()
 
-        for _ in range(1000):
+        for _ in range(10000):
             bpy.ops.ui.exporter()
 
         profile.disable()
 
+        #profile.dump_stats(bpy.path.abspath(context.preferences.addons[__package__].preferences.output+'_stats.txt'))
         profile.print_stats()
 
         return {'FINISHED'}
