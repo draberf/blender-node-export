@@ -1188,7 +1188,7 @@ NODE_SPECIFICATIONS = {
     'FunctionNodeInputInt': {
         'class': 'input_node',
         'props': lambda node, _: [
-            widgets.Value(name="", value=node.outputs[0].default_value)
+            widgets.Value(name="", value=(node.integer if 'integer' in node.bl_rna.properties else node.outputs[0].default_value))
         ]
     },
     'GeometryNodeIsViewport': {
