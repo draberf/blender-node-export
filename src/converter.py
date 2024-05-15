@@ -107,6 +107,7 @@ class Converter():
         }
 
         widgets.PROPERTIES = widget_args
+        widgets.FLAGS = set()
 
         widget_args['scale'] = context.preferences.view.ui_scale
 
@@ -250,48 +251,50 @@ class Converter():
             arrow = ET.SubElement(symbol, elem_name, attrib=elem_attrs)
 
         ## color wheel
-        color_wheel = ET.SubElement(defs, 'symbol', id='color_wheel')
-        ### add 'cloud' over gradient
-        cloud_lin = ET.SubElement(color_wheel, 'linearGradient', id='cloud_gradient_linear')
-        ET.SubElement(cloud_lin, 'stop', attrib={'offset':   '0', 'stop-opacity':'1'  , 'stop-color':'white'})
-        ET.SubElement(cloud_lin, 'stop', attrib={'offset': '0.6', 'stop-opacity':'0.5', 'stop-color':'white'})
-        ET.SubElement(cloud_lin, 'stop', attrib={'offset': '1.0', 'stop-opacity':'0'  , 'stop-color':'white'})
-        cloud = ET.SubElement(color_wheel, 'radialGradient', attrib={
-            'id':'cloud_gradient',
-            'xlink:href':'#cloud_gradient_linear',
-            'cx':'0',
-            'cy':'0',
-            'fx':'0',
-            'fy':'0',
-            'r':'50',
-            'gradientUnits':'userSpaceOnUse'
-        })
-        radius=50
-        grp = ET.SubElement(color_wheel, 'g', transform=f'translate({radius},{radius})')
-        steps=2*self.quality
-        def angleToCoords(angle):
-            return radius*cos(angle), radius*sin(angle)
-        for i in range(steps):
-            angle_start = i*2*pi/steps
-            angle_end = (i+1)*2*pi/steps
-            point1_x, point1_y = angleToCoords(angle_start)
-            point2_x, point2_y = angleToCoords(angle_end)
-            color = methods.socketColorToSVGColor(hsv_to_rgb((0.75 + i/steps), 1.0, 1.0))
-            fill = color
-            if self.use_gradient:
-                next_color = methods.socketColorToSVGColor(hsv_to_rgb((0.75 + (i+1)/steps), 1.0, 1.0))
-                grad = ET.SubElement(grp, 'linearGradient', id=f'color_wheel_grad_{i}', gradientUnits='userSpaceOnUse', x1=str(point1_x), x2=str(point2_x), y1=str(point1_y), y2=str(point2_y))
-                ET.SubElement(grad, 'stop', attrib={'offset':'0%', 'stop-color':color})
-                ET.SubElement(grad, 'stop', attrib={'offset':'100%', 'stop-color':next_color})
-                fill = f'url(#color_wheel_grad_{i})'
-            ET.SubElement(grp, 'polygon', points=f"0 0 {point1_x} {point1_y} {point2_x} {point2_y}", style=f"fill:{fill}; stroke:none")
-        ET.SubElement(grp, 'circle', cx='0', cy='0', r=str(radius), fill='url(#cloud_gradient)')
+        if 'COLOR_PICKER' in widgets.FLAGS:
+            color_wheel = ET.SubElement(defs, 'symbol', id='color_wheel')
+            ### add 'cloud' over gradient
+            cloud_lin = ET.SubElement(color_wheel, 'linearGradient', id='cloud_gradient_linear')
+            ET.SubElement(cloud_lin, 'stop', attrib={'offset':   '0', 'stop-opacity':'1'  , 'stop-color':'white'})
+            ET.SubElement(cloud_lin, 'stop', attrib={'offset': '0.6', 'stop-opacity':'0.5', 'stop-color':'white'})
+            ET.SubElement(cloud_lin, 'stop', attrib={'offset': '1.0', 'stop-opacity':'0'  , 'stop-color':'white'})
+            cloud = ET.SubElement(color_wheel, 'radialGradient', attrib={
+                'id':'cloud_gradient',
+                'xlink:href':'#cloud_gradient_linear',
+                'cx':'0',
+                'cy':'0',
+                'fx':'0',
+                'fy':'0',
+                'r':'50',
+                'gradientUnits':'userSpaceOnUse'
+            })
+            radius=50
+            grp = ET.SubElement(color_wheel, 'g', transform=f'translate({radius},{radius})')
+            steps=2*self.quality
+            def angleToCoords(angle):
+                return radius*cos(angle), radius*sin(angle)
+            for i in range(steps):
+                angle_start = i*2*pi/steps
+                angle_end = (i+1)*2*pi/steps
+                point1_x, point1_y = angleToCoords(angle_start)
+                point2_x, point2_y = angleToCoords(angle_end)
+                color = methods.socketColorToSVGColor(hsv_to_rgb((0.75 + i/steps), 1.0, 1.0))
+                fill = color
+                if self.use_gradient:
+                    next_color = methods.socketColorToSVGColor(hsv_to_rgb((0.75 + (i+1)/steps), 1.0, 1.0))
+                    grad = ET.SubElement(grp, 'linearGradient', id=f'color_wheel_grad_{i}', gradientUnits='userSpaceOnUse', x1=str(point1_x), x2=str(point2_x), y1=str(point1_y), y2=str(point2_y))
+                    ET.SubElement(grad, 'stop', attrib={'offset':'0%', 'stop-color':color})
+                    ET.SubElement(grad, 'stop', attrib={'offset':'100%', 'stop-color':next_color})
+                    fill = f'url(#color_wheel_grad_{i})'
+                ET.SubElement(grp, 'polygon', points=f"0 0 {point1_x} {point1_y} {point2_x} {point2_y}", style=f"fill:{fill}; stroke:none")
+            ET.SubElement(grp, 'circle', cx='0', cy='0', r=str(radius), fill='url(#cloud_gradient)')
 
         ## hue correct gradient
-        grad = ET.SubElement(defs, 'linearGradient', id='hc_grad', x1='0', x2='1', y1='0', y2='0')
-        for i in range(7):
-            prog = i/6.0
-            ET.SubElement(grad, 'stop', attrib={'offset':  str(prog), 'stop-color':methods.socketColorToSVGColor(hsv_to_rgb(prog, 1.0, 1.0))})
+        if 'HUE_GRADIENT' in widgets.FLAGS:
+            grad = ET.SubElement(defs, 'linearGradient', id='hc_grad', x1='0', x2='1', y1='0', y2='0')
+            for i in range(7):
+                prog = i/6.0
+                ET.SubElement(grad, 'stop', attrib={'offset':  str(prog), 'stop-color':methods.socketColorToSVGColor(hsv_to_rgb(prog, 1.0, 1.0))})
 
 
         return defs

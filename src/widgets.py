@@ -34,6 +34,7 @@ DEFAULT_WIDTH = 100.0
 DEFAULT_PADDING = 0.06
 
 PROPERTIES = {}
+FLAGS = set()
 
 def dropdown(node, prop, label="") -> 'Widget':
     if not label:
@@ -493,6 +494,7 @@ class ColorPicker(Widget):
     def __init__(self, color=[1.0,0.0,0.0], **kwargs) -> None:
         super().__init__(**kwargs)
         self.color = color
+        FLAGS.add('COLOR_PICKER')
 
     def height(self) -> float:
         return 90.0
@@ -570,6 +572,7 @@ class Curves(Widget):
         super().__init__()
         self.curves = curves
         self.hue_background = hue_background
+        if hue_background: FLAGS.add('HUE_GRADIENT')
 
     def height(self) -> float:
         return 8 * constants.LINKED_SOCKET_HEIGHT
