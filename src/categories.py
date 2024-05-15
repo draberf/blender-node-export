@@ -2363,6 +2363,12 @@ NODE_SPECIFICATIONS = {
             dropdown(node, 'vector_type', "Type:")
         ]
     },
+    'ShaderNodeNormal': {
+        'class': 'vector_node',
+        'props': lambda node, _: [
+            widgets.Vector(values=node.outputs[0].default_value),
+        ]
+    },
     'ShaderNodeNormalMap': {
         'class': 'vector_node',
         'props': lambda node, _: [
