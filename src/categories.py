@@ -1212,7 +1212,7 @@ NODE_SPECIFICATIONS = {
     'FunctionNodeInputString': {
         'class': 'input_node',
         'props': lambda node, _: [
-            widgets.String(value=node.outputs[0].default_value)
+            widgets.String(value=node.string if 'string' in node.bl_rna.properties else node.outputs[0].default_value)
         ]
     },
     # ShaderNodeValue    
