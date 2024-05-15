@@ -148,7 +148,6 @@ class UIColorHeaderPanel(UIColorPanel):
         layout = self.layout
         props = context.preferences.addons[__package__].preferences
 
-        # https://blender.stackexchange.com/questions/41387/how-to-deactivate-a-ui-element-in-an-add-on
         for color_name in ['header_color_'+name for name in CATEGORY_NAMES]+['header_opacity']:
             layout.prop(props, color_name)
 panels.append(UIColorHeaderPanel)
