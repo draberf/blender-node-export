@@ -108,6 +108,8 @@ class Converter():
 
         widgets.PROPERTIES = widget_args
 
+        widget_args['scale'] = context.preferences.view.ui_scale
+
         self.nodes = []
         self.node_frames = []
 
