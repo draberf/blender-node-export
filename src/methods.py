@@ -31,12 +31,14 @@ def blColorToSVGColor(color: mathutils.Color) -> str:
     r, g, b = color.r, color.g, color.b
     # compliant with specification at p85
     return "rgb("+",".join([str(round(x*255)) for x in [r,g,b]])+")"
-
-# from https://github.com/blender/blender/blob/594f47ecd2d5367ca936cf6fc6ec8168c2b360d0/source/blender/blenlib/intern/math_color.c
 def colorCorrect(value: float) -> float:
     if bpy.data.scenes[0].display_settings.display_device == 'sRGB': return linearRGBtoSRGB(value)
     return value
 
+
+# based on: https://github.com/blender/blender/blob/594f47ecd2d5367ca936cf6fc6ec8168c2b360d0/source/blender/blenlib/intern/math_color.c
+# (which is Blender's source code)
+# it is distributed under the same license as this add-on
 def linearRGBtoSRGB(value: float) -> float:
   if value < 0.0031308:
     return 0.0 if value < 0.0 else value * 12.92
