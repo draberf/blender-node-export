@@ -77,9 +77,9 @@ def nodeFactory(n, colors, args) -> node.UINode:
 
     match n.bl_idname:
         case 'NodeFrame':
-            return node.UIFrameNode(n)
+            return node.UIFrameNode(n, args=args)
         case 'NodeReroute':
-            return node.UIRedirectNode(n, colors=colors)
+            return node.UIRedirectNode(n, colors=colors, args=args)
         case _:
             if n.hide: return node.UIHiddenNode(n, colors=colors, args=args)
             return node.UINodeRegular(n, colors=colors, args=args)
