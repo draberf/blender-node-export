@@ -221,21 +221,21 @@ class UIInspectPanel(UIPanel):
             text='Export'
         )
 
-        layout.operator(
-            operator='ui.inspector',
-            icon='NODE',
-            text='Inspect Selected'
-        )
+        #layout.operator(
+        #    operator='ui.inspector',
+        #    icon='NODE',
+        #    text='Inspect Selected'
+        #)
 
-        layout.operator(
-            operator='ui.test_size',
-            icon='NODE',
-            text='Test Size'
-        )
+        #layout.operator(
+        #    operator='ui.test_size',
+        #    icon='NODE',
+        #    text='Test Size'
+        #)
 
-        layout.operator(
-            operator='ui.test_time',
-            icon='NODE',
-            text='Test Time'
-        )
+        #layout.operator(
+        #    operator='ui.test_time',
+        #    icon='NODE',
+        #    text='Test Time'
+        #)
 panels.append(UIInspectPanel)
