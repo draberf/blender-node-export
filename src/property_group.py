@@ -235,3 +235,10 @@ class ExportPropertyGroup(bpy.types.AddonPreferences):
             (page, page, "") for page in PAGES.keys()
         ], default='A4'
     )
+
+    # target file to export into
+    import_file: bpy.props.StringProperty(
+        name = "Import",
+        description = "Source file of Node graph",
+        subtype='FILE_PATH'
+    )
