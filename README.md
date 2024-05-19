@@ -29,6 +29,8 @@ To export the current Node graph, navigate to the Export to SVG > Export panel, 
 
 **Save/Load Configuration** -- Export your current options to a configuration file ("Save"), or overwrite your current options with new ones from a configuration file ("Load").
 
+**Import** -- Import layout of Nodes from an existing SVG exported using this add-on. NOTE: Only works on exported trees from 0.3.2 onwards. No precautions are in place for XML parsing security.
+
 ## Color Options
 
 **Colors > Use Theme colors** -- The output's appearance will imitate your Blender Theme. While this box is checked, all the other options are ignored and hidden from the user interface.
