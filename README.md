@@ -19,6 +19,8 @@ To export the current Node graph, navigate to the Export to SVG > Export panel, 
 
 **Export > Export Selected Only** -- Only selected Nodes and their mutual links will be exported. If the option is checked but no Node is selected, the whole graph is exported.
 
+**Export > Limit by Viewport** -- Exclude Nodes from the export which are not visible in the editor. **NOTE:** The behavior of this option is inconsistent around the edges, but should exclude Nodes way out of your screen.
+
 **Detail > Element Quality** -- Certain widgets (Color Picker, Ramp, Curves) are only imitated in the SVG. This setting lets you choose the quality of the imitation at the cost of larger output file.
 
 **Detail > Use Gradients** -- Add gradients to certain widgets (Color Picker, Ramp) to improve their appearance at the cost of larger output file.
@@ -44,3 +46,10 @@ To export the current Node graph, navigate to the Export to SVG > Export panel, 
 **Colors > Sockets** -- Adjust the colors of markers and wires for specific value types.
 
 **Colors > Sockets > Use generic socket color** -- All scockets in the output will be rendered using the same color ("Generic"), for example for minimalist visual styles.
+
+## Size Options
+
+**Output Size > Size** -- Choose size constraint type:
+- Default: The output's scale will not be affected.
+- Custom: Specify width or height of output (in pixels).
+- Page: Limit output size to fit to a page. Choose between portrait or landscape, and define margins to reduce the dimensions by.
