@@ -18,6 +18,8 @@ This file is part of Node Exporter to SVG.
     along with this program; if not, see <https://www.gnu.org/licenses>.
 '''
 
+from math import floor
+
 # ratio of actual node frame dimensions to the bpy object
 NODE_DIM_RATIO = 0.8
 
@@ -115,3 +117,8 @@ TEXTS = (
 ROUND_CORNER = 5
 
 FRAME_NODE_PADDING = 30
+
+PAGES = {}
+PAGES.update({
+        k:(floor(787.5*(1.618**i)),1274*(1.618**i)) for k, i in zip(['A5', 'A4', 'A3', 'A2', 'A1', 'A0'], range(-1, 5))
+    })
