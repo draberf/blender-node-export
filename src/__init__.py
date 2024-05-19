@@ -22,7 +22,7 @@ bl_info = {
     "name": "Node Exporter to SVG",
     "description": "Adds operator to export a node tree into an SVG image",
     "author": "Filip Dráber",
-    "version": (0, 3, 0),
+    "version": (0, 3, 2),
     "blender": (4, 1, 0),
     "location": "Node Editor",
     "warning": "",
