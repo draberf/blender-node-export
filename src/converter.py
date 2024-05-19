@@ -28,7 +28,7 @@ import bpy
 import xml.etree.ElementTree as ET
 
 from colorsys import rgb_to_hsv, hsv_to_rgb
-from math import sin, cos, pi
+from math import sin, cos, pi, inf
 from re import search
 
 MARKER_DEFS = {
@@ -122,10 +122,37 @@ class Converter():
 
         self.anchor_refs = {}
 
-        filtered_nodes = nodetree.nodes if not props.export_selected_only else [n for n in nodetree.nodes if n.select]
+        filtered_nodes = []
+        region_w = context.region.width
+        region_h = context.region.height
+        for n in nodetree.nodes:
+            if props.export_selected_only:
+                if not n.select: continue
+            if props.export_viewport_only:
+                node_ul = n.location[0]-n.width/2, n.location[1]
+                node_lr = n.location[0]+n.width/2, n.location[1]-n.height
+                view_ul = context.region.view2d.view_to_region(*node_ul)
+                view_lr = context.region.view2d.view_to_region(*node_lr)
+                if view_ul[0] > 10000: continue
+                if view_lr[0] > region_w: continue
+                if view_ul[1] > 10000: continue
+                if view_lr[1] > region_h: continue
+            filtered_nodes.append(n)
         if not filtered_nodes:
             filtered_nodes = nodetree.nodes
 
+        # size limits?
+        self.size_limits = True
+        match props.export_dimensions_enum:
+            case 'CUSTOM':
+                self.max_width  = props.export_dim_custom_width  if props.export_dim_custom_select == 'WIDTH'  else inf
+                self.max_height = props.export_dim_custom_height if props.export_dim_custom_select == 'HEIGHT' else inf
+            case 'PAGE':
+                page_dims = constants.PAGES[props.export_dim_page_type]
+                self.max_width  = (page_dims[1] if props.export_dim_page_landscape else page_dims[0]) * (100 - props.export_dim_page_margins) / 100
+                self.max_height = (page_dims[0] if props.export_dim_page_landscape else page_dims[1]) * (100 - props.export_dim_page_margins) / 100
+            case _:
+                self.size_limits = False
 
         # process Nodes, including nesting into Frames
         top_level = []
@@ -370,6 +397,10 @@ class Converter():
         # constrain size and update properties
         svg_w = vb_w
         svg_h = vb_h
+        if self.size_limits:
+            ratio = min(self.max_width / vb_w, self.max_height / vb_h)
+            svg_w = vb_w * ratio
+            svg_h = vb_h * ratio
 
         svg.set('width',  str(svg_w))
         svg.set('height', str(svg_h))
