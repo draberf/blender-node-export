@@ -22,6 +22,7 @@ import bpy
 from re import search
 import xml.etree.ElementTree as ET
 from math import pi, inf
+import json
 
 from . import categories
 from . import constants
@@ -145,6 +146,7 @@ class UINodeSpecified(UINode):
             self.specification = categories.NODE_SPECIFICATIONS[node.bl_idname]
 
         # set display name
+        self.type = node.bl_idname
         self.name = node.name
         if node.label:
             self.name = node.label
@@ -168,6 +170,18 @@ class UINodeSpecified(UINode):
 
         # prepare anchors dictionary
         self.anchors = {}
+
+    def svg(self, header_opacity=60, use_gradient=False) -> None | ET.Element:
+        supergroup = ET.Element('g', transform=f'translate({self.x},{self.y})', id=f'{self.id}')
+        supergroup.set('class', 'spec_node')
+        meta = ET.SubElement(supergroup, 'metadata')
+        meta_dict = {
+            'type': self.type,
+            'x':    self.x,
+            'y':    -self.y,
+        }
+        meta.text = json.dumps(meta_dict)
+        return supergroup
 
     
 
@@ -219,7 +233,7 @@ class UINodeRegular(UINodeSpecified):
         self.h = max(self.h, self.height+constants.BOTTOM_PADDING)   
 
     def svg(self, header_opacity=60, use_gradient=False) -> ET.Element:
-        supergroup = ET.Element('g', transform=f'translate({self.x},{self.y})', id=f'{self.id}')
+        supergroup = super().svg(header_opacity=header_opacity, use_gradient=use_gradient)
         clip_rect = ET.Element('rect', attrib={
             'width':str(self.w),
             'height':str(self.h),
@@ -386,7 +400,8 @@ class UIHiddenNode(UINodeSpecified):
     def svg(self, header_opacity, use_gradient=False):
 
         # create group
-        group = ET.Element('g', transform=f'translate({self.x},{self.y})', id=f'{self.id}')
+        group = super().svg(header_opacity=header_opacity, use_gradient=use_gradient)
+
         if self.muted: group.set('opacity', '0.5')
         
         # add round rectangle base
