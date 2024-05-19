@@ -169,6 +169,80 @@ class UIColorSocketPanel(UIColorPanel):
             else: row.enabled = not props.use_generic_socket
 panels.append(UIColorSocketPanel)
 
+class UISizePanel(UIPanel):
+    bl_parent_id = 'NODE_EDITOR_PT_export_parent'
+    bl_idname = "NODE_EDITOR_PT_size"
+    bl_label = "Output Size"
+    
+    def draw(self, context):
+
+        layout = self.layout
+        props = context.preferences.addons[__package__].preferences
+
+        layout.prop(props, 'export_dimensions_enum')
+
+        match props.export_dimensions_enum:
+            case 'CUSTOM':
+                row = layout.row()
+                row.props_enum(props, 'export_dim_custom_select')
+                for prop_name, enum_val in zip(['export_dim_custom_width', 'export_dim_custom_height'], ['WIDTH', 'HEIGHT']):
+                    row = layout.row()
+                    row.prop(props, prop_name)
+                    row.enabled = props.export_dim_custom_select == enum_val
+            case 'PAGE':
+                layout.prop(props, 'export_dim_page_type')
+                layout.prop(props, 'export_dim_page_landscape')
+                layout.prop(props, 'export_dim_page_margins')
+            case _:
+                ...
+
+
+panels.append(UISizePanel)
+
+class UIInspectPanel(UIPanel):
+    bl_parent_id = 'NODE_EDITOR_PT_export_parent'
+    bl_idname = "NODE_EDITOR_PT_export"
+    bl_label = "Export"
+    bl_options = set()
+
+    def draw(self, context):
+
+        layout = self.layout
+        props = context.preferences.addons[__package__].preferences
+
+        layout.label(text="Export target")
+
+        layout.prop(props, 'export_selected_only')
+        layout.prop(props, 'export_visible_only')
+
+        layout.prop(props, 'output', text="")
+
+        layout.operator(
+            operator='ui.exporter',
+            icon='NODETREE',
+            text='Export'
+        )
+
+        layout.operator(
+            operator='ui.inspector',
+            icon='NODE',
+            text='Inspect Selected'
+        )
+
+        #layout.operator(
+        #    operator='ui.test_size',
+        #    icon='NODE',
+        #    text='Test Size'
+        #)
+
+        #layout.operator(
+        #    operator='ui.test_time',
+        #    icon='NODE',
+        #    text='Test Time'
+        #)
+panels.append(UIInspectPanel)
+
+
 class UIConfigPanel(UIPanel):
     bl_parent_id = 'NODE_EDITOR_PT_export_parent'
     bl_idname = "NODE_EDITOR_PT_conf"
@@ -194,48 +268,3 @@ class UIConfigPanel(UIPanel):
         load_row.enabled = (props.config_mode == 'LOAD')
 
 panels.append(UIConfigPanel)
-
-class UIInspectPanel(UIPanel):
-    bl_parent_id = 'NODE_EDITOR_PT_export_parent'
-    bl_idname = "NODE_EDITOR_PT_export"
-    bl_label = "Export"
-    bl_options = set()
-
-    def draw(self, context):
-
-        layout = self.layout
-        props = context.preferences.addons[__package__].preferences
-
-        row = layout.row()
-        row.label(text="Export target")
-
-        row = layout.row()
-        row.prop(props, 'export_selected_only')
-
-        row = layout.row()
-        row.prop(props, 'output', text="")
-
-        layout.operator(
-            operator='ui.exporter',
-            icon='NODETREE',
-            text='Export'
-        )
-
-        #layout.operator(
-        #    operator='ui.inspector',
-        #    icon='NODE',
-        #    text='Inspect Selected'
-        #)
-
-        #layout.operator(
-        #    operator='ui.test_size',
-        #    icon='NODE',
-        #    text='Test Size'
-        #)
-
-        #layout.operator(
-        #    operator='ui.test_time',
-        #    icon='NODE',
-        #    text='Test Time'
-        #)
-panels.append(UIInspectPanel)
