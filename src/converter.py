@@ -207,7 +207,9 @@ class Converter():
         
         style_elem = ET.Element('style')
 
-        style_elem.text = '\n'.join([
+        style_elem.text = '\n\t\t\t'.join([
+
+            "",
 
             # texts
             "text { font-family: sans-serif, arial; font-size: 10px; fill: "+colors['text_base']+" }",
@@ -252,7 +254,9 @@ class Converter():
             # sockets
             *([
                 ".marker ."+name.lower()+" { fill: "+colors['socket_color_'+name.lower()]+" }" for name in constants.SOCKET_COLORS.keys()
-            ])
+            ]),
+
+            ""
         ])
 
         return style_elem
