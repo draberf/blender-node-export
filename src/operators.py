@@ -110,18 +110,18 @@ class UIExportOperator(bpy.types.Operator):
 
         props = context.preferences.addons[__package__].preferences
 
-        header = "<?xml version='1.0' encoding='utf-8'?>"
+        header = b"<?xml version='1.0' encoding='utf-8'?>"
 
-        doctype = "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">"
+        doctype = b"<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">"
 
         tree = Converter(context).convert()
         
         abs_path = bpy.path.abspath(context.preferences.addons[__package__].preferences.output)
 
-        with open(abs_path, "w+") as f:
+        with open(abs_path, "wb") as f:
             f.write(header)
             f.write(doctype)
-            tree.write(f, encoding='unicode')
+            tree.write(f)
 
         def draw(self, _):
             self.layout.label(text = f'Succesfully exported graph to {abs_path}.')
