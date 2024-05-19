@@ -213,7 +213,7 @@ class UIInspectPanel(UIPanel):
         layout.label(text="Export target")
 
         layout.prop(props, 'export_selected_only')
-        layout.prop(props, 'export_visible_only')
+        layout.prop(props, 'export_viewport_only')
 
         layout.prop(props, 'output', text="")
 
