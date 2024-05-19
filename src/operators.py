@@ -53,12 +53,24 @@ class UIInspectOperator(bpy.types.Operator):
 
     def execute(self, context):
         
-        print("====genus")
+        print("====")
+
+        for obj, name in zip([context.region], ['Region']):
+            print(name)
+            for prop in obj.bl_rna.properties:
+                print('>>', prop.name, getattr(obj, prop.identifier))
 
 
         if not (nodes := context.selected_nodes):
             print("No selected node")
             return {'CANCELLED'}
+
+        for node in nodes:
+            print(node.location)
+            print(context.region.view2d.view_to_region(*node.location))
+
+        return {'FINISHED'}
+
 
         for node in nodes:
             print("")
@@ -82,8 +94,8 @@ class UIInspectOperator(bpy.types.Operator):
             for prop in node.bl_rna.properties:
                 if prop.identifier in IGNORE_PROPS: continue
                 print(">", prop, prop.type, prop.subtype, "name", prop.name)
-                #for attr in prop.bl_rna.properties:
-                #    print("> >", attr, ":  ", getattr(prop, attr.identifier))
+                for attr in prop.bl_rna.properties:
+                    print("> >", attr, ":  ", getattr(prop, attr.identifier))
     
         return {'FINISHED'}
 operators.append(UIInspectOperator)
