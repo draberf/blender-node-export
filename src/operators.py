@@ -256,3 +256,32 @@ class UITimeOperator(bpy.types.Operator):
 
         return {'FINISHED'}
 operators.append(UITimeOperator)
+
+class UINodeImportOperator(bpy.types.Operator):
+    bl_idname = 'ui.import_nodes'
+    bl_label = 'Import Nodes'
+    bl_description = "Imports Node layout from a previously exported file."
+
+    def execute(self, context):
+
+        props = context.preferences.addons[__package__].preferences
+        
+        graph = context.space_data.node_tree
+
+        tree = ET.parse(props.import_file)
+        root = tree.getroot()
+
+        for g in root.findall('{http://www.w3.org/2000/svg}g'):
+            if 'class' in g.attrib:
+                if g.attrib['class'] != 'spec_node': continue
+            else:
+                continue
+            meta = g.find('{http://www.w3.org/2000/svg}metadata')
+            meta_info = json.loads(meta.text)
+
+            new_node = graph.nodes.new(type=meta_info['type'])
+            new_node.location = meta_info['x'], meta_info['y']
+
+        return {'FINISHED'}
+operators.append(UINodeImportOperator)
+
