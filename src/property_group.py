@@ -20,7 +20,7 @@ This file is part of Node Exporter to SVG.
 
 import bpy
 
-from .constants import HEADER_OPACITY
+from .constants import HEADER_OPACITY, PAGES
 
 class ExportPropertyGroup(bpy.types.AddonPreferences):
     bl_idname = __package__
@@ -29,6 +29,13 @@ class ExportPropertyGroup(bpy.types.AddonPreferences):
     export_selected_only: bpy.props.BoolProperty(
         name="Export Selected Only",
         description="Limit export only to selected Nodes and their links. (Exports everything if nothing is selected.)",
+        default=False
+    )
+
+    # toggle whether export should exclude nodes outside viewport
+    export_viewport_only: bpy.props.BoolProperty(
+        name="Limit by Viewport",
+        description="Only include Nodes fully inside the current viewport.",
         default=False
     )
 
@@ -174,4 +181,57 @@ class ExportPropertyGroup(bpy.types.AddonPreferences):
         name = "Output",
         description = "Target file name to export graph to",
         subtype='FILE_PATH'
+    )
+
+    # export size properties
+
+    export_dimensions_enum: bpy.props.EnumProperty(
+        items=[
+            ('DEFAULT', "Default", "Use default export size"),
+            ('CUSTOM', "Custom", "Specify custom width or height"),
+            ('PAGE', "Page", "Fit output to page"),
+        ],
+        description = "Specify size of the output",
+        name = "Size", default='DEFAULT'
+    )
+
+    export_dim_custom_select: bpy.props.EnumProperty(
+        items=[
+            ('WIDTH', "Width", "Define the output width"),
+            ('HEIGHT', "Height", "Define the output height")
+        ],
+        description = "Choose whether the output's height or width is specified",
+        name = "Output dimension", default='WIDTH'
+    )
+
+    export_dim_custom_width: bpy.props.IntProperty(
+        name="Width",
+        description="Width of the output (in pixels)",
+        subtype='UNSIGNED'
+    )
+
+    export_dim_custom_height: bpy.props.IntProperty(
+        name="Height",
+        description="Height of the output (in pixels)",
+        subtype='UNSIGNED'
+    )
+
+    export_dim_page_margins: bpy.props.FloatProperty(
+        name="Margins",
+        description="Reduce output size by proportion of page dimensions",
+        subtype="PERCENTAGE",
+        default=28, soft_min=0, soft_max=100
+    )
+
+    export_dim_page_landscape: bpy.props.BoolProperty(
+        name="Landscape",
+        description="Use landscape mode instead of portrait"
+    )
+
+    export_dim_page_type: bpy.props.EnumProperty(
+        name="Format",
+        description="Choose page format",
+        items=[
+            (page, page, "") for page in PAGES.keys()
+        ], default='A4'
     )
