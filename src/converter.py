@@ -331,8 +331,8 @@ class Converter():
 
 
         # update viewbox based on rendered links
-        svg_w = self.vb_max_x-self.vb_min_x
-        svg_h = self.vb_max_y-self.vb_min_y
+        vb_w = self.vb_max_x-self.vb_min_x
+        vb_h = self.vb_max_y-self.vb_min_y
 
         # add links to final SVG
         fac = self.curving/10.0
@@ -359,17 +359,25 @@ class Converter():
             if self.curving > 0 and control_x1 > control_x2:
                 x1, x2 = methods.getBezierExtrema(from_x, control_x1, control_x2, to_x)
                 self.vb_min_x = min(self.vb_min_x, min(x1, x2))
-                svg_w = max(svg_w, max(x1-self.vb_min_x, x2-self.vb_min_x))
+                vb_w = max(vb_w, max(x1-self.vb_min_x, x2-self.vb_min_x))
+
+        self.vb_min_x -= constants.VIEWBOX_PADDING
+        self.vb_min_y -= constants.VIEWBOX_PADDING
+        vb_w += 2*constants.VIEWBOX_PADDING
+        vb_h += 2*constants.VIEWBOX_PADDING
 
 
+        # constrain size and update properties
+        svg_w = vb_w
+        svg_h = vb_h
 
         svg.set('width',  str(svg_w))
         svg.set('height', str(svg_h))
         svg.set('viewBox', ' '.join([str(f) for f in [
-            self.vb_min_x - constants.VIEWBOX_PADDING,
-            self.vb_min_y - constants.VIEWBOX_PADDING,
-            svg_w + 2*constants.VIEWBOX_PADDING,
-            svg_h + 2*constants.VIEWBOX_PADDING
+            self.vb_min_x,
+            self.vb_min_y,
+            vb_w,
+            vb_h
         ]]))        
 
         # add nodes to final SVG

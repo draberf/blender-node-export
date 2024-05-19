@@ -108,8 +108,8 @@ class UINode():
     def __init__(self, node: bpy.types.Node, colors = {}, args = {}) -> None:
         
         self.w, self.h = node.dimensions
-        self.w *= constants.NODE_DIM_RATIO / args['scale']
-        self.h *= constants.NODE_DIM_RATIO / args['scale']
+        self.w *= 1 / args['scale']
+        self.h *= 1 / args['scale']
         self.x =  node.location[0]
         self.y = -node.location[1]
 
