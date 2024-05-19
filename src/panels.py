@@ -268,3 +268,22 @@ class UIConfigPanel(UIPanel):
         load_row.enabled = (props.config_mode == 'LOAD')
 
 panels.append(UIConfigPanel)
+
+class UIImportPanel(UIPanel):
+    bl_parent_id = 'NODE_EDITOR_PT_export_parent'
+    bl_idname = "NODE_EDITOR_PT_import"
+    bl_label = "Import Node Graph"
+
+    def draw(self, context):
+
+        layout = self.layout
+        props = context.preferences.addons[__package__].preferences
+
+        layout.label(text="WARNING")
+        layout.label(text="Only import XML files you trust.")
+
+        layout.prop(props, 'import_file')
+
+        layout.operator('ui.import_nodes')
+
+panels.append(UIImportPanel)
