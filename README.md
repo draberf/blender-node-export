@@ -8,6 +8,9 @@ For a custom install, download the repository and run `make` to create a .zip ar
 
 To install the add-on into Blender, you can use Blender's built-in add-on manager: Edit > Preferences > Add-ons > Install... and select the .zip archive. Check the box next to the newly-added add-on in the list (You can find it under Import-Export, or by name 'Node Exporter To SVG').
 
+# Video
+Check out [this video](https://youtu.be/KYiybW2WdeE) to see the add-on in action.
+
 # Usage
 Once installed, you can access the add-on in the Toolbar in any Node editor. The Toolbar is on the right edge of the editor, and you can show/hide it with the `N` key. The add-on is under the Export tab.
 
