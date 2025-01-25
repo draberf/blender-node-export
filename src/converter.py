@@ -96,6 +96,7 @@ class Converter():
 
         self.colors = methods.getConfigurationFromContext(context)
 
+        self.transparent_bg = props.transparent_background
         self.quality = props.fidelity
         self.use_gradient = props.use_gradients
 
@@ -256,6 +257,9 @@ class Converter():
                 ".marker ."+name.lower()+" { fill: "+colors['socket_color_'+name.lower()]+" }" for name in constants.SOCKET_COLORS.keys()
             ]),
 
+            # background
+            ".bg { stroke-width: 0; fill:"+colors['color_background']+"}",
+
             ""
         ])
 
@@ -341,6 +345,10 @@ class Converter():
 
         svg.append(self.makeDefs())
 
+        # add background background color
+        bg = None
+        if not self.transparent_bg:
+            bg = ET.SubElement(svg, 'rect', attrib={'width': '100%', 'height': '100%', 'class': 'bg'})
 
         # add node frames to final SVG
         for frame in self.node_frames:
@@ -413,7 +421,11 @@ class Converter():
             self.vb_min_y,
             vb_w,
             vb_h
-        ]]))        
+        ]]))
+
+        if not self.transparent_bg:
+            bg.set('x', str(self.vb_min_x))        
+            bg.set('y', str(self.vb_min_y))        
 
         # add nodes to final SVG
         for n in self.nodes:

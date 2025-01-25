@@ -105,7 +105,7 @@ ELEMENTS = (
     'base', 'string_field', 'dropdown',
     'bool_false', 'bool_true', 'checkmark',
     'value_field', 'value_progress',
-    'axis_x', 'axis_y', 'axis_z'
+    'axis_x', 'axis_y', 'axis_z', 'background'
 )
 
 TEXTS = (

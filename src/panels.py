@@ -69,6 +69,7 @@ class UIQualityPanel(UIPanel):
         layout.prop(props, 'fidelity')
         layout.prop(props, 'use_gradients')
         layout.prop(props, 'rounded_corners')
+        layout.prop(props, 'transparent_background')
 panels.append(UIQualityPanel)
 
 class UIOutlinePanel(UIPanel):
@@ -229,17 +230,6 @@ class UIInspectPanel(UIPanel):
             text='Inspect Selected'
         )
 
-        #layout.operator(
-        #    operator='ui.test_size',
-        #    icon='NODE',
-        #    text='Test Size'
-        #)
-
-        #layout.operator(
-        #    operator='ui.test_time',
-        #    icon='NODE',
-        #    text='Test Time'
-        #)
 panels.append(UIInspectPanel)
 
 

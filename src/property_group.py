@@ -46,6 +46,13 @@ class ExportPropertyGroup(bpy.types.AddonPreferences):
         default=True
     )
 
+    # leave background transparent
+    transparent_background: bpy.props.BoolProperty(
+        name="Transparent Background",
+        description="Leave background transparent",
+        default=True
+    )
+
     # graphical quality of certain elements
     fidelity: bpy.props.IntProperty(
         name="Element Quality",
@@ -94,17 +101,18 @@ class ExportPropertyGroup(bpy.types.AddonPreferences):
     text_slider:            bpy.props.FloatVectorProperty(name="Slider",     subtype='COLOR_GAMMA', min=0, max=1, size=3)
 
     # node element colors
-    color_base:             bpy.props.FloatVectorProperty(name="Base",          subtype='COLOR_GAMMA', min=0, max=1, size=4)
-    color_string_field:     bpy.props.FloatVectorProperty(name="String Field",  subtype='COLOR_GAMMA', min=0, max=1, size=4)
-    color_dropdown:         bpy.props.FloatVectorProperty(name="Dropdown",      subtype='COLOR_GAMMA', min=0, max=1, size=4)
-    color_bool_false:       bpy.props.FloatVectorProperty(name="False",         subtype='COLOR_GAMMA', min=0, max=1, size=4)
-    color_bool_true:        bpy.props.FloatVectorProperty(name="True",          subtype='COLOR_GAMMA', min=0, max=1, size=4)
-    color_checkmark:        bpy.props.FloatVectorProperty(name="Checkmark",     subtype='COLOR_GAMMA', min=0, max=1, size=4)
-    color_value_field:      bpy.props.FloatVectorProperty(name="Value",         subtype='COLOR_GAMMA', min=0, max=1, size=4)
-    color_value_progress:   bpy.props.FloatVectorProperty(name="Progress Bar",  subtype='COLOR_GAMMA', min=0, max=1, size=4)
-    color_axis_x:           bpy.props.FloatVectorProperty(name="Axis X",        subtype='COLOR_GAMMA', min=0, max=1, size=3)
-    color_axis_y:           bpy.props.FloatVectorProperty(name="Axis Y",        subtype='COLOR_GAMMA', min=0, max=1, size=3)
-    color_axis_z:           bpy.props.FloatVectorProperty(name="Axis Z",        subtype='COLOR_GAMMA', min=0, max=1, size=3)
+    color_base:             bpy.props.FloatVectorProperty(name="Base",              subtype='COLOR_GAMMA', min=0, max=1, size=4)
+    color_string_field:     bpy.props.FloatVectorProperty(name="String Field",      subtype='COLOR_GAMMA', min=0, max=1, size=4)
+    color_dropdown:         bpy.props.FloatVectorProperty(name="Dropdown",          subtype='COLOR_GAMMA', min=0, max=1, size=4)
+    color_bool_false:       bpy.props.FloatVectorProperty(name="False",             subtype='COLOR_GAMMA', min=0, max=1, size=4)
+    color_bool_true:        bpy.props.FloatVectorProperty(name="True",              subtype='COLOR_GAMMA', min=0, max=1, size=4)
+    color_checkmark:        bpy.props.FloatVectorProperty(name="Checkmark",         subtype='COLOR_GAMMA', min=0, max=1, size=4)
+    color_value_field:      bpy.props.FloatVectorProperty(name="Value",             subtype='COLOR_GAMMA', min=0, max=1, size=4)
+    color_value_progress:   bpy.props.FloatVectorProperty(name="Progress Bar",      subtype='COLOR_GAMMA', min=0, max=1, size=4)
+    color_axis_x:           bpy.props.FloatVectorProperty(name="Axis X",            subtype='COLOR_GAMMA', min=0, max=1, size=3)
+    color_axis_y:           bpy.props.FloatVectorProperty(name="Axis Y",            subtype='COLOR_GAMMA', min=0, max=1, size=3)
+    color_axis_z:           bpy.props.FloatVectorProperty(name="Axis Z",            subtype='COLOR_GAMMA', min=0, max=1, size=3)
+    color_background:       bpy.props.FloatVectorProperty(name="Background Color",  subtype='COLOR',       min=0, max=1, size=3)
 
     # colors of node headers
     header_color_input:         bpy.props.FloatVectorProperty(name="Input",     subtype='COLOR_GAMMA', min=0, max=1, size=3) 
@@ -155,6 +163,7 @@ class ExportPropertyGroup(bpy.types.AddonPreferences):
 
     # colors of nodes
     node_color: bpy.props.FloatVectorProperty(name="Base Color", subtype='COLOR', min=0, max=1)
+
 
     # config file mode
     config_mode:        bpy.props.EnumProperty(

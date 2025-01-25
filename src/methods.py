@@ -118,6 +118,7 @@ def getElementColors(context):
     elem_colors['color_axis_y'] = theme.user_interface.axis_y
     elem_colors['color_axis_z'] = theme.user_interface.axis_z
     elem_colors['color_text'] = theme.user_interface.wcol_regular.text
+    elem_colors['color_background'] = theme.node_editor.space.back
 
     return elem_colors
 
