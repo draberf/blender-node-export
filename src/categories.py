@@ -1883,6 +1883,14 @@ NODE_SPECIFICATIONS = {
         'class': 'group_node'
     },
 
+    ### Geometry Nodes
+
+    'GeometryNodeGroup': {
+        'class': 'group_node',
+        'name_behavior': lambda node: node.node_tree.name,
+        'props': lambda node, _: [
+        ]
+    },
 
     ### SHADER NODES ###
 
