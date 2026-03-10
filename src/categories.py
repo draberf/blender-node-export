@@ -965,16 +965,10 @@ NODE_SPECIFICATIONS = {
         'class': 'geometry_node'
     },
     'GeometryNodeFillCurve': {
-        'class': 'geometry_node',
-        'props': lambda node, _: [
-            dropdown(node, 'mode')
-        ]
+        'class': 'geometry_node'
     },
     'GeometryNodeFilletCurve': {
-        'class': 'geometry_node',
-        'props': lambda node, _: [
-            dropdown(node, 'mode')
-        ]
+        'class': 'geometry_node'
     },
     'GeometryNodeResampleCurve': {
         'class': 'geometry_node',

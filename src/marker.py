@@ -23,14 +23,20 @@ import xml.etree.ElementTree as ET
 class UIShape():
 
     shapes = {
-        "C": "circle",
-        "D": "diamond",
-        "S": "square"
+        "C": "circle",        # CIRCLE
+        "D": "diamond",       # DIAMOND
+        "S": "square",        # SQUARE
+        "L": "circle",        # LINE - render as circle
+        "V": "diamond",       # VOLUME_GRID - render as diamond
+        "I": "square"         # LIST - render as square
     }
 
     def __init__(self, socket, render=True):
-        self.shape = self.shapes[socket.display_shape[0]]
-        self.has_dot = socket.display_shape[-1] == "T"
+        # Get first character of display_shape (CIRCLE, SQUARE, DIAMOND, LINE, etc.)
+        # The last character 'T' indicates a dot should be added (e.g., CIRCLE_DOT)
+        shape_key = socket.display_shape[0] if socket.display_shape else 'C'
+        self.shape = self.shapes.get(shape_key, "circle")
+        self.has_dot = len(socket.display_shape) > 1 and socket.display_shape.endswith("T")
         self.type = socket.type.lower()
         self.render = render
 

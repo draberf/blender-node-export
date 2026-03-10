@@ -54,7 +54,10 @@ def socketColorToSVGColor(color: list[float], corrected=True) -> str:
     
 
 def enumName(node: bpy.types.Node, enum_name: str) -> str:
-    return node.bl_rna.properties[enum_name].enum_items[getattr(node, enum_name)].name
+    prop = node.bl_rna.properties[enum_name]
+    if isinstance(prop, bpy.types.EnumProperty):
+        return prop.enum_items[getattr(node, enum_name)].name
+    return ""
 
 def getFloatString(value: float, decimal_points: int = 3) -> str:
 
@@ -124,7 +127,19 @@ def getElementColors(context):
 
 def getCategoryColors(context):
     theme = context.preferences.themes[0]
-    return {'header_color_'+name:getattr(theme.node_editor, name+'_node') for name in CATEGORY_NAMES}
+    cat_colors = {}
+    # Default gray color for categories that don't have theme colors in Blender 5.0+
+    default_color = (0.6, 0.6, 0.6)
+    
+    for name in CATEGORY_NAMES:
+        attr_name = name + '_node'
+        if hasattr(theme.node_editor, attr_name):
+            cat_colors['header_color_'+name] = getattr(theme.node_editor, attr_name)
+        else:
+            # Some categories (e.g., 'layout') were removed in Blender 5.0
+            # Use a neutral gray color for these categories
+            cat_colors['header_color_'+name] = default_color
+    return cat_colors
 
 def getSocketColors():
     elem_colors = {}
@@ -215,4 +230,4 @@ def colorStringToArray(color: str) -> tuple[float, float, float]:
     for i in range(1,6,2):
         arr.append(int(color[i:i+2], 16)/256)
 
-    return arr
+    return tuple(arr)

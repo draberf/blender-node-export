@@ -88,7 +88,8 @@ SOCKET_WIDGET_DEFS = {
     'STRING': lambda socket: widgets.String(value=socket.default_value, name=socket.name),
     'BOOLEAN': lambda socket: widgets.Boolean(name=socket.name, value=socket.default_value),
     'CUSTOM': lambda socket: widgets.Label(text=socket.name),
-    'MENU': lambda socket: widgets.String(value=socket.default_value)
+    'MENU': lambda socket: widgets.String(value=socket.default_value),
+    'MATRIX': lambda socket: widgets.Label(text=socket.name)
 }
 
 def widgetFactory(socket) -> widgets.Widget:
@@ -222,8 +223,16 @@ class UINodeRegular(UINodeSpecified):
                         if not widget: continue
                         registerWidget(widget)
                 except:
-                    print("Error when converting a prop of", node.name, "-- using Placeholder instead.")
-                    registerWidget(widgets.Placeholder())
+                    # Avoid drawing large placeholder crosses for geometry nodes
+                    # Some geometry nodes changed properties across Blender versions
+                    # and failing here would create an unnecessary X placeholder.
+                    print("Error when converting a prop of", node.name, "-- skipping placeholder for geometry node.")
+                    try:
+                        if getattr(self, 'color_class', '') != 'geometry_node':
+                            registerWidget(widgets.Placeholder())
+                    except Exception:
+                        # As a last resort, do nothing to prevent visual artifacts
+                        pass
 
         # process inputs
         for in_socket in self.inputs:
